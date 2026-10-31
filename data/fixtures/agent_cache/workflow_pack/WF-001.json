@@ -1,0 +1,87 @@
+{
+  "input_hash": "a9a3af38cd336d7ca1f4b152bd306740e63d99163de4e8f4c81b57183378f541",
+  "source": "hand_authored",
+  "model": null,
+  "duration_ms": null,
+  "output": {
+    "headline": "Move from nine approval workflows to three, with the same controls",
+    "from_count": 9,
+    "to_count": 3,
+    "proposed": [
+      {
+        "keeps": "WF-001",
+        "name": "Purchase order approval",
+        "rule": "Line manager, then budget holder",
+        "absorbs": [
+          "WF-004"
+        ],
+        "erpx_configuration": [
+          "Standard approval workflow on purchase orders",
+          "Two steps: line manager, budget holder"
+        ]
+      },
+      {
+        "keeps": "WF-002",
+        "name": "Expense approval",
+        "rule": "One approver",
+        "absorbs": [
+          "WF-005",
+          "WF-007",
+          "WF-009"
+        ],
+        "erpx_configuration": [
+          "Standard approval workflow on expenses",
+          "One step, with the approver found from the claimant"
+        ]
+      },
+      {
+        "keeps": "WF-003",
+        "name": "High-value purchase order approval",
+        "rule": "Budget holder, then finance",
+        "absorbs": [
+          "WF-008"
+        ],
+        "erpx_configuration": [
+          "Standard approval workflow on purchase orders above the value limit",
+          "Two steps: budget holder, finance approver"
+        ]
+      }
+    ],
+    "retire": [
+      "WF-006"
+    ],
+    "control_impact": [
+      "No approval step is removed from any purchase or expense",
+      "Partner, IT and overseas variants become approver rules inside the standard workflows",
+      "WF-006 is used only by a dormant entity, so no live control depends on it"
+    ],
+    "tests": [
+      {
+        "id": "W1",
+        "description": "Standard purchase order",
+        "expected": "Goes to the line manager, then the budget holder"
+      },
+      {
+        "id": "W2",
+        "description": "IT purchase, previously WF-004",
+        "expected": "Budget holder step goes to the IT budget holder"
+      },
+      {
+        "id": "W3",
+        "description": "High-value purchase order",
+        "expected": "Goes to the budget holder, then finance"
+      },
+      {
+        "id": "W4",
+        "description": "Partner expense claim, previously WF-005",
+        "expected": "Goes to the managing partner"
+      },
+      {
+        "id": "W5",
+        "description": "Purchase order raised by a dormant entity",
+        "expected": "Blocked: the entity is closed for new transactions"
+      }
+    ],
+    "decision_needed": "Ardleigh's finance lead decides whether to adopt the three workflows and retire WF-006."
+  }
+}

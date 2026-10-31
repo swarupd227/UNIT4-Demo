@@ -1,0 +1,14 @@
+{
+  "columns": ["partner_code", "partner_name", "age_0_30", "age_31_60", "age_61_90", "age_over_90", "total_wip"],
+  "filters": ["partner_code IN hard_coded_partners", "project.status = 'open'"],
+  "hard_coded_partners": [
+    "P001", "P002", "P003", "P004", "P005", "P006", "P007", "P008", "P009", "P010",
+    "P011", "P012", "P013", "P014", "P015", "P016", "P017", "P018", "P019", "P020",
+    "P021", "P022", "P023", "P024", "P025", "P026", "P027", "P028", "P029", "P030",
+    "P031", "P032", "P033", "P034", "P035", "P036", "P037", "P038", "P039", "P040",
+    "P901", "P902", "P903", "P904"
+  ],
+  "layout_last_changed": "2022-03-18",
+  "report_type": "spreadsheet_addin",
+  "tables": ["wip_item", "project", "resource_reference"]
+}

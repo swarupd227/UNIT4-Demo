@@ -1,0 +1,7 @@
+{
+  "description": "Settings for the trial load of the UK entity into the simulated ERPx target",
+  "entity": "GB01",
+  "fx_rate_decimals": 3,
+  "reporting_date": "2026-10-31",
+  "wip_excluded_project_status": ["closed"]
+}

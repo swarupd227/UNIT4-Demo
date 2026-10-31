@@ -1,0 +1,52 @@
+[
+  {
+    "issue_id": "M1", "issue_type": "Conflict", "scene": 3, "item_ref": "CC-014", "check_ref": "R8",
+    "planted": "Billing write-down threshold: 10% in code, 15% in the written policy",
+    "expected_behaviour": "Raise a customer question with both sources"
+  },
+  {
+    "issue_id": "M2", "issue_type": "Hidden dependency", "scene": 3, "item_ref": "CC-014", "check_ref": null,
+    "planted": "CC-014 reads zz_rate_override, which integration INT-09 also writes to",
+    "expected_behaviour": "Show the dependency before the item is retired or rebuilt"
+  },
+  {
+    "issue_id": "M3", "issue_type": "Wrong retire", "scene": 2, "item_ref": "RP-112", "check_ref": null,
+    "planted": "Year-end audit pack runs once a year",
+    "expected_behaviour": "Refuse to retire; send to customer"
+  },
+  {
+    "issue_id": "M4", "issue_type": "Stale logic", "scene": 4, "item_ref": "RP-077", "check_ref": "R7",
+    "planted": "WIP ageing report has a hard-coded, out-of-date partner list",
+    "expected_behaviour": "Flag during rebuild; propose using the resource reference data"
+  },
+  {
+    "issue_id": "M5", "issue_type": "Dormant use", "scene": 5, "item_ref": "WF-006", "check_ref": null,
+    "planted": "One workflow variant is used only by a dormant legal entity",
+    "expected_behaviour": "Propose retirement with the evidence"
+  },
+  {
+    "issue_id": "M6", "issue_type": "Mapping conflict", "scene": 6, "item_ref": "CF-203", "check_ref": "R6",
+    "planted": "Two accounts map to one ERPx account with different VAT codes",
+    "expected_behaviour": "Fail check R6 and list the accounts"
+  },
+  {
+    "issue_id": "M7", "issue_type": "Rounding", "scene": 6, "item_ref": null, "check_ref": "R2",
+    "planted": "Receivables differ by £1,240.50 because the revaluation rate is held at 3 decimal places",
+    "expected_behaviour": "Fail check R2 and trace the cause"
+  },
+  {
+    "issue_id": "M8", "issue_type": "Data quality", "scene": 6, "item_ref": null, "check_ref": "R4",
+    "planted": "14 closed projects still hold WIP",
+    "expected_behaviour": "Fail check R4; propose clean-up before migration"
+  },
+  {
+    "issue_id": "M9", "issue_type": "Duplicate values", "scene": 6, "item_ref": "CF-204", "check_ref": "R6",
+    "planted": "A dimension value with trailing spaces looks like two values",
+    "expected_behaviour": "Merge with consultant approval"
+  },
+  {
+    "issue_id": "M10", "issue_type": "No owner", "scene": 2, "item_ref": "CC-037", "check_ref": null,
+    "planted": "A custom code item has no documentation, no owner and no readable purpose",
+    "expected_behaviour": "Mark as needing a customer interview, not an automatic decision"
+  }
+]

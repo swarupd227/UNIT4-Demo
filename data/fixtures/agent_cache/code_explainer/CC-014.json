@@ -1,0 +1,60 @@
+{
+  "input_hash": "814817fd79a44046a033f91c2885536060e5ff28b87a024806ed4da58320b852",
+  "source": "hand_authored",
+  "model": null,
+  "duration_ms": null,
+  "output": {
+    "plain_english": "Every night this job works through a queue of billing adjustments. It reprices a line if the client has a rate override, holds large write-downs until a partner approves them, and writes everything else straight into the billing tables.",
+    "purpose_known": true,
+    "steps": [
+      {
+        "text": "Reads queued adjustments due by the run date, with each line's billable value, partner and any client rate override.",
+        "find": "FROM   zz_billing_adjust_queue w"
+      },
+      {
+        "text": "Reprices the line first when the client has a rate override.",
+        "find": "billable = Reprice(line, (decimal)line[\"override_rate\"]);"
+      },
+      {
+        "text": "For a write-down above the limit, checks for a partner approval and holds the line if there is none.",
+        "find": "if ((string)line[\"adjust_type\"] == \"D\" && Needs(billable, value))"
+      },
+      {
+        "text": "Records a pending approval, only once per billing line.",
+        "find": "INSERT INTO zz_writedown_approval"
+      },
+      {
+        "text": "Writes the new value into the billing line and marks the queue item processed.",
+        "find": "UPDATE billing_line"
+      }
+    ],
+    "hidden_rules": [
+      {
+        "text": "Write-downs above 10% of the billable value need partner approval. This appears nowhere except the code.",
+        "find": "private const decimal Limit = 0.10m;"
+      },
+      {
+        "text": "The test uses the repriced value, so a rate override can change whether approval is needed.",
+        "find": "return billable != 0m && Math.Abs(value) / billable > Limit;"
+      },
+      {
+        "text": "Write-ups never need approval: only adjustment type D is tested.",
+        "find": "if ((string)line[\"adjust_type\"] == \"D\" && Needs(billable, value))"
+      }
+    ],
+    "cloud_blockers": [
+      {
+        "text": "Direct update of the billing line.",
+        "find": "UPDATE billing_line"
+      },
+      {
+        "text": "Direct insert into a custom approval table.",
+        "find": "INSERT INTO zz_writedown_approval"
+      },
+      {
+        "text": "Direct update of a custom queue table.",
+        "find": "UPDATE zz_billing_adjust_queue SET processed = 1"
+      }
+    ]
+  }
+}

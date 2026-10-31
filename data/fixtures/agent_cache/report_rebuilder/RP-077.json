@@ -1,0 +1,22 @@
+{
+  "input_hash": "53252baea58a4ba9e48886b92e666b98d38e764e83f2ba7387d9e1bf769724e8",
+  "source": "hand_authored",
+  "model": null,
+  "duration_ms": null,
+  "output": {
+    "report_id": "RP-077",
+    "summary": "Rebuild the weekly WIP ageing report as a read-only ERPx report with the same columns and age bands.",
+    "rebuilt_as": "Read-only report over project WIP, grouped by engagement partner and age band",
+    "changes": [
+      "Partners come from the resource reference data, not a typed-in list",
+      "Departed partners drop out by themselves"
+    ],
+    "flagged": [
+      "The typed-in list omits partners who joined after March 2022, so today's report understates WIP"
+    ],
+    "parity_plan": [
+      "First rebuild faithfully with the old list, and prove the totals match exactly",
+      "Then fix the list, and prove the difference equals the omitted partners' WIP"
+    ]
+  }
+}

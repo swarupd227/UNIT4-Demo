@@ -1,0 +1,50 @@
+{
+  "input_hash": "a5755092d1c929b47a193062deda33826fa0b046f1dede81ea414129502663bd",
+  "source": "hand_authored",
+  "model": null,
+  "duration_ms": null,
+  "output": {
+    "title": "Partner approval for large billing write-downs",
+    "summary": "Replace the nightly job with ERPx standard billing adjustments, plus one extension that holds write-downs above the threshold until the engagement partner approves them.",
+    "standard_coverage": [
+      "Recording write-ups and write-downs on billing lines",
+      "Applying agreed client rates",
+      "Audit history of adjustments"
+    ],
+    "extension_name": "Write-down approval",
+    "trigger": "When a write-down is submitted on a billing line",
+    "behaviour": [
+      "Calculate the write-down as a share of the billable value, after any client rate",
+      "At or below the threshold, let the adjustment proceed",
+      "Above the threshold, hold it and ask the engagement partner for approval",
+      "On approval, release the adjustment and record the approver and date",
+      "On rejection, return it to the project manager with the reason"
+    ],
+    "data": [
+      "Threshold: one configurable value, not a value in code",
+      "Approval record: billing line, partner, decision, date. Retained seven years, per policy 4.3"
+    ],
+    "api_calls": [
+      {
+        "purpose": "Read the billing line and its project",
+        "call": "Read billing line through a supported API"
+      },
+      {
+        "purpose": "Apply the adjustment",
+        "call": "Submit the adjustment through a supported API, never a table write"
+      },
+      {
+        "purpose": "Request approval",
+        "call": "Start an approval task for the engagement partner"
+      }
+    ],
+    "dependencies": [
+      "INT-09 feeds the client rate table this rule reads, so it must load rates into ERPx before go-live"
+    ],
+    "open_points": [
+      "The customer must choose the threshold: 10% in code, 15% in policy",
+      "Unit4's technical lead must confirm which extension option to use"
+    ],
+    "caveat": "Illustrative. ERPx extension options and API names need confirming with Unit4."
+  }
+}

@@ -1,0 +1,101 @@
+{
+  "input_hash": "004e96a6a27ba7bd4bafede4bc8cc6dc1160d7e0ed65fd4ecd13fc817d96ba4d",
+  "source": "hand_authored",
+  "model": null,
+  "duration_ms": null,
+  "output": {
+    "rule_id": "BR-CC014-01",
+    "cases": [
+      {
+        "id": "T1",
+        "description": "Small write-down of 5%",
+        "adjust_type": "write_down",
+        "billable_minor": 100000,
+        "adjust_minor": 5000,
+        "prior_approval": false,
+        "expected_at_10": "apply",
+        "expected_at_15": "apply"
+      },
+      {
+        "id": "T2",
+        "description": "Write-down of exactly 10%",
+        "adjust_type": "write_down",
+        "billable_minor": 100000,
+        "adjust_minor": 10000,
+        "prior_approval": false,
+        "expected_at_10": "apply",
+        "expected_at_15": "apply"
+      },
+      {
+        "id": "T3",
+        "description": "Write-down of 10.01%, just above 10%",
+        "adjust_type": "write_down",
+        "billable_minor": 100000,
+        "adjust_minor": 10010,
+        "prior_approval": false,
+        "expected_at_10": "hold",
+        "expected_at_15": "apply"
+      },
+      {
+        "id": "T4",
+        "description": "Write-down of 12%, where the two thresholds disagree",
+        "adjust_type": "write_down",
+        "billable_minor": 100000,
+        "adjust_minor": 12000,
+        "prior_approval": false,
+        "expected_at_10": "hold",
+        "expected_at_15": "apply"
+      },
+      {
+        "id": "T5",
+        "description": "Write-down of exactly 15%",
+        "adjust_type": "write_down",
+        "billable_minor": 100000,
+        "adjust_minor": 15000,
+        "prior_approval": false,
+        "expected_at_10": "hold",
+        "expected_at_15": "apply"
+      },
+      {
+        "id": "T6",
+        "description": "Write-down of 15.01%, just above 15%",
+        "adjust_type": "write_down",
+        "billable_minor": 100000,
+        "adjust_minor": 15010,
+        "prior_approval": false,
+        "expected_at_10": "hold",
+        "expected_at_15": "hold"
+      },
+      {
+        "id": "T7",
+        "description": "Large write-down that a partner has already approved",
+        "adjust_type": "write_down",
+        "billable_minor": 100000,
+        "adjust_minor": 40000,
+        "prior_approval": true,
+        "expected_at_10": "apply",
+        "expected_at_15": "apply"
+      },
+      {
+        "id": "T8",
+        "description": "Large write-up, which never needs approval",
+        "adjust_type": "write_up",
+        "billable_minor": 100000,
+        "adjust_minor": 40000,
+        "prior_approval": false,
+        "expected_at_10": "apply",
+        "expected_at_15": "apply"
+      },
+      {
+        "id": "T9",
+        "description": "Write-down on a line with no billable value",
+        "adjust_type": "write_down",
+        "billable_minor": 0,
+        "adjust_minor": 5000,
+        "prior_approval": false,
+        "expected_at_10": "apply",
+        "expected_at_15": "apply"
+      }
+    ]
+  }
+}

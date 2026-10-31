@@ -1,0 +1,15 @@
+line-length = 110
+target-version = "py313"
+
+[lint]
+select = ["E", "F", "I", "UP", "B"]
+
+[lint.isort]
+known-first-party = ["app", "data", "engines"]
+known-third-party = ["alembic"]
+
+[lint.per-file-ignores]
+"data/generator/estate.py" = ["E501"]
+
+[format]
+exclude = ["data/generator/estate.py"]

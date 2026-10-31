@@ -1,0 +1,16 @@
+{
+  "input_hash": "25f63c0862e7cda1e18e79259a5ef9d0cf9c985d7911a4e2d4185c04ecf242b4",
+  "source": "hand_authored",
+  "model": null,
+  "duration_ms": null,
+  "output": {
+    "report_id": "RP-084",
+    "summary": "Rebuild the monthly utilisation report as a read-only ERPx report by period and grade.",
+    "rebuilt_as": "Read-only report over grade-level utilisation totals",
+    "changes": [],
+    "flagged": [],
+    "parity_plan": [
+      "Compare available and billable hours by period and grade"
+    ]
+  }
+}

@@ -1,0 +1,8 @@
+id: R7
+version: 1
+name: Report parity
+compares: Totals from rebuilt reports against CR reports for the same period
+tolerance: Zero, with any fix explained to the penny
+unit: money
+type: python
+handler: report_parity

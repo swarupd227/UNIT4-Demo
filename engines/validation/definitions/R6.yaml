@@ -1,0 +1,45 @@
+id: R6
+version: 2
+name: Code mapping
+compares: Every account and dimension value maps to exactly one ERPx value, with no conflict hidden by a merge
+tolerance: None unmapped
+unit: count
+type: sql
+totals: |
+  SELECT (SELECT count(*) FROM cr_source.account) + (SELECT count(*) FROM cr_source.dimension_value) AS source_value,
+         (SELECT count(*) FROM cr_source.account_map) + (SELECT count(*) FROM cr_source.dimension_map) AS target_value,
+         (SELECT count(*) FROM cr_source.account) AS source_count,
+         (SELECT count(*) FROM erpx_sim.account) AS target_count
+differences: |
+  SELECT 'unmapped / account ' || a.account_code AS row_key, NULL::bigint AS source_value,
+         NULL::bigint AS target_value, NULL::bigint AS difference,
+         jsonb_build_object('sub_rule', 'unmapped', 'values', jsonb_build_array(a.account_code)) AS detail
+  FROM cr_source.account a
+  LEFT JOIN cr_source.account_map m USING (account_code)
+  WHERE m.account_code IS NULL
+  UNION ALL
+  SELECT 'unmapped / ' || d.dimension || ' ' || d.value, NULL, NULL, NULL,
+         jsonb_build_object('sub_rule', 'unmapped', 'values', jsonb_build_array(d.value))
+  FROM cr_source.dimension_value d
+  LEFT JOIN cr_source.dimension_map m USING (dimension, value)
+  WHERE m.value IS NULL
+  UNION ALL
+  SELECT 'many_to_one_conflict / ERPx account ' || m.erpx_account, NULL, NULL, NULL,
+         jsonb_build_object(
+             'sub_rule', 'many_to_one_conflict', 'erpx_account', m.erpx_account,
+             'accounts', jsonb_agg(jsonb_build_object('account', a.account_code, 'name', a.name,
+                                                      'vat_code', a.vat_code) ORDER BY a.account_code))
+  FROM cr_source.account a
+  JOIN cr_source.account_map m USING (account_code)
+  GROUP BY m.erpx_account
+  HAVING count(DISTINCT a.vat_code) > 1
+  UNION ALL
+  SELECT 'duplicate_value / ' || dimension || ' ' || upper(rtrim(value)), NULL, NULL, NULL,
+         jsonb_build_object(
+             'sub_rule', 'duplicate_value', 'dimension', dimension,
+             'values', jsonb_agg(value ORDER BY value),
+             'lengths', jsonb_agg(length(value) ORDER BY value))
+  FROM cr_source.dimension_value
+  GROUP BY dimension, upper(rtrim(value))
+  HAVING count(*) > 1
+  ORDER BY 1

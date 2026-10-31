@@ -1,0 +1,9 @@
+{
+  "columns": ["account_code", "account_name", "closing_balance", "adjustments", "audited_balance", "preparer", "reviewer"],
+  "filters": ["period = :year_end_period"],
+  "layout_last_changed": "2023-11-09",
+  "report_type": "report_layout",
+  "schedule": "Run by the financial controller after the year-end close",
+  "tables": ["gl_balance", "account"],
+  "description": "Year-end statutory audit working papers for the external auditors"
+}

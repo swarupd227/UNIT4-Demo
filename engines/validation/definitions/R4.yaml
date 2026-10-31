@@ -1,0 +1,31 @@
+id: R4
+version: 1
+name: Project WIP
+compares: Hours, cost and billable value by project
+tolerance: Zero
+unit: money
+type: sql
+totals: |
+  SELECT (SELECT sum(billable_minor) FROM cr_source.wip_item) AS source_value,
+         (SELECT sum(billable_minor) FROM erpx_sim.wip_item) AS target_value,
+         (SELECT count(DISTINCT project_id) FROM cr_source.wip_item) AS source_count,
+         (SELECT count(DISTINCT project_id) FROM erpx_sim.wip_item) AS target_count
+differences: |
+  WITH s AS (
+      SELECT project_id, sum(hours_x100) AS hours, sum(cost_minor) AS cost, sum(billable_minor) AS value
+      FROM cr_source.wip_item GROUP BY 1
+  ), t AS (
+      SELECT project_id, sum(hours_x100) AS hours, sum(cost_minor) AS cost, sum(billable_minor) AS value
+      FROM erpx_sim.wip_item GROUP BY 1
+  )
+  SELECT project_id AS row_key,
+         s.value AS source_value, t.value AS target_value,
+         coalesce(t.value, 0) - coalesce(s.value, 0) AS difference,
+         jsonb_build_object('source_hours_x100', s.hours, 'target_hours_x100', t.hours,
+                            'source_cost', s.cost, 'target_cost', t.cost,
+                            'project_status', p.status, 'closed_date', p.closed_date) AS detail
+  FROM s
+  FULL JOIN t USING (project_id)
+  LEFT JOIN cr_source.project p USING (project_id)
+  WHERE s.value IS DISTINCT FROM t.value OR s.hours IS DISTINCT FROM t.hours OR s.cost IS DISTINCT FROM t.cost
+  ORDER BY abs(coalesce(t.value, 0) - coalesce(s.value, 0)) DESC, 1

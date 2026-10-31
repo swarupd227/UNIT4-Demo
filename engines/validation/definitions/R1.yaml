@@ -1,0 +1,30 @@
+id: R1
+version: 1
+name: Trial balance
+compares: Balances by account, period and dimension
+tolerance: Zero
+unit: money
+type: sql
+totals: |
+  SELECT (SELECT coalesce(sum(abs(amount_minor)), 0) FROM cr_source.gl_balance) AS source_value,
+         (SELECT coalesce(sum(abs(amount_minor)), 0) FROM erpx_sim.gl_balance) AS target_value,
+         (SELECT count(*) FROM cr_source.gl_balance) AS source_count,
+         (SELECT count(*) FROM erpx_sim.gl_balance) AS target_count
+differences: |
+  WITH source AS (
+      SELECT m.erpx_account, b.period, c.erpx_value AS cost_centre, l.erpx_value AS service_line,
+             sum(b.amount_minor) AS amount
+      FROM cr_source.gl_balance b
+      JOIN cr_source.account_map m USING (account_code)
+      JOIN cr_source.dimension_map c ON c.dimension = 'COSTC' AND c.value = b.cost_centre
+      JOIN cr_source.dimension_map l ON l.dimension = 'SERVLINE' AND l.value = b.service_line
+      GROUP BY 1, 2, 3, 4
+  )
+  SELECT concat_ws(' / ', erpx_account, period, cost_centre, service_line) AS row_key,
+         s.amount AS source_value, t.amount_minor AS target_value,
+         coalesce(t.amount_minor, 0) - coalesce(s.amount, 0) AS difference,
+         '{}'::jsonb AS detail
+  FROM source s
+  FULL JOIN erpx_sim.gl_balance t USING (erpx_account, period, cost_centre, service_line)
+  WHERE s.amount IS DISTINCT FROM t.amount_minor
+  ORDER BY abs(coalesce(t.amount_minor, 0) - coalesce(s.amount, 0)) DESC, 1

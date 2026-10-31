@@ -1,0 +1,8 @@
+id: R8
+version: 1
+name: Business rule tests
+compares: Test cases for the rebuilt billing approval rule
+tolerance: All pass
+unit: count
+type: python
+handler: billing_rule_tests

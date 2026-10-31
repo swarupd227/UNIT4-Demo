@@ -1,0 +1,30 @@
+id: R5
+version: 1
+name: Master data counts
+compares: Customers, suppliers, projects and active flags
+tolerance: Zero
+unit: count
+type: sql
+totals: |
+  SELECT (SELECT count(*) FROM cr_source.customer) + (SELECT count(*) FROM cr_source.supplier)
+             + (SELECT count(*) FROM cr_source.project) AS source_value,
+         (SELECT count(*) FROM erpx_sim.customer) + (SELECT count(*) FROM erpx_sim.supplier)
+             + (SELECT count(*) FROM erpx_sim.project) AS target_value,
+         3 AS source_count, 3 AS target_count
+differences: |
+  WITH counts AS (
+      SELECT 'Customers' AS measure, (SELECT count(*) FROM cr_source.customer) AS s,
+             (SELECT count(*) FROM erpx_sim.customer) AS t
+      UNION ALL SELECT 'Active customers', (SELECT count(*) FROM cr_source.customer WHERE active),
+             (SELECT count(*) FROM erpx_sim.customer WHERE active)
+      UNION ALL SELECT 'Suppliers', (SELECT count(*) FROM cr_source.supplier),
+             (SELECT count(*) FROM erpx_sim.supplier)
+      UNION ALL SELECT 'Active suppliers', (SELECT count(*) FROM cr_source.supplier WHERE active),
+             (SELECT count(*) FROM erpx_sim.supplier WHERE active)
+      UNION ALL SELECT 'Projects', (SELECT count(*) FROM cr_source.project),
+             (SELECT count(*) FROM erpx_sim.project)
+      UNION ALL SELECT 'Open projects', (SELECT count(*) FROM cr_source.project WHERE status = 'open'),
+             (SELECT count(*) FROM erpx_sim.project WHERE status = 'open')
+  )
+  SELECT measure AS row_key, s AS source_value, t AS target_value, t - s AS difference, '{}'::jsonb AS detail
+  FROM counts WHERE s <> t ORDER BY 1

@@ -1,0 +1,7 @@
+{
+  "columns": ["period", "grade", "available_hours", "billable_hours", "utilisation_pct"],
+  "filters": ["period between :from and :to"],
+  "layout_last_changed": "2024-05-02",
+  "report_type": "report_layout",
+  "tables": ["utilisation_summary"]
+}

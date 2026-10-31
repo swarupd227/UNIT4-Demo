@@ -1,0 +1,30 @@
+{
+  "input_hash": "b5165d756378bc021f32e9a417577041aa3412e670cbb9042b05c79507ad9765",
+  "source": "hand_authored",
+  "model": null,
+  "duration_ms": null,
+  "output": {
+    "rule_id": "BR-CC014-01",
+    "statement": "A write-down above the threshold share of a billing line's billable value is held until the engagement partner approves it.",
+    "threshold_pct": 10,
+    "applies_to": "Write-downs on billing lines, after any client rate override",
+    "approver": "Engagement partner on the project",
+    "stored_in": "Custom table zz_writedown_approval",
+    "sources": [
+      {
+        "text": "The threshold value",
+        "find": "private const decimal Limit = 0.10m;"
+      },
+      {
+        "text": "The test",
+        "find": "return billable != 0m && Math.Abs(value) / billable > Limit;"
+      },
+      {
+        "text": "The hold",
+        "find": "Hold(line, runDate);"
+      }
+    ],
+    "policy_reference": "Client Billing Policy, version 6, section 4.2",
+    "policy_threshold_pct": 15
+  }
+}

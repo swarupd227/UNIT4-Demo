@@ -1,0 +1,27 @@
+id: R3
+version: 1
+name: Open payables
+compares: Count and value by supplier and currency
+tolerance: Zero
+unit: money
+type: sql
+totals: |
+  SELECT (SELECT sum(base_minor) FROM cr_source.ap_open_item) AS source_value,
+         (SELECT sum(base_minor) FROM erpx_sim.ap_open_item) AS target_value,
+         (SELECT count(*) FROM cr_source.ap_open_item) AS source_count,
+         (SELECT count(*) FROM erpx_sim.ap_open_item) AS target_count
+differences: |
+  WITH s AS (
+      SELECT supplier_id, currency, count(*) AS items, sum(base_minor) AS value
+      FROM cr_source.ap_open_item GROUP BY 1, 2
+  ), t AS (
+      SELECT supplier_id, currency, count(*) AS items, sum(base_minor) AS value
+      FROM erpx_sim.ap_open_item GROUP BY 1, 2
+  )
+  SELECT supplier_id || ' / ' || currency AS row_key,
+         s.value AS source_value, t.value AS target_value,
+         coalesce(t.value, 0) - coalesce(s.value, 0) AS difference,
+         jsonb_build_object('currency', currency, 'source_items', s.items, 'target_items', t.items) AS detail
+  FROM s FULL JOIN t USING (supplier_id, currency)
+  WHERE s.value IS DISTINCT FROM t.value OR s.items IS DISTINCT FROM t.items
+  ORDER BY abs(coalesce(t.value, 0) - coalesce(s.value, 0)) DESC, 1

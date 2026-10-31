@@ -1,0 +1,60 @@
+services:
+  db:
+    image: pgvector/pgvector:pg16
+    environment:
+      POSTGRES_USER: studio
+      POSTGRES_PASSWORD: studio
+      POSTGRES_DB: studio
+    ports:
+      - "5544:5432"
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U studio -d studio"]
+      interval: 3s
+      timeout: 3s
+      retries: 20
+
+  api:
+    build:
+      context: .
+      dockerfile: apps/api/Dockerfile
+    environment:
+      STUDIO_DATABASE_URL: postgresql+psycopg://studio:studio@db:5432/studio
+      STUDIO_LLM_MODE: ${STUDIO_LLM_MODE:-replay}
+      STUDIO_STORAGE_ROOT: /workspace/storage
+      PYTHONPATH: /workspace:/workspace/apps/api
+    volumes:
+      - .:/workspace
+    working_dir: /workspace/apps/api
+    command: sh -c "alembic upgrade head && uvicorn app.main:app --host 0.0.0.0 --port 8000 --reload --reload-dir /workspace/apps/api/app --reload-dir /workspace/engines"
+    ports:
+      - "8000:8000"
+    depends_on:
+      db:
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD-SHELL", "python -c \"import urllib.request as u; u.urlopen('http://localhost:8000/healthz')\""]
+      interval: 5s
+      timeout: 3s
+      retries: 20
+
+  web:
+    image: node:22-alpine
+    working_dir: /workspace/apps/web
+    environment:
+      API_PROXY_TARGET: http://api:8000
+      CHOKIDAR_USEPOLLING: "true"
+    volumes:
+      - .:/workspace
+      - web_node_modules:/workspace/apps/web/node_modules
+    command: sh -c "npm install --no-audit --no-fund && npm run dev -- --host 0.0.0.0"
+    ports:
+      - "5183:5183"
+    depends_on:
+      api:
+        condition: service_healthy
+
+volumes:
+  pgdata:
+  web_node_modules:

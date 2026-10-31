@@ -1,0 +1,27 @@
+{
+  "input_hash": "06811a3ab4915b8a44a2e59eae7c014e9a366d55a064dada658b49e149db159a",
+  "source": "hand_authored",
+  "model": null,
+  "duration_ms": null,
+  "output": {
+    "plain_english": "Every week this job finds the latest closed time period and locks all earlier timesheet lines, so closed time cannot change.",
+    "purpose_known": true,
+    "steps": [
+      {
+        "text": "Finds the end of the latest closed period.",
+        "find": "SELECT MAX(period_end) FROM time_period WHERE status = 'C'"
+      },
+      {
+        "text": "Locks every unlocked timesheet line up to that date.",
+        "find": "UPDATE timesheet_line"
+      }
+    ],
+    "hidden_rules": [],
+    "cloud_blockers": [
+      {
+        "text": "Direct update of the timesheet table.",
+        "find": "UPDATE timesheet_line"
+      }
+    ]
+  }
+}

@@ -1,0 +1,31 @@
+{
+  "input_hash": "381635130c158461ac912181dcf03a093f01ecdc0814d1bd69e1d66bbfa67556",
+  "source": "hand_authored",
+  "model": null,
+  "duration_ms": null,
+  "output": {
+    "plain_english": "The mechanics are clear but the purpose is not. The job reads rows from a temporary table, transforms a value, and calls service U7 for some rows. Nothing says what this is for.",
+    "purpose_known": false,
+    "steps": [
+      {
+        "text": "Reads rows flagged 2 from a custom temporary table.",
+        "find": "SELECT k1, k2, v FROM zz_tmp_x1 WHERE f = 2"
+      },
+      {
+        "text": "Scrambles the value with a fixed bitwise operation.",
+        "find": "var n = (int)r[\"v\"] ^ 0x5A;"
+      },
+      {
+        "text": "Calls service U7 for roughly one row in seven.",
+        "find": "Svc.Call(\"U7\""
+      }
+    ],
+    "hidden_rules": [],
+    "cloud_blockers": [
+      {
+        "text": "Calls a service that is not defined anywhere in the estate.",
+        "find": "Svc.Call(\"U7\""
+      }
+    ]
+  }
+}
