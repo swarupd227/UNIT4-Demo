@@ -8,10 +8,12 @@ from app.config import get_settings
 from app.db import get_connection
 from app.decisions import router as decisions_router
 from app.validation import router as validation_router
+from app.workbench import router as workbench_router
 
 app = FastAPI(title="Migration Studio API")
 app.include_router(decisions_router)
 app.include_router(validation_router)
+app.include_router(workbench_router)
 
 Db = Annotated[Connection, Depends(get_connection)]
 
@@ -35,6 +37,12 @@ class Progress(BaseModel):
     open_questions: int
 
 
+class ReconciliationStatus(BaseModel):
+    passed: int
+    total: int
+    exceptions: int
+
+
 class CaseSummary(BaseModel):
     case_id: str
     label: str
@@ -42,7 +50,15 @@ class CaseSummary(BaseModel):
     customer_name: str
     synthetic: bool
     entity_label: str
+    sector: str
+    staff_count: int
+    erp_since: int
+    cr_since: int
+    modules_in_scope: str
+    out_of_scope: str
+    goal: str
     progress: Progress
+    reconciliation: ReconciliationStatus | None
     entities: list[LegalEntity]
     estate: list[EstateCount]
 
@@ -63,7 +79,9 @@ def get_case(db: Db) -> CaseSummary:
     row = (
         db.execute(
             text("""
-            SELECT c.case_id, c.label, c.status, k.customer_id, k.name AS customer_name, k.synthetic
+            SELECT c.case_id, c.label, c.status, k.customer_id, k.name AS customer_name, k.synthetic,
+                   k.sector, k.staff_count, k.erp_since, k.cr_since, k.modules_in_scope, k.out_of_scope,
+                   k.goal
             FROM studio.migration_case c
             JOIN studio.customer k USING (customer_id)
             ORDER BY c.case_id
@@ -106,8 +124,29 @@ def get_case(db: Db) -> CaseSummary:
         .mappings()
         .one()
     )
+    reconciliation = (
+        db.execute(
+            text("""
+            SELECT count(*) FILTER (WHERE status = 'pass') AS passed, count(*) AS total,
+                   (SELECT count(*) FROM studio.exception e WHERE e.run_id = r.run_id) AS exceptions
+            FROM studio.check_result r
+            WHERE r.run_id = (SELECT max(run_id) FROM studio.check_run)
+            GROUP BY r.run_id
+        """)
+        )
+        .mappings()
+        .first()
+    )
     return CaseSummary(
         entity_label="UK entity",
+        sector=row["sector"],
+        staff_count=row["staff_count"],
+        erp_since=row["erp_since"],
+        cr_since=row["cr_since"],
+        modules_in_scope=row["modules_in_scope"],
+        out_of_scope=row["out_of_scope"],
+        goal=row["goal"],
+        reconciliation=ReconciliationStatus(**reconciliation) if reconciliation else None,
         progress=Progress(**progress),
         case_id=row["case_id"],
         label=row["label"],

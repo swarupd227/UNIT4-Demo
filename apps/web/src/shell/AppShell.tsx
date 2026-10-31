@@ -7,8 +7,11 @@ import { api } from "../lib/api";
 import { usePersona } from "../lib/persona";
 import { ROLE_KEYS, ROLES, STAGES } from "../lib/terms";
 import { useToast } from "../lib/toast";
+import { workbench } from "../lib/workbench";
 import { Kbd, Skeleton } from "../ui/primitives";
 import { CommandPalette } from "./CommandPalette";
+
+const TIMING_INTERVAL_SECONDS = 15;
 
 function Metric({ value, label }: { value: string; label: string }) {
   return (
@@ -28,7 +31,12 @@ function PersonaMenu() {
     mutationFn: () => api.reset(role),
     onSuccess: () => {
       client.invalidateQueries();
-      navigate("/decisions");
+      try {
+        sessionStorage.removeItem("studio.estate-loaded");
+      } catch {
+        // Nothing to clear.
+      }
+      navigate("/customer");
       toast("Demo reset to the start state");
     },
   });
@@ -112,7 +120,10 @@ function CustomerBar() {
               label="decisions agreed"
             />
             <Metric value={String(data.progress.open_questions)} label="open questions" />
-            <Metric value="Not run" label="reconciliation" />
+            <Metric
+              value={data.reconciliation ? `${data.reconciliation.passed} of ${data.reconciliation.total}` : "Not run"}
+              label={data.reconciliation ? "checks passed" : "reconciliation"}
+            />
           </>
         )}
         <PersonaMenu />
@@ -129,25 +140,17 @@ function JourneyRail() {
           const number = <span className="tnum mr-2 text-[13px] opacity-70">{index}</span>;
           return (
             <li key={stage.key}>
-              {stage.key === "decisions" ? (
-                <NavLink
-                  to="/decisions"
-                  aria-current="page"
-                  className="flex h-9 items-center rounded-lg bg-ink px-3.5 text-[15px] font-medium text-canvas"
-                >
-                  {number}
-                  {stage.label}
-                </NavLink>
-              ) : (
-                <span
-                  aria-disabled
-                  title="Built in Phase 4"
-                  className="flex h-9 items-center px-3.5 text-[15px] text-ink-3"
-                >
-                  {number}
-                  {stage.label}
-                </span>
-              )}
+              <NavLink
+                to={`/${stage.key}`}
+                className={({ isActive }) =>
+                  `flex h-9 items-center rounded-lg px-3.5 text-[15px] font-medium transition-colors ${
+                    isActive ? "bg-ink text-canvas" : "text-ink-2 hover:bg-line/50"
+                  }`
+                }
+              >
+                {number}
+                {stage.label}
+              </NavLink>
             </li>
           );
         })}
@@ -159,9 +162,21 @@ function JourneyRail() {
   );
 }
 
+// The workbench logs its own time, so effort on the scorecard is measured rather than claimed.
+function useStageTiming(stage: string) {
+  const { role } = usePersona();
+  useEffect(() => {
+    const timer = window.setInterval(() => {
+      if (!document.hidden) workbench.timing(stage, TIMING_INTERVAL_SECONDS, role).catch(() => undefined);
+    }, TIMING_INTERVAL_SECONDS * 1000);
+    return () => window.clearInterval(timer);
+  }, [stage, role]);
+}
+
 export function AppShell() {
   const location = useLocation();
   const [paletteOpen, setPaletteOpen] = useState(false);
+  useStageTiming(location.pathname.split("/")[1]);
 
   useEffect(() => {
     function onKey(event: KeyboardEvent) {

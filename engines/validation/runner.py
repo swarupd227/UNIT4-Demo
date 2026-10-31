@@ -40,7 +40,7 @@ def definitions_hash() -> str:
     return digest.hexdigest()
 
 
-def _input_hash(db: Connection) -> str:
+def current_input_hash(db: Connection) -> str:
     digest = hashlib.sha256()
     for table in INPUT_TABLES:
         value = db.execute(
@@ -76,7 +76,7 @@ def _json_default(value: Any) -> str:
 
 def run_checks(db: Connection) -> int:
     started = datetime.now(UTC)
-    input_hash = _input_hash(db)
+    input_hash = current_input_hash(db)
     results = []
     for definition in load_definitions():
         result = _run_check(db, definition)

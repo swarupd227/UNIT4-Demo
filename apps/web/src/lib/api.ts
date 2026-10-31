@@ -8,9 +8,18 @@ export type CaseSummary = {
   status: string;
   customer_name: string;
   entity_label: string;
+  sector: string;
+  staff_count: number;
+  erp_since: number;
+  cr_since: number;
+  modules_in_scope: string;
+  out_of_scope: string;
+  goal: string;
   synthetic: boolean;
+  entities: { entity_code: string; name: string; status: string; in_migration_scope: boolean }[];
   estate: EstateCount[];
   progress: { total: number; agreed: number; open_questions: number };
+  reconciliation: { passed: number; total: number; exceptions: number } | null;
 };
 
 export type DecisionRow = {
@@ -95,7 +104,7 @@ export type DecisionDetail = DecisionRow & {
   allowed: { accept: boolean; edit: boolean; ask: boolean; answer: boolean; reason: string | null };
 };
 
-async function request<T>(path: string, role: Role, init?: RequestInit): Promise<T> {
+export async function request<T>(path: string, role: Role, init?: RequestInit): Promise<T> {
   const response = await fetch(path, {
     ...init,
     headers: { "Content-Type": "application/json", "X-Studio-Persona": role },
@@ -108,7 +117,7 @@ async function request<T>(path: string, role: Role, init?: RequestInit): Promise
   return response.json();
 }
 
-const post = <T = unknown>(path: string, role: Role, body?: unknown) =>
+export const post = <T = unknown>(path: string, role: Role, body?: unknown) =>
   request<T>(path, role, { method: "POST", body: body ? JSON.stringify(body) : undefined });
 
 export const api = {

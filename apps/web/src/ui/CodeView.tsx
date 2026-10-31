@@ -43,7 +43,13 @@ export function CodeView({ source, focusLine }: Props) {
   }, [source, lang]);
 
   useEffect(() => {
-    focusRef.current?.scrollIntoView({ block: "center" });
+    // Scroll only the code pane. scrollIntoView would also move the page around it.
+    const line = focusRef.current;
+    const pane = line?.closest(".scroll-quiet");
+    if (line && pane) {
+      const top = line.offsetTop - pane.clientHeight / 2;
+      pane.scrollTo({ top, behavior: "smooth" });
+    }
   }, [focusLine, lines]);
 
   return (

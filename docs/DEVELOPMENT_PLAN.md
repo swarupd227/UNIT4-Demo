@@ -49,6 +49,8 @@ These are contradictions or gaps that a Unit4 expert in the audience would notic
 | 12 | **Product-gap counts need other customers**, but the demo has one | Mapping memory would be empty | Seed a few synthetic precedents from other fictional customers and label them synthetic |
 | 13 | **No dormant entity exists for M5.** The spec lists three legal entities, all active, but M5 needs a dormant one, and the mock-up labels WF-006 "NL" | WF-006 has no entity to be dormant in | Add a dormant fourth company, Ardleigh Advisory Holding B.V. (NL02, dormant since June 2023). It sits outside the three trading entities |
 | 15 | **Agent inputs do not exist until Phase 3.** The Decisions screen needs proposals now | Proposals could otherwise be copied from the answer key, which would fake the score | The rules run on labelled stand-in signals in the agents' output shape, with deliberate misses. Phase 3 replaces the signals, not the rules |
+| 16 | **The live report counts differ from the spec by design.** The spec plans 61 retire and 18 rebuild, but RP-058 and RP-112 are held for the customer | Forcing the planned numbers would hide the held items | The screen shows 60 retire, 38 into 9, 31 standard, 17 rebuild and 2 held, which adds to 148. The planned figures apply once the customer answers |
+| 17 | **A signature beside "1 of 233 agreed" is not credible.** Nobody clears 233 items live | Experts would question the sign-off | Routine decisions start agreed: consultant-only, confidence 85 or above, no flags, no configuration. They are labelled seeded demo history in the audit trail, detail panel and pack |
 | 14 | **The rebuild reports have no home for RP-112.** The 148 must still add up with the audit pack held for the customer | The report totals could drift | RP-112 is counted within the 18 rebuilds, with state "held" until the customer confirms it |
 
 Minor: "built up over 15 years" against a 2009 start is 17 years. The mock-up's tabs omit Customer card and Scorecard, so the plan treats those as the start and end of the journey rail.
@@ -196,7 +198,7 @@ Status: all three met, on a Docker network with no internet route. Report cluste
 
 If no LLM key is available yet, the replay cache is hand-authored in the same schema, and the live run is added once a key exists.
 
-### Phase 4: Remaining screens (`#16`–`#18`)
+### Phase 4: Remaining screens (`#16`–`#18`) (built)
 Customer card, Estate, Code, Reports, Workflows, Reconcile, Sign-off and Scorecard, all to the Phase 2 standard, along with the PDF pack and ZIP manifest.
 **Exit:** the full journey runs start to finish on real local data, with the sign-off gate working and a scorecard computed from the database.
 

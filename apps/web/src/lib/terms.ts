@@ -50,12 +50,13 @@ export const ROLES = {
 export type Role = keyof typeof ROLES;
 export const ROLE_KEYS = Object.keys(ROLES) as Role[];
 
-export const ITEM_TYPES: Record<string, { label: string; plural: string }> = {
-  CC: { label: "Custom code", plural: "Code" },
-  RP: { label: "Report", plural: "Reports" },
-  WF: { label: "Workflow", plural: "Workflows" },
-  CF: { label: "Configuration", plural: "Config" },
+export const ITEM_TYPES: Record<string, { label: string; plural: string; estate: string }> = {
+  CC: { label: "Custom code", plural: "Code", estate: "Custom code items" },
+  RP: { label: "Report", plural: "Reports", estate: "Custom reports" },
+  WF: { label: "Workflow", plural: "Workflows", estate: "Approval workflows" },
+  CF: { label: "Configuration", plural: "Config", estate: "Configuration areas" },
 };
+export const ITEM_TYPE_KEYS = Object.keys(ITEM_TYPES);
 
 export const SUBTYPES: Record<string, string> = {
   server_process: "Server process",
@@ -73,9 +74,12 @@ export const SUBTYPES: Record<string, string> = {
 export const AUDIT_ACTIONS: Record<string, string> = {
   proposed: "Proposed",
   accepted: "Accepted",
+  accepted_seeded: "Accepted (seeded demo history)",
   edited: "Changed the decision",
   asked_customer: "Asked the customer",
   answered: "Answered",
+  generated_pack: "Generated the sign-off pack",
+  signed_pack: "Signed the pack",
 };
 
 export const STAGES = [

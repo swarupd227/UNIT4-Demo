@@ -136,6 +136,9 @@ function Approvals({ item }: { item: DecisionDetail }) {
   return (
     <section>
       <SectionLabel>Who confirms</SectionLabel>
+      {item.audit.some((event) => event.action === "accepted_seeded") && (
+        <p className="mb-2 text-[14px] text-ink-3">Seeded as demo history, not accepted during this demo.</p>
+      )}
       <ol className="space-y-1.5">
         {item.required_roles.map((role) => {
           const approval = item.approvals.find((a) => a.role === role);

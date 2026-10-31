@@ -227,7 +227,7 @@ def propose(facts: ItemFacts) -> Proposal:
         evidence.append({"kind": "standard", "label": f"Near-duplicate group led by {target}"})
         return Proposal(
             KEEP,
-            "merge_survivor" if survivor else "merge_into",
+            "merge_survivor" if survivor else f"merge_into:{target}",
             "proposed",
             "Kept as the report for its near-duplicate group."
             if survivor

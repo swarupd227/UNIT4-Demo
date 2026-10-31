@@ -92,14 +92,20 @@ export function StatusLabel({ status }: { status: Status }) {
   );
 }
 
-export function AiBadge({ title }: { title?: string }) {
+// Every agent result is hand-authored until a model runs, and the badge says so.
+export function AiBadge({ source = "hand_authored" }: { source?: string }) {
+  const authored = source === "hand_authored";
   return (
     <span
-      title={title ?? "Written by an AI analysis agent. A person reviews it."}
+      title={
+        authored
+          ? "Written by hand in the agent format for this demo. No model produced it."
+          : "Written by an AI analysis agent. A person reviews it."
+      }
       className="inline-flex items-center gap-1 rounded-md bg-ai-soft px-1.5 py-0.5 text-[12px] font-semibold text-ai"
     >
       <Sparkles size={12} aria-hidden />
-      AI analysis
+      {authored ? "Authored stand-in" : "AI analysis"}
     </span>
   );
 }

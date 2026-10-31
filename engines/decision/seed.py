@@ -13,13 +13,15 @@ from engines.agents.analysis import analyse_reports, analyse_workflows, find_sta
 from engines.agents.pipeline import store_artefacts
 from engines.decision import audit
 from engines.decision.policy import CONSULTANT, CUSTOMER, PERSONAS, required_roles, status_for
-from engines.decision.rules import ENGINE_VERSION, ItemFacts, Proposal, propose
+from engines.decision.rules import ENGINE_VERSION, RETIRE, ItemFacts, Proposal, propose
 
 START_TIME = datetime(2026, 10, 30, 16, 0, tzinfo=UTC)
 ENGINE_ACTOR = "Decision engine"
 
 # The mock-up's starting statuses: one retirement already agreed, two questions already sent.
 AGREED_AT_START = "RP-031"
+RETIRE_CHOICES = ["Keep it", "Retire it"]
+ROUTINE_MIN_CONFIDENCE = 85
 
 
 def _dependencies(db: Connection) -> dict[str, list[dict[str, str]]]:
@@ -142,11 +144,27 @@ def _store_proposal(db: Connection, item_id: str, proposal: Proposal) -> None:
     )
 
 
+def _is_routine(item_type: str, proposal: Proposal, required: list[str], has_question: bool) -> bool:
+    """Decisions a consultant would already have cleared before the demo starts.
+
+    Seeded, and labelled so on the audit trail and in the sign-off pack. Anything flagged, unsure,
+    needing a second role, or in configuration stays open, because reconciliation can reopen those.
+    """
+    return (
+        required == [CONSULTANT]
+        and item_type != "CF"
+        and (proposal.confidence or 0) >= ROUTINE_MIN_CONFIDENCE
+        and not proposal.flags
+        and not has_question
+    )
+
+
 def seed_decisions(db: Connection) -> None:
     db.execute(
         text("""
         TRUNCATE studio.audit_event, studio.customer_question, studio.approval, studio.decision,
-                 studio.check_run, studio.mapping_memory, studio.artefact,
+                 studio.check_run, studio.mapping_memory, studio.artefact, studio.signoff_pack,
+                 studio.timing_event,
                  studio.proposal, studio.dependency RESTART IDENTITY CASCADE
     """)
     )
@@ -167,7 +185,10 @@ def seed_decisions(db: Connection) -> None:
         if proposal.state == "held" and not question:
             question = f"{facts.name} looks unused, but it may have a legal, audit or tax purpose. Can it go?"
         required = required_roles(facts.item_type, proposal.outcome)
-        approved = [CONSULTANT, CUSTOMER] if facts.item_id == AGREED_AT_START else []
+        routine = _is_routine(facts.item_type, proposal, required, bool(question))
+        approved = [CONSULTANT] if routine else []
+        if facts.item_id == AGREED_AT_START:
+            approved = [CONSULTANT, CUSTOMER]
         status = status_for(required, approved, bool(question), conflict_open)
         db.execute(
             text("""
@@ -198,11 +219,15 @@ def seed_decisions(db: Connection) -> None:
                 text("""
                     INSERT INTO studio.customer_question
                         (item_id, question, options, status, asked_by, asked_at)
-                    VALUES (:item_id, :question, '[]', 'open', :asked_by, :asked_at)
+                    VALUES (:item_id, :question, CAST(:options AS jsonb), 'open', :asked_by, :asked_at)
                 """),
                 {
                     "item_id": facts.item_id,
                     "question": question,
+                    # An item that may go gets two clear choices. An interview needs a written answer.
+                    "options": json.dumps(
+                        RETIRE_CHOICES if RETIRE in (proposal.outcome, proposal.candidate_outcome) else []
+                    ),
                     "asked_by": PERSONAS[CONSULTANT],
                     "asked_at": asked_at,
                 },
@@ -217,7 +242,7 @@ def seed_decisions(db: Connection) -> None:
                 {"question": question},
             )
         for offset, role in enumerate(approved, start=1):
-            approved_at = START_TIME + timedelta(hours=offset)
+            approved_at = START_TIME + timedelta(minutes=30 if routine else 60 * offset)
             db.execute(
                 text("INSERT INTO studio.approval VALUES (:item_id, :role, :person, :decided_at)"),
                 {"item_id": facts.item_id, "role": role, "person": PERSONAS[role], "decided_at": approved_at},
@@ -227,7 +252,7 @@ def seed_decisions(db: Connection) -> None:
                 approved_at,
                 PERSONAS[role],
                 role,
-                "accepted",
+                "accepted_seeded" if routine else "accepted",
                 facts.item_id,
                 {"outcome": proposal.outcome},
             )
