@@ -45,13 +45,13 @@ export function WorkflowsScreen() {
 
   return (
     <Screen
-      title={`${variants.length} approval workflows, ${pack.to_count} would do`}
-      lead={`Two variants handle ${Math.round((topTwo / total) * 100)}% of ${total.toLocaleString("en-GB")} approvals in 12 months.`}
+      title="Approval workflows"
+      lead={`${variants.length} variants, ${pack.to_count} proposed. The top two handle ${Math.round((topTwo / total) * 100)}% of ${total.toLocaleString("en-GB")} approvals in 12 months.`}
       next="reconcile"
       aside={
         !proposal && (
           <Button variant="primary" onClick={() => setProposal(true)}>
-            Show the proposal
+            View proposal
           </Button>
         )
       }
@@ -111,7 +111,7 @@ export function WorkflowsScreen() {
                 ))}
               </ul>
             </Panel>
-            <Panel title="What it means for controls">
+            <Panel title="Control impact">
               <ul className="list-disc space-y-1 pl-5 text-[15px] leading-6">
                 {pack.control_impact.map((line) => (
                   <li key={line}>{line}</li>

@@ -48,7 +48,7 @@ function ThresholdCard({ onAnswered }: { onAnswered: () => void }) {
   if (!item?.conflict) return null;
   return (
     <div className="rounded-xl border border-warn/40 bg-warn-soft p-4">
-      <h3 className="text-[17px] font-semibold">R8 needs one decision</h3>
+      <h3 className="text-[17px] font-semibold">R8: decision required</h3>
       <p className="mt-1 text-[16px] leading-6">{item.conflict.question}</p>
       <div className="mt-3 flex flex-wrap items-center gap-2">
         {open && item.allowed.answer &&
@@ -58,7 +58,7 @@ function ThresholdCard({ onAnswered }: { onAnswered: () => void }) {
             </Button>
           ))}
         {open && !item.allowed.answer && (
-          <span className="text-[15px] text-ink-2">Waiting for Jordan Ashby. Switch persona to answer.</span>
+          <span className="text-[15px] text-ink-2">Waiting for Jordan Ashby.</span>
         )}
         {!open && item.allowed.ask && <Button onClick={() => mutate.mutate({})}>Ask the customer</Button>}
       </div>
@@ -140,9 +140,9 @@ function ParitySummary({ check }: { check: CheckResult }) {
   const report = reports[0];
   return (
     <div className="text-[16px] leading-7">
-      <p>{report.name}: the faithful rebuild matches CR exactly at {money(report.cr_total)}.</p>
+      <p>{report.name}: the like-for-like rebuild matches CR at {money(report.cr_total)}.</p>
       <p>
-        The fixed report adds {money(report.reconciling_item?.amount)}, which is exactly the WIP of{" "}
+        The corrected report adds {money(report.reconciling_item?.amount)}, equal to the WIP of{" "}
         {report.reconciling_item?.partners.join(", ")}.
       </p>
     </div>
@@ -197,7 +197,7 @@ export function ReconcileScreen() {
   return (
     <Screen
       title="Reconciliation"
-      lead="Plain code, not a language model. The same data always gives the same result."
+      lead="Deterministic checks between CR and ERPx, repeatable on the same data"
       next="signoff"
       aside={
         <Button variant={latest ? "secondary" : "primary"} disabled={run.isPending} onClick={() => run.mutate()}>
@@ -210,7 +210,7 @@ export function ReconcileScreen() {
       {!isPending && !latest && !run.isPending && (
         <Panel>
           <p className="py-16 text-center text-[18px] text-ink-2">
-            Eight checks on the trial migration of the UK entity into the simulated ERPx target.
+            Eight checks on the trial migration of the UK entity into the ERPx sandbox.
           </p>
         </Panel>
       )}
@@ -260,7 +260,7 @@ export function ReconcileScreen() {
               <Panel className="flex items-center justify-between gap-6">
                 <p className="text-[17px]">
                   <strong className="tnum">{passed} of {latest.checks.length}</strong> checks pass.{" "}
-                  <strong className="tnum">{latest.exceptions.length}</strong> exceptions listed for people to resolve.
+                  <strong className="tnum">{latest.exceptions.length}</strong> exceptions to resolve.
                 </p>
                 <p className="tnum flex items-center gap-2 text-[15px] text-ink-2">
                   <ShieldCheck size={18} className="text-accent" aria-hidden />

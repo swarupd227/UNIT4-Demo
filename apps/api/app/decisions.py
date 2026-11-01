@@ -336,7 +336,7 @@ def mapping_memory(db: Tx) -> list[dict[str, Any]]:
     return [dict(row) for row in rows]
 
 
-@router.post("/demo/reset")
+@router.post("/workspace/reset")
 def reset(db: Tx) -> dict[str, str]:
     seed_decisions(db)
     return {"status": "ok"}

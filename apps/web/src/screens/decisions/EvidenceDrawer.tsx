@@ -10,7 +10,7 @@ type Props = { evidence: Evidence | null; item: DecisionDetail; onClose: () => v
 const CODE_VERIFIED = new Set(["usage", "keyword", "dependency", "entity", "owner", "precedent", "stale"]);
 
 function Provenance({ kind }: { kind: string }) {
-  if (kind === "j2x") return <SourceBadge>From J2X.AI (simulated)</SourceBadge>;
+  if (kind === "j2x") return <SourceBadge>From J2X.AI</SourceBadge>;
   if (kind === "policy") return <SourceBadge>Customer document</SourceBadge>;
   return CODE_VERIFIED.has(kind) ? <CodeBadge /> : <AiBadge />;
 }

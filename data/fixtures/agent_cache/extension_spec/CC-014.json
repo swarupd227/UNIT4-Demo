@@ -1,5 +1,5 @@
 {
-  "input_hash": "a5755092d1c929b47a193062deda33826fa0b046f1dede81ea414129502663bd",
+  "input_hash": "787f7407b8c6fc349b0bc2293042b9fdde152d8955c020a71603fafa1d05bfa8",
   "source": "hand_authored",
   "model": null,
   "duration_ms": null,
@@ -45,6 +45,6 @@
       "The customer must choose the threshold: 10% in code, 15% in policy",
       "Unit4's technical lead must confirm which extension option to use"
     ],
-    "caveat": "Illustrative. ERPx extension options and API names need confirming with Unit4."
+    "caveat": "ERPx extension options and API names are to be confirmed with Unit4."
   }
 }

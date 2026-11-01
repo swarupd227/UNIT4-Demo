@@ -32,7 +32,7 @@ function DecisionCell({ row }: { row: DecisionRow }) {
         {refusedRetire(row) && (
           <span className="mt-0.5 inline-flex items-center gap-1 text-[13px] font-semibold text-warn">
             <ShieldAlert size={14} aria-hidden />
-            Refused to retire
+            Retirement blocked
           </span>
         )}
       </span>

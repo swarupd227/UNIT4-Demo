@@ -17,9 +17,9 @@ CUSTOMER = {"X-Studio-Persona": "customer"}
 @pytest.fixture
 def client() -> Iterator[TestClient]:
     with TestClient(app) as test_client:
-        test_client.post("/api/demo/reset")
+        test_client.post("/api/workspace/reset")
         yield test_client
-        test_client.post("/api/demo/reset")
+        test_client.post("/api/workspace/reset")
 
 
 def clear_questions(client: TestClient) -> None:
@@ -165,7 +165,7 @@ def test_pack_states_how_much_is_seeded(client: TestClient) -> None:
 def test_prepare_rebuilds_the_state_each_scene_expects(
     client: TestClient, scene: int, questions: int, reconciled: bool, signed: bool
 ) -> None:
-    assert client.post(f"/api/demo/prepare/{scene}").status_code == 200
+    assert client.post(f"/api/workspace/prepare/{scene}").status_code == 200
     state = client.get("/api/signoff").json()
     assert len(state["open_questions"]) == questions
     assert (client.get("/api/reconciliation/latest").json() is not None) == reconciled
@@ -174,4 +174,4 @@ def test_prepare_rebuilds_the_state_each_scene_expects(
 
 
 def test_prepare_rejects_an_unknown_scene(client: TestClient) -> None:
-    assert client.post("/api/demo/prepare/9").status_code == 404
+    assert client.post("/api/workspace/prepare/9").status_code == 404

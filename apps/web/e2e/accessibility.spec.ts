@@ -3,15 +3,15 @@ import { expect, test, type Page } from "@playwright/test";
 import { prepare } from "./helpers";
 
 const SCREENS: [string, string, string][] = [
-  ["Customer", "/customer", "Everything you see here is synthetic"],
-  ["Estate", "/estate", "The CR estate"],
+  ["Customer", "/customer", "Sandbox environment"],
+  ["Estate", "/estate", "CR estate"],
   ["Decisions", "/decisions/CC-014", "Billing adjust writer"],
-  ["Code", "/code/CC-014", "Plain English"],
-  ["Reports", "/reports", "148 custom reports"],
+  ["Code", "/code/CC-014", "Explanation"],
+  ["Reports", "/reports", "148 in scope"],
   ["Workflows", "/workflows", "Use in the last 12 months"],
   ["Reconcile", "/reconcile", "Report parity"],
   ["Sign-off", "/signoff", "Before signing"],
-  ["Scorecard", "/scorecard", "Planted issues found"],
+  ["Scorecard", "/scorecard", "Known issues found"],
   ["Presenter", "/presenter", "Rehearsals"],
 ];
 

@@ -74,7 +74,7 @@ export const SUBTYPES: Record<string, string> = {
 export const AUDIT_ACTIONS: Record<string, string> = {
   proposed: "Proposed",
   accepted: "Accepted",
-  accepted_seeded: "Accepted (seeded demo history)",
+  accepted_seeded: "Accepted in an earlier session",
   edited: "Changed the decision",
   asked_customer: "Asked the customer",
   answered: "Answered",

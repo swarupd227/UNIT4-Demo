@@ -234,7 +234,7 @@ export function DecisionsScreen() {
         <div className="space-y-3.5 border-b border-line p-5">
           <div className="flex items-baseline justify-between gap-6">
             <h1 className="text-2xl font-semibold">Decision register</h1>
-            <p className="text-[15px] text-ink-2">Every item gets a decision, a reason and a named person.</p>
+            <p className="text-[15px] text-ink-2">Outcome, reason and owner for every item in scope</p>
           </div>
           {isPending ? (
             <Skeleton className="h-9" />

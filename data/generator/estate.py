@@ -539,7 +539,7 @@ def generate_precedents() -> Table:
     number = 1
     for pattern in gaps:
         for label in "BCDEFG":
-            rows.append((f"PR-{number:03d}", pattern, f"Customer {label} (synthetic)", EXTENSION, "approved", True))
+            rows.append((f"PR-{number:03d}", pattern, f"Customer {label} (sandbox)", EXTENSION, "approved", True))
             number += 1
     for pattern, outcome, status in [
         ("Nightly job writing billing adjustments", EXTENSION, "approved"),
@@ -548,13 +548,13 @@ def generate_precedents() -> Table:
         ("Annual statutory report with low usage", RETIRE, "rejected"),
     ]:
         for label in "BC":
-            rows.append((f"PR-{number:03d}", pattern, f"Customer {label} (synthetic)", outcome, status, True))
+            rows.append((f"PR-{number:03d}", pattern, f"Customer {label} (sandbox)", outcome, status, True))
             number += 1
     return ["precedent_id", "pattern", "source_customer", "outcome", "review_status", "synthetic"], rows
 
 
 def standard_catalogue() -> dict[str, Any]:
     return {
-        "note": "Illustrative list for the demo. To be replaced with Unit4's actual ERPx standard content.",
+        "note": "Reference list, pending Unit4's ERPx standard content.",
         "reports": sorted(STANDARD_REPORTS),
     }

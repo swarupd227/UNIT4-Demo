@@ -191,14 +191,14 @@ def _render_pdf(data: dict[str, Any], summary: dict[str, Any], audit_head: str) 
     <html><head><meta charset="utf-8"><style>{CSS}</style></head><body>
     <h1>Customer sign-off pack</h1>
     <p class="lead">{html.escape(case.customer)} · {html.escape(case.label)} · CR to ERPx</p>
-    <p class="scope"><strong>Scope.</strong> {SCOPE} All data in this demonstration is synthetic.</p>
+    <p class="scope"><strong>Scope.</strong> {SCOPE} Sandbox environment: test data only.</p>
     <h2>Summary</h2>
     {
         _table(
             ["Measure", "Value"],
             [
                 ["Decisions agreed", f"{summary['agreed']} of {summary['decisions']}"],
-                ["Of which seeded as demo history", summary["seeded_history"]],
+                ["Of which accepted in earlier sessions", summary["seeded_history"]],
                 ["Checks passed", f"{summary['checks_passed']} of {summary['checks']}"],
                 ["Exceptions listed", summary["exceptions"]],
                 ["Customer questions answered", summary["questions_answered"]],

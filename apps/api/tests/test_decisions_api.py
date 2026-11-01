@@ -15,9 +15,9 @@ TECHNICAL = {"X-Studio-Persona": "unit4_technical"}
 @pytest.fixture
 def client() -> Iterator[TestClient]:
     with TestClient(app) as test_client:
-        test_client.post("/api/demo/reset")
+        test_client.post("/api/workspace/reset")
         yield test_client
-        test_client.post("/api/demo/reset")
+        test_client.post("/api/workspace/reset")
 
 
 def status(client: TestClient, item_id: str) -> str:

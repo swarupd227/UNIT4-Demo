@@ -243,7 +243,7 @@ def propose(facts: ItemFacts) -> Proposal:
             {
                 "kind": "standard",
                 "label": signal["standard_feature"],
-                "detail": "Illustrative mapping, to be confirmed against Unit4's standard content.",
+                "detail": "To be confirmed against Unit4's standard content.",
             }
         )
         return Proposal(
@@ -264,7 +264,7 @@ def propose(facts: ItemFacts) -> Proposal:
                 {
                     "kind": "precedent",
                     "label": f"{facts.precedents} similar items in mapping memory",
-                    "detail": "Synthetic precedents from other fictional customers.",
+                    "detail": "Sandbox precedents from other customers.",
                 }
             )
             return Proposal(

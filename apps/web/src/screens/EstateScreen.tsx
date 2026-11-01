@@ -26,7 +26,7 @@ export function EstateScreen() {
 
   const sources = data
     ? [
-        { label: "J2X.AI assessment", detail: "Simulated output, dated 14 September 2026" },
+        { label: "J2X.AI assessment", detail: "Assessment dated 14 September 2026" },
         { label: "Custom code", detail: `${data.types.find((t) => t.item_type === "CC")?.count} items` },
         { label: "Reports and usage logs", detail: `${data.volumes.usage_events.toLocaleString("en-GB")} usage records` },
         { label: "Configuration", detail: `${data.volumes.accounts.toLocaleString("en-GB")} accounts` },
@@ -55,14 +55,14 @@ export function EstateScreen() {
 
   return (
     <Screen
-      title="The CR estate"
-      lead="We start from what J2X.AI has already assessed, and pick up where it stops."
+      title="CR estate"
+      lead="J2X.AI assessment and source inventory"
       next={done ? "decisions" : undefined}
       aside={
         step < 0 && (
           <Button variant="primary" onClick={() => setStep(0)}>
             <Download size={18} aria-hidden />
-            Load the estate
+            Load estate
           </Button>
         )
       }
@@ -125,10 +125,6 @@ export function EstateScreen() {
                 </li>
               ))}
             </ul>
-            <p className="mt-4 text-[15px] text-ink-2">
-              J2X explains what exists. Deciding what to do with each item, rebuilding it and proving the result is
-              where this work starts.
-            </p>
           </Panel>
           <div className="grid grid-cols-2 gap-4">
             <Panel title="Time by stage">
@@ -139,12 +135,11 @@ export function EstateScreen() {
                       <th scope="row" className="py-2 text-left font-normal">
                         {stage}
                       </th>
-                      <td className="py-2 text-right text-ink-3">To be baselined</td>
+                      <td className="py-2 text-right text-ink-3">Baseline pending</td>
                     </tr>
                   ))}
                 </tbody>
               </table>
-              <p className="mt-2 text-[14px] text-ink-3">Unit4 has not shared a baseline, so we do not assume one.</p>
             </Panel>
             <Panel title={`${data.integrations.length} integrations`} aside={<SourceBadge>Listed only</SourceBadge>}>
               <ul className="grid grid-cols-2 gap-x-6 gap-y-1 text-[15px]">

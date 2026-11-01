@@ -21,15 +21,12 @@ export function CustomerScreen() {
   const estate = ITEM_TYPE_KEYS.flatMap((key) => data.estate.filter((row) => row.item_type === key));
   return (
     <Screen title={data.customer_name} lead={data.goal} next="estate">
-      <section className="flex items-center gap-4 rounded-xl bg-ink p-5 text-canvas">
-        <ShieldCheck size={32} aria-hidden className="shrink-0" />
-        <div>
-          <p className="text-[20px] font-semibold">Everything you see here is synthetic.</p>
-          <p className="text-[16px] opacity-85">
-            A fictional customer with no real Unit4 data, no payroll or HR data, and no connection to J2X.AI or a
-            production tenant. The ERPx target is simulated.
-          </p>
-        </div>
+      <section className="flex items-center gap-3 rounded-lg border border-line bg-surface px-4 py-3 text-[15px] text-ink-2">
+        <ShieldCheck size={20} aria-hidden className="shrink-0 text-accent" />
+        <p>
+          <strong className="font-semibold text-ink">Sandbox environment.</strong> Test data only, with no payroll or
+          HR data. Not connected to J2X.AI or a production tenant. The ERPx target is simulated.
+        </p>
       </section>
       <div className="grid grid-cols-4 gap-4">
         {estate.map((row, index) => (
@@ -40,13 +37,13 @@ export function CustomerScreen() {
             transition={{ delay: index * 0.06, duration: 0.2 }}
             className="rounded-xl bg-surface p-5 shadow-panel"
           >
-            <div className="tnum text-[44px] leading-none font-semibold">{row.count}</div>
+            <div className="tnum text-[32px] leading-none font-semibold">{row.count}</div>
             <div className="mt-2 text-[16px] text-ink-2">{ITEM_TYPES[row.item_type].estate}</div>
           </motion.div>
         ))}
       </div>
       <div className="grid grid-cols-2 gap-4">
-        <Panel title="The customer">
+        <Panel title="Customer profile">
           <dl className="grid grid-cols-[180px_1fr] gap-y-2.5 text-[16px]">
             <dt className="text-ink-3">Sector</dt>
             <dd>{data.sector}</dd>
@@ -72,7 +69,7 @@ export function CustomerScreen() {
                 </span>
                 {entity.in_migration_scope && (
                   <span className="rounded-md bg-accent-soft px-2 py-0.5 text-[14px] font-semibold text-accent">
-                    Migrating in this demo
+                    In migration scope
                   </span>
                 )}
               </li>

@@ -1,14 +1,13 @@
 import * as Dropdown from "@radix-ui/react-dropdown-menu";
-import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
-import { Check, ChevronDown, MonitorPlay, RotateCcw } from "lucide-react";
+import { useQuery } from "@tanstack/react-query";
+import { Check, ChevronDown } from "lucide-react";
 import { useEffect, useState } from "react";
 import { NavLink, Outlet, useLocation, useNavigate } from "react-router-dom";
 import { api } from "../lib/api";
 import { usePersona } from "../lib/persona";
-import { clearEstateLoaded, useAudienceLink } from "../lib/presenter";
+import { useAudienceLink } from "../lib/presenter";
 import { recordingPath, sceneForPath, SCENES } from "../lib/scenes";
 import { ROLE_KEYS, ROLES, STAGES } from "../lib/terms";
-import { useToast } from "../lib/toast";
 import { workbench } from "../lib/workbench";
 import { Kbd, Skeleton } from "../ui/primitives";
 import { CommandPalette } from "./CommandPalette";
@@ -26,18 +25,6 @@ function Metric({ value, label }: { value: string; label: string }) {
 
 function PersonaMenu() {
   const { role, setRole } = usePersona();
-  const toast = useToast();
-  const client = useQueryClient();
-  const navigate = useNavigate();
-  const reset = useMutation({
-    mutationFn: () => api.reset(role),
-    onSuccess: () => {
-      client.invalidateQueries();
-      clearEstateLoaded();
-      navigate("/customer");
-      toast("Demo reset to the start state");
-    },
-  });
   const person = ROLES[role];
   const initials = person.person
     .split(" ")
@@ -78,21 +65,6 @@ function PersonaMenu() {
               {key === role && <Check size={18} className="text-accent" aria-hidden />}
             </Dropdown.Item>
           ))}
-          <Dropdown.Separator className="my-1 h-px bg-line" />
-          <Dropdown.Item
-            onSelect={() => reset.mutate()}
-            className="flex cursor-pointer items-center gap-2 rounded-lg px-2.5 py-2 text-[15px] outline-none data-[highlighted]:bg-selected"
-          >
-            <RotateCcw size={16} aria-hidden />
-            Reset demo
-          </Dropdown.Item>
-          <Dropdown.Item
-            onSelect={() => window.open("/presenter", "studio-presenter", "popup,width=1280,height=800")}
-            className="flex cursor-pointer items-center gap-2 rounded-lg px-2.5 py-2 text-[15px] outline-none data-[highlighted]:bg-selected"
-          >
-            <MonitorPlay size={16} aria-hidden />
-            Open presenter console
-          </Dropdown.Item>
         </Dropdown.Content>
       </Dropdown.Portal>
     </Dropdown.Root>
@@ -114,7 +86,7 @@ function CustomerBar() {
       </div>
       {data?.synthetic && (
         <span className="rounded-md border border-on-spine-2/40 px-2 py-0.5 text-[13px] font-medium text-on-spine-2">
-          Synthetic data
+          Sandbox
         </span>
       )}
       <div className="ml-auto flex items-center gap-8">
@@ -139,28 +111,24 @@ function CustomerBar() {
 
 function JourneyRail() {
   return (
-    <nav aria-label="Migration journey" className="shrink-0 border-b border-line bg-surface px-5">
+    <nav aria-label="Migration stages" className="shrink-0 border-b border-line bg-surface px-5">
       <ol className="flex h-[52px] items-center gap-1">
-        {STAGES.map((stage, index) => {
-          const number = <span className="tnum mr-2 text-[13px] opacity-70">{index}</span>;
-          return (
-            <li key={stage.key}>
-              <NavLink
-                to={`/${stage.key}`}
-                className={({ isActive }) =>
-                  `flex h-9 items-center rounded-lg px-3.5 text-[15px] font-medium transition-colors ${
-                    isActive ? "bg-ink text-canvas" : "text-ink-2 hover:bg-line/50"
-                  }`
-                }
-              >
-                {number}
-                {stage.label}
-              </NavLink>
-            </li>
-          );
-        })}
+        {STAGES.map((stage) => (
+          <li key={stage.key}>
+            <NavLink
+              to={`/${stage.key}`}
+              className={({ isActive }) =>
+                `flex h-9 items-center rounded-lg px-3.5 text-[15px] font-medium transition-colors ${
+                  isActive ? "bg-ink text-canvas" : "text-ink-2 hover:bg-line/50"
+                }`
+              }
+            >
+              {stage.label}
+            </NavLink>
+          </li>
+        ))}
         <li className="ml-auto flex items-center gap-1.5 text-[14px] text-ink-3">
-          <Kbd>Ctrl K</Kbd> to jump anywhere
+          <Kbd>Ctrl K</Kbd> Search
         </li>
       </ol>
     </nav>
@@ -190,6 +158,12 @@ export function AppShell() {
       if ((event.ctrlKey || event.metaKey) && event.key.toLowerCase() === "k") {
         event.preventDefault();
         setPaletteOpen((open) => !open);
+        return;
+      }
+      // The presenter console has no menu entry, because it is not part of the product.
+      if (event.ctrlKey && event.altKey && event.key.toLowerCase() === "p") {
+        event.preventDefault();
+        window.open("/presenter", "studio-presenter", "popup,width=1280,height=800");
         return;
       }
       const target = event.target as HTMLElement;

@@ -63,7 +63,7 @@ function QuestionQueue({ state }: { state: SignoffState }) {
   const customer = role === "customer";
   return (
     <Panel title={`${state.open_questions.length} customer questions open`}>
-      {!customer && <p className="mb-3 text-[15px] text-ink-2">Switch persona to Jordan Ashby to answer these.</p>}
+      {!customer && <p className="mb-3 text-[15px] text-ink-2">Waiting for Jordan Ashby.</p>}
       <ul className="space-y-3">
         {state.open_questions.map((question) => (
           <li key={question.question_id} className="rounded-lg bg-warn-soft p-3">
@@ -142,7 +142,7 @@ export function SignoffScreen() {
               <dl className="tnum grid grid-cols-[1fr_auto] gap-y-1 text-[16px]">
                 <dt className="text-ink-2">Decisions agreed</dt>
                 <dd>{pack.summary.agreed} of {pack.summary.decisions}</dd>
-                <dt className="text-ink-2">Of which seeded as demo history</dt>
+                <dt className="text-ink-2">Of which accepted in earlier sessions</dt>
                 <dd>{pack.summary.seeded_history}</dd>
                 <dt className="text-ink-2">Checks passed</dt>
                 <dd>{pack.summary.checks_passed} of {pack.summary.checks}</dd>
@@ -201,8 +201,8 @@ export function SignoffScreen() {
             </>
           ) : (
             <p className="m-auto max-w-md text-center text-[18px] leading-7 text-ink-2">
-              One pack with the decision register, reconciliation report, exception log, test evidence and customer
-              questions.
+              No pack generated yet. It will hold the decision register, reconciliation report, exception log, test
+              evidence and customer questions.
             </p>
           )}
         </Panel>

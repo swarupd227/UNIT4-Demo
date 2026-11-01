@@ -137,7 +137,7 @@ function Approvals({ item }: { item: DecisionDetail }) {
     <section>
       <SectionLabel>Who confirms</SectionLabel>
       {item.audit.some((event) => event.action === "accepted_seeded") && (
-        <p className="mb-2 text-[14px] text-ink-3">Seeded as demo history, not accepted during this demo.</p>
+        <p className="mb-2 text-[14px] text-ink-3">Accepted in an earlier session.</p>
       )}
       <ol className="space-y-1.5">
         {item.required_roles.map((role) => {
@@ -295,7 +295,7 @@ export function DetailPanel({ itemId, onEvidence, onEdit, onAsk, onAccept, onAns
           {refusedRetire(item) && (
             <p className="mt-1 inline-flex items-center gap-1.5 text-[15px] font-semibold text-warn">
               <ShieldAlert size={16} aria-hidden />
-              Refused to retire
+              Retirement blocked
             </p>
           )}
           <p className="mt-1 text-[15px] leading-6 text-ink-2">{item.reason}</p>

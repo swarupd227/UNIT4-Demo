@@ -19,7 +19,7 @@ test.afterEach(async ({ page }, info) => {
 
 test("scene 0 sets the scene", async ({ page, request }) => {
   await prepare(request, 0);
-  await timedGoto(page, "/customer", "Everything you see here is synthetic");
+  await timedGoto(page, "/customer", "Sandbox environment");
   await expect(page.getByText("Custom reports")).toBeVisible();
   await page.waitForTimeout(700);
   const tile = page.getByText("148", { exact: true }).locator("..");
@@ -29,8 +29,8 @@ test("scene 0 sets the scene", async ({ page, request }) => {
 
 test("scene 1 loads the estate on top of J2X", async ({ page, request }) => {
   await prepare(request, 1);
-  await timedGoto(page, "/estate", "The CR estate");
-  await page.getByRole("button", { name: "Load the estate" }).click();
+  await timedGoto(page, "/estate", "CR estate");
+  await page.getByRole("button", { name: "Load estate" }).click();
   await expect(page.getByText("Estate map")).toBeVisible();
   await expect(page.getByText("107 of 148 explained")).toBeVisible();
   await page.waitForTimeout(2500);
@@ -42,7 +42,7 @@ test("scene 2 refuses to retire the audit pack", async ({ page, request }) => {
   await page.getByRole("row", { name: /RP-112/ }).click();
   const panel = page.getByRole("complementary", { name: "Item detail" });
   await expect(panel.getByRole("heading", { name: "Year-end audit pack" })).toBeVisible();
-  await expect(panel.getByText("Refused to retire")).toBeVisible();
+  await expect(panel.getByText("Retirement blocked")).toBeVisible();
   await panel.getByRole("button", { name: /Protected word/ }).click();
   await expect(page.getByRole("dialog")).toContainText("never retired");
   await page.waitForTimeout(1500);
@@ -70,21 +70,21 @@ test("scene 3 explains CC-014", async ({ page, request }) => {
 
 test("scene 4 proves the rebuild to the penny", async ({ page, request }) => {
   await prepare(request, 4);
-  await timedGoto(page, "/reports", "148 custom reports");
+  await timedGoto(page, "/reports", "148 in scope");
   await page.waitForTimeout(1300);
   await page.getByRole("button", { name: "Rebuild and run parity" }).click();
   await expect(page.getByText("Totals match to the penny")).toBeVisible();
   await page.waitForTimeout(1000);
   await page.getByRole("button", { name: "Fix the partner list" }).click();
-  await expect(page.getByText("exactly the WIP of P041")).toBeVisible();
+  await expect(page.getByText("equals the WIP of P041")).toBeVisible();
   await expect(page.getByText("£4,583,872.60").first()).toBeVisible();
   await page.waitForTimeout(1500);
 });
 
 test("scene 5 moves nine workflows to three", async ({ page, request }) => {
   await prepare(request, 5);
-  await timedGoto(page, "/workflows", "9 approval workflows");
-  await page.getByRole("button", { name: "Show the proposal" }).click();
+  await timedGoto(page, "/workflows", "9 variants");
+  await page.getByRole("button", { name: "View proposal" }).click();
   await expect(page.getByText("Used only by a dormant legal entity")).toBeVisible();
   await page.getByRole("button", { name: "Send pack to customer" }).click();
   await expect(page.getByRole("button", { name: "Sent to the customer" })).toBeVisible();
@@ -135,7 +135,7 @@ test("scene 7 generates and signs the pack", async ({ page, request }) => {
   await page.getByRole("button", { name: "Generate the pack" }).click();
   await expect(page.getByTitle("Sign-off pack")).toBeVisible();
   console.log(`PACK generated in ${Date.now() - started}ms`);
-  await expect(page.getByText("Of which seeded as demo history")).toBeVisible();
+  await expect(page.getByText("Of which accepted in earlier sessions")).toBeVisible();
   await page.waitForTimeout(1000);
   await asPerson(page, "Robin Hale", "Jordan Ashby");
   await page.getByRole("button", { name: "Sign off the trial migration" }).click();
@@ -145,8 +145,8 @@ test("scene 7 generates and signs the pack", async ({ page, request }) => {
 
 test("scene 8 shows measured results and no saving", async ({ page, request }) => {
   await prepare(request, 8);
-  await timedGoto(page, "/scorecard", "Planted issues found");
-  await expect(page.getByText("We do not quote a percentage saving")).toBeVisible();
+  await timedGoto(page, "/scorecard", "Known issues found");
+  await expect(page.getByText("No baseline available")).toBeVisible();
   await expect(page.getByText("Signed by the customer")).toBeVisible();
   await expect(page.getByLabel("Not found yet")).toHaveCount(0);
   await page.waitForTimeout(2500);
@@ -156,11 +156,11 @@ test("the presenter console drives the audience window", async ({ context, reque
   await prepare(request, 0);
   const audience = await context.newPage();
   await audience.goto("/customer");
-  await expect(audience.getByText("Everything you see here is synthetic")).toBeVisible();
+  await expect(audience.getByText("Sandbox environment")).toBeVisible();
   const consoleWindow = await context.newPage();
   await consoleWindow.goto("/presenter");
   await consoleWindow.getByRole("button", { name: /Next: Load the estate/ }).click();
-  await expect(audience.getByText("The CR estate")).toBeVisible();
+  await expect(audience.getByText("CR estate")).toBeVisible();
   await consoleWindow.keyboard.press("ArrowRight");
   await expect(audience).toHaveURL(/decisions/);
   await expect(audience).toHaveURL(/decisions\/[A-Z]/);
@@ -187,7 +187,7 @@ test("reduced motion still shows everything", async ({ browser, baseURL, request
 
 test("reset is quick", async ({ request }) => {
   const started = Date.now();
-  const response = await request.post("/api/demo/reset");
+  const response = await request.post("/api/workspace/reset");
   expect(response.ok()).toBeTruthy();
   const elapsed = Date.now() - started;
   console.log(`RESET ${elapsed}ms`);
@@ -199,7 +199,7 @@ test("a recording plays over the app and returns to live", async ({ context, req
   await prepare(request, 0);
   const audience = await context.newPage();
   await audience.goto("/customer");
-  await expect(audience.getByText("Everything you see here is synthetic")).toBeVisible();
+  await expect(audience.getByText("Sandbox environment")).toBeVisible();
   const consoleWindow = await context.newPage();
   await consoleWindow.goto("/presenter");
   await consoleWindow.getByRole("button", { name: "Play recording" }).click();

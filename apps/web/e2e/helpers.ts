@@ -3,7 +3,7 @@ import { expect, type APIRequestContext, type Page } from "@playwright/test";
 export const SCENE_LOAD_LIMIT_MS = 2000;
 
 export async function prepare(request: APIRequestContext, scene: number) {
-  const response = await request.post(`/api/demo/prepare/${scene}`);
+  const response = await request.post(`/api/workspace/prepare/${scene}`);
   expect(response.ok()).toBeTruthy();
 }
 

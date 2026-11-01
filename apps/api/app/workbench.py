@@ -272,7 +272,7 @@ SCENE_ANSWERS = {
 }
 
 
-@router.post("/demo/prepare/{scene}")
+@router.post("/workspace/prepare/{scene}")
 def prepare_scene(scene: int, db: Tx) -> dict[str, str]:
     """Rebuilds the state a scene expects, so the presenter can resume anywhere."""
     if not 0 <= scene <= 8:

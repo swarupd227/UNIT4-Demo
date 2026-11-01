@@ -1,6 +1,6 @@
 # Ardleigh Consulting Group: Client Billing Policy
 
-Fictional document, created for a demonstration. Version 6, approved by the Finance Committee, March 2024.
+Version 6, approved by the Finance Committee, March 2024.
 
 ## 1. Purpose
 

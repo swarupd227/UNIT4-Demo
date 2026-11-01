@@ -79,19 +79,19 @@ function ParityView({ parity, fixed, onFix }: { parity: Parity; fixed: boolean; 
   return (
     <div className="space-y-4">
       <section>
-        <h3 className="mb-2 text-[15px] font-semibold">Step 1: rebuild it faithfully, old partner list included</h3>
+        <h3 className="mb-2 text-[15px] font-semibold">Like-for-like rebuild, original partner list</h3>
         <div className="flex gap-3">
           <Total label="CR report" value={parity.cr_total} />
           <Total label="Rebuilt report" value={parity.faithful_rebuild_total ?? 0} />
         </div>
         <p className="mt-2 flex items-center gap-2 text-[16px] font-medium text-ok">
-          <Check size={19} aria-hidden /> Totals match to the penny, so the logic is proven
+          <Check size={19} aria-hidden /> Totals match to the penny
         </p>
       </section>
       {!fixed ? (
         <div className="rounded-lg bg-warn-soft p-4">
           <p className="text-[16px] leading-6">
-            The report only includes partners typed into it in 2022. {item.partners.length} current partners are missing.
+            The partner list was hard-coded in 2022. {item.partners.length} current partners are missing.
           </p>
           <Button variant="primary" className="mt-3" onClick={onFix}>
             <Wrench size={17} aria-hidden />
@@ -100,14 +100,14 @@ function ParityView({ parity, fixed, onFix }: { parity: Parity; fixed: boolean; 
         </div>
       ) : (
         <motion.section initial={{ opacity: 0, y: 6 }} animate={{ opacity: 1, y: 0 }}>
-          <h3 className="mb-2 text-[15px] font-semibold">Step 2: use current partners from the reference data</h3>
+          <h3 className="mb-2 text-[15px] font-semibold">Corrected rebuild, current partners from reference data</h3>
           <div className="flex gap-3">
-            <Total label="Fixed report" value={parity.fixed_rebuild_total ?? 0} />
+            <Total label="Corrected report" value={parity.fixed_rebuild_total ?? 0} />
             <Total label="Difference" value={(parity.fixed_rebuild_total ?? 0) - parity.cr_total} tone="text-warn" />
             <Total label="Missing partners' WIP" value={item.amount} tone="text-warn" />
           </div>
           <p className="mt-2 flex items-center gap-2 text-[16px] font-medium text-ok">
-            <Check size={19} aria-hidden /> The difference is exactly the WIP of {item.partners.join(", ")}
+            <Check size={19} aria-hidden /> The difference equals the WIP of {item.partners.join(", ")}
           </p>
         </motion.section>
       )}
@@ -134,8 +134,8 @@ export function ReportsScreen() {
 
   return (
     <Screen
-      title={`${data.total} custom reports`}
-      lead={`${after} custom reports remain, and the ones that stay are proven.`}
+      title="Custom reports"
+      lead={`${data.total} in scope, ${after} after rationalisation`}
       next="workflows"
     >
       <Panel>
@@ -152,7 +152,7 @@ export function ReportsScreen() {
       </Panel>
       <div className="grid grid-cols-[minmax(0,5fr)_minmax(0,7fr)] gap-4">
         <div className="space-y-4">
-          <Panel title={`${data.merged} near-duplicates become ${data.merged_into}`}>
+          <Panel title={`Merge groups: ${data.merged} reports into ${data.merged_into}`}>
             <ul tabIndex={0} aria-label="Merge groups" className="scroll-quiet max-h-[340px] divide-y divide-line overflow-y-auto">
               {data.groups.map((group) => (
                 <li key={group.lead.item_id} className="py-2">
@@ -167,7 +167,7 @@ export function ReportsScreen() {
               ))}
             </ul>
           </Panel>
-          <Panel title="Held, not retired">
+          <Panel title="Held for customer review">
             <ul className="space-y-1.5">
               {data.held.map((row) => (
                 <li key={row.item_id}>
@@ -181,7 +181,7 @@ export function ReportsScreen() {
           </Panel>
         </div>
         <Panel
-          title="Prove the rebuild"
+          title="Report parity"
           aside={
             <div className="flex items-center gap-3">
               {parity && <CodeBadge />}

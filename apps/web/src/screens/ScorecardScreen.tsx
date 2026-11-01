@@ -13,9 +13,9 @@ function minutes(seconds: number): string {
 function Hero({ value, of, label, note }: { value: number; of?: number; label: string; note: string }) {
   return (
     <Panel>
-      <div className="tnum text-[56px] leading-none font-semibold">
+      <div className="tnum text-[36px] leading-none font-semibold">
         <CountUp value={value} />
-        {of !== undefined && <span className="text-[30px] font-medium text-ink-3"> of {of}</span>}
+        {of !== undefined && <span className="text-[22px] font-medium text-ink-3"> of {of}</span>}
       </div>
       <div className="mt-2 text-[17px] font-medium">{label}</div>
       <div className="text-[15px] text-ink-3">{note}</div>
@@ -35,28 +35,29 @@ export function ScorecardScreen() {
     [
       "Reconciliation accuracy",
       data.reconciliation.run ? `${data.reconciliation.passed} of ${data.reconciliation.total} checks pass` : "Not run",
-      "Every planted difference found",
+      "All known differences found",
     ],
     ["Validation run time", data.reconciliation.seconds ? `${data.reconciliation.seconds.toFixed(1)} sec` : "Not run", "Measured"],
     ["Defects", data.defects.tested ? `${data.defects.failed} of ${data.defects.tested} rebuilds failed first run` : "Not tested", "Measured"],
     [
       "Agent run time",
       authored ? "Not measured" : "Recorded run",
-      authored ? `${authored.count} results authored by hand in the agent format` : "From the recorded run",
+      authored ? `${authored.count} prepared analyses` : "From the recorded run",
     ],
     ["Full customer journey", "Pilot measure", "Not measured here"],
+    ["Saving against baseline", "Not calculated", "No baseline available"],
   ];
 
   return (
     <Screen
       title="Results"
-      lead="Measured on synthetic data, against an answer key. They do not predict results on real customers."
-      aside={<CodeBadge title="Computed from the database and the answer key" />}
+      lead="Measured on the sandbox dataset against expected results. Not a forecast for customer migrations."
+      aside={<CodeBadge title="Computed from the database and the expected results" />}
     >
       <div className="grid grid-cols-3 gap-4">
-        <Hero value={data.found} of={data.planted} label="Planted issues found" note="The demo needs all ten" />
+        <Hero value={data.found} of={data.planted} label="Known issues found" note="Target: all 10" />
         <Hero value={data.false_items.count} label="False items raised" note={`Limit ${data.false_items.limit}: ${data.false_items.items.join(", ") || "none"}`} />
-        <Hero value={data.decision_quality.matched} of={data.decision_quality.total} label="Decisions match the answer key" note={`Missed: ${data.decision_quality.wrong.join(", ") || "none"}`} />
+        <Hero value={data.decision_quality.matched} of={data.decision_quality.total} label="Decisions match expected results" note={`Missed: ${data.decision_quality.wrong.join(", ") || "none"}`} />
       </div>
       <div className="grid grid-cols-[minmax(0,1fr)_minmax(0,1fr)] gap-4">
         <div className="space-y-4">
@@ -105,7 +106,7 @@ export function ScorecardScreen() {
             </ul>
           </Panel>
         </div>
-        <Panel title="The ten planted issues">
+        <Panel title="Known issues">
           <ol className="divide-y divide-line">
             {data.issues.map((issue) => (
               <li key={issue.issue_id} className="flex items-start gap-3 py-2 text-[16px]">
@@ -121,9 +122,6 @@ export function ScorecardScreen() {
           </ol>
         </Panel>
       </div>
-      <p className="rounded-xl bg-surface p-5 text-[17px] leading-7 shadow-panel">
-        We do not quote a percentage saving. Unit4 has not shared a baseline, so any comparison would be an assumption.
-      </p>
     </Screen>
   );
 }

@@ -155,7 +155,7 @@ export function CodeScreen() {
   return (
     <Screen
       title="Custom code"
-      lead="What it really does, what it hides, and how it moves safely."
+      lead="Code analysis, rule extraction and extension design"
       next="reports"
       aside={
         <nav className="flex rounded-lg border border-line-strong bg-surface p-0.5" aria-label="Code items">
@@ -223,11 +223,11 @@ export function CodeScreen() {
                 <CodeView source={item.source_text ?? ""} focusLine={line} />
               </div>
             </Panel>
-            <Panel title="Plain English" aside={<AiBadge />}>
+            <Panel title="Explanation" aside={<AiBadge />}>
               <div className="scroll-quiet h-[500px] space-y-4 overflow-y-auto">
-                <CitationList title="Step by step" items={explanation.steps} onHover={setLine} />
-                <CitationList title="Hidden rules" items={explanation.hidden_rules} onHover={setLine} />
-                <CitationList title="Cannot move as it is" items={explanation.cloud_blockers} onHover={setLine} />
+                <CitationList title="Logic" items={explanation.steps} onHover={setLine} />
+                <CitationList title="Embedded rules" items={explanation.hidden_rules} onHover={setLine} />
+                <CitationList title="Cloud blockers" items={explanation.cloud_blockers} onHover={setLine} />
                 {dependencies.map((dependency) => (
                   <p key={dependency.label} className="flex gap-2 rounded-lg bg-warn-soft p-3 text-[15px] leading-6">
                     <Link2 size={18} className="mt-1 shrink-0 text-warn" aria-hidden />
