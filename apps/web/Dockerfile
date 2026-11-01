@@ -3,7 +3,7 @@ WORKDIR /web
 COPY package.json package-lock.json ./
 RUN npm ci --no-audit --no-fund
 COPY . .
-# The recordings are git-ignored, so a clean checkout has none. Stop here, not on stage.
+# A missing recording should stop the build, not surface on stage.
 RUN test "$(ls public/fallback/*.webm 2>/dev/null | wc -l)" -eq 9 \
     || (echo "Expected 9 scene recordings. Run npm run record first." >&2 && exit 1)
 RUN npm run build

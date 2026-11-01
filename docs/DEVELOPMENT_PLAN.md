@@ -212,7 +212,7 @@ Status: three consecutive clean scripted passes on the production build, with ev
 Bicep for Container Apps, Postgres, Blob Storage, Key Vault, Container Registry and Application Insights. Add Entra sign-in and a CI pipeline, then install the Azure CLI, which this machine does not have yet.
 **Exit:** a full rehearsal passes on the Azure URL, with replay mode behaving identically to local.
 
-Status: prepared, not deployed. Templates, images, pipelines and [the runbook](AZURE_DEPLOYMENT.md) exist and were tested on this machine as far as that is possible. The subscription, Entra access and a Git remote are still needed, and the exit gate can only be met on Azure.
+Status: prepared, not deployed. Templates, images, pipelines and [the runbook](AZURE_DEPLOYMENT.md) exist and were tested on this machine as far as that is possible. The code is on GitHub, and the exit gate can only be met on Azure.
 
 ---
 

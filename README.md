@@ -48,7 +48,7 @@ Browser tests run against the production build, with the journey, accessibility 
 npm run e2e
 ```
 
-To record the scene fallbacks. Run this before `npm run demo`, because the build includes them:
+To record the scene fallbacks again after the screens change. Commit the results, because the production build and the Azure image include them:
 
 ```bash
 npm run record

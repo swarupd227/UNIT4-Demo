@@ -28,7 +28,7 @@ There is one shared case. Two people using the site at the same time will see ea
 - An Azure subscription and a resource group, with Owner on the group. The templates assign roles to the managed identity, so Contributor alone is not enough.
 - Rights to create an app registration in Entra, or someone who can do it for you.
 - Azure CLI 2.61 or newer, Docker and Git Bash on the machine that deploys.
-- The scene recordings. They are git-ignored, so run `npm run record` first on a fresh checkout. The web image refuses to build without all nine.
+- The scene recordings, which are kept in Git. Run `npm run record` and commit them if the screens change. The web image refuses to build without all nine.
 
 ## First deployment
 
@@ -112,7 +112,7 @@ Run `bash infra/deploy.sh` again with the same three variables, or start the **D
 
 ## Automated deployment
 
-`.github/workflows/ci.yml` runs every check on pull requests. `.github/workflows/deploy.yml` is started by hand. This repository has no remote yet, so neither has run.
+`.github/workflows/ci.yml` runs every check on pull requests. `.github/workflows/deploy.yml` is started by hand from https://github.com/swarupd227/UNIT4-Demo.
 
 To enable deployment, create a GitHub environment called `azure`, plus an Entra identity with Owner on the resource group and a federated credential for that environment. Then set:
 

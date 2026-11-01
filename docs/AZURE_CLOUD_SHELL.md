@@ -6,9 +6,7 @@ Nothing here has been run against a real subscription yet, so expect to fix some
 
 ## Before you start
 
-On your own machine, run `npm run package:azure`. It creates `migration-studio-source.tar.gz` in the project folder, including the nine scene recordings that Git leaves out. If the file is older than your latest change, run it again.
-
-Cloud Shell has no Docker, so Azure builds the images from this package. Cloud Shell can't see your machine, so you upload it: use **Manage files > Upload** in the Cloud Shell toolbar. It lands in your home folder. Upload it again whenever a session has lost it, which `ls ~/migration-studio-source.tar.gz` will show.
+Blocks that need the code get it from https://github.com/swarupd227/UNIT4-Demo: they clone the repository if the shell doesn't have it, then pull the latest `main`. So push your changes before you deploy them. Cloud Shell has no Docker, so Azure builds the images from that code.
 
 You will need to keep two secrets from step 2 in your password manager. Cloud Shell won't remember them.
 
@@ -56,7 +54,8 @@ The braces make the shell read the whole paste before it asks for anything. If n
 ```bash
 {
 az account set --subscription "Microsoft Azure Sponsorship"
-mkdir -p ~/studio && tar -xzf ~/migration-studio-source.tar.gz -C ~/studio && cd ~/studio
+[ -d ~/UNIT4-Demo ] || git clone https://github.com/swarupd227/UNIT4-Demo.git ~/UNIT4-Demo
+cd ~/UNIT4-Demo && git pull --ff-only
 
 read -rsp "ENTRA_CLIENT_ID: " ENTRA_CLIENT_ID && echo
 read -rsp "ENTRA_CLIENT_SECRET: " ENTRA_CLIENT_SECRET && echo
@@ -77,10 +76,11 @@ Azure builds both images in the registry. This takes about 10 minutes.
 
 ```bash
 az account set --subscription "Microsoft Azure Sponsorship"
-mkdir -p ~/studio && tar -xzf ~/migration-studio-source.tar.gz -C ~/studio && cd ~/studio
+[ -d ~/UNIT4-Demo ] || git clone https://github.com/swarupd227/UNIT4-Demo.git ~/UNIT4-Demo
+cd ~/UNIT4-Demo && git pull --ff-only
 
 REGISTRY=$(az acr list --resource-group rg-migration-studio --query "[0].name" --output tsv)
-TAG=$(date +%Y%m%d%H%M)
+TAG=$(git rev-parse --short=12 HEAD)
 
 az acr build --registry "$REGISTRY" --image "studio-api:$TAG" --target production \
   --file apps/api/Dockerfile . && \
@@ -95,7 +95,8 @@ This deploys the newest images. It asks for the same three values.
 ```bash
 {
 az account set --subscription "Microsoft Azure Sponsorship"
-mkdir -p ~/studio && tar -xzf ~/migration-studio-source.tar.gz -C ~/studio && cd ~/studio
+[ -d ~/UNIT4-Demo ] || git clone https://github.com/swarupd227/UNIT4-Demo.git ~/UNIT4-Demo
+cd ~/UNIT4-Demo && git pull --ff-only
 
 read -rsp "ENTRA_CLIENT_ID: " ENTRA_CLIENT_ID && echo
 read -rsp "ENTRA_CLIENT_SECRET: " ENTRA_CLIENT_SECRET && echo
@@ -179,7 +180,7 @@ Then open the site in a browser, sign in, and run a full rehearsal. That rehears
 
 ## Deploying a change
 
-Run `npm run package:azure`, upload the new package, then run steps 4 and 5. Your data stays as it is, and any database migrations run when the API starts.
+Push your changes to `main`, then run steps 4 and 5. Your data stays as it is, and any database migrations run when the API starts.
 
 ## If something fails
 
