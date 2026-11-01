@@ -7,8 +7,11 @@ from collections.abc import Iterator
 
 import pytest
 from fastapi.testclient import TestClient
+from weasyprint import HTML
 
 from app.main import app
+from engines.decision.memory import next_proposal
+from engines.signoff.pack import workflow_pack_html
 
 CONSULTANT = {"X-Studio-Persona": "consultant"}
 CUSTOMER = {"X-Studio-Persona": "customer"}
@@ -175,3 +178,92 @@ def test_prepare_rebuilds_the_state_each_scene_expects(
 
 def test_prepare_rejects_an_unknown_scene(client: TestClient) -> None:
     assert client.post("/api/workspace/prepare/9").status_code == 404
+
+
+def run_with_duplicate_value(client: TestClient) -> dict:
+    run = client.post("/api/reconciliation/run").json()
+    return next(e for e in run["exceptions"] if e["code"] == "duplicate_dimension_value")
+
+
+def test_only_the_named_approver_can_approve_an_exception(client: TestClient) -> None:
+    exception = run_with_duplicate_value(client)
+    url = f"/api/reconciliation/exceptions/{exception['exception_id']}/approve"
+    assert client.post(url, headers=CUSTOMER).status_code == 403
+    assert client.post(url, headers=CONSULTANT).status_code == 200
+    assert client.post(url, headers=CONSULTANT).status_code == 409
+    assert (
+        client.post("/api/reconciliation/exceptions/EX-R9-1/approve", headers=CONSULTANT).status_code == 404
+    )
+
+
+def test_an_approval_survives_a_rerun_without_changing_the_result(client: TestClient) -> None:
+    exception = run_with_duplicate_value(client)
+    before = client.get("/api/reconciliation/latest").json()["result_hash"]
+    client.post(f"/api/reconciliation/exceptions/{exception['exception_id']}/approve", headers=CONSULTANT)
+    rerun = client.post("/api/reconciliation/run").json()
+    assert rerun["result_hash"] == before
+    approved = next(e for e in rerun["exceptions"] if e["code"] == "duplicate_dimension_value")
+    assert approved["approved_by"] == "Robin Hale"
+    assert next(c for c in rerun["checks"] if c["check_id"] == "R6")["status"] == "fail"
+
+
+def test_a_reset_clears_exception_approvals(client: TestClient) -> None:
+    exception = run_with_duplicate_value(client)
+    client.post(f"/api/reconciliation/exceptions/{exception['exception_id']}/approve", headers=CONSULTANT)
+    client.post("/api/workspace/reset")
+    assert run_with_duplicate_value(client)["approved_by"] is None
+
+
+def test_the_pack_records_who_approved_an_exception(client: TestClient) -> None:
+    exception = run_with_duplicate_value(client)
+    client.post(f"/api/reconciliation/exceptions/{exception['exception_id']}/approve", headers=CONSULTANT)
+    pack = ready_pack(client)["pack"]
+    archive = client.get(f"/api/signoff/{pack['pack_id']}/signoff_pack.zip").content
+    log = zipfile.ZipFile(io.BytesIO(archive)).read("exception_log.csv").decode()
+    assert "Robin Hale" in log
+
+
+def test_consultant_effort_is_reported_per_case(client: TestClient) -> None:
+    client.post("/api/timing", headers=CONSULTANT, json={"stage": "reports", "seconds": 30})
+    client.post("/api/timing", headers=CUSTOMER, json={"stage": "reports", "seconds": 15})
+    cases = {row["case"]: row["consultant_seconds"] for row in client.get("/api/scorecard").json()["cases"]}
+    assert cases == {"Case 1: custom code": 0, "Case 2: report estate": 30, "Case 3: approval workflows": 0}
+
+
+def test_the_workflow_decision_pack_is_one_page(client: TestClient) -> None:
+    pack = client.get("/api/workflows").json()["pack"]
+    response = client.get("/api/workflows/decision-pack.pdf")
+    assert response.status_code == 200
+    assert response.headers["content-type"] == "application/pdf"
+    assert response.content.startswith(b"%PDF-")
+    usage = {workflow["keeps"]: 1000 for workflow in pack["proposed"]}
+    assert len(HTML(string=workflow_pack_html("Ardleigh Consulting Group", pack, usage)).render().pages) == 1
+
+
+def test_memory_offers_the_most_approved_outcome() -> None:
+    history = [("retire", "approved"), ("retire", "approved"), ("keep_repoint", "approved")]
+    assert next_proposal(history) == ("retire", 80)
+
+
+def test_memory_stops_offering_a_rejected_outcome() -> None:
+    assert next_proposal([("retire", "approved"), ("retire", "rejected")]) == (None, None)
+
+
+def test_memory_confidence_has_a_ceiling() -> None:
+    assert next_proposal([("retire", "approved")] * 20) == ("retire", 95)
+
+
+def test_an_edit_reaches_mapping_memory_on_the_scorecard(client: TestClient) -> None:
+    assert client.get("/api/scorecard").json()["memory"]["entries"] == []
+    row = next(r for r in client.get("/api/decisions").json() if r["status"] == "review" and r["outcome"])
+    edited = "keep_repoint" if row["outcome"] != "keep_repoint" else "retire"
+    response = client.post(
+        f"/api/decisions/{row['item_id']}/edit",
+        headers=CONSULTANT,
+        json={"outcome": edited, "reason": "Still needed"},
+    )
+    assert response.status_code == 200, response.text
+    memory = client.get("/api/scorecard").json()["memory"]
+    assert memory["rejected"] == 1
+    assert memory["entries"][0]["item_id"] == row["item_id"]
+    assert memory["entries"][0]["next_outcome"] != row["outcome"]

@@ -1,6 +1,7 @@
 import { useQuery } from "@tanstack/react-query";
 import { Check, CircleDashed, X } from "lucide-react";
 import { usePersona } from "../lib/persona";
+import { OUTCOMES, type Outcome } from "../lib/terms";
 import { workbench } from "../lib/workbench";
 import { CountUp, Panel, Screen } from "../ui/layout";
 import { CodeBadge, Skeleton } from "../ui/primitives";
@@ -8,6 +9,10 @@ import { CodeBadge, Skeleton } from "../ui/primitives";
 function minutes(seconds: number): string {
   if (seconds === 0) return "None logged";
   return seconds < 60 ? `${seconds} sec` : `${(seconds / 60).toFixed(1)} min`;
+}
+
+function outcomeLabel(outcome: string): string {
+  return OUTCOMES[outcome as Outcome]?.label ?? outcome;
 }
 
 function Hero({ value, of, label, note }: { value: number; of?: number; label: string; note: string }) {
@@ -80,6 +85,18 @@ export function ScorecardScreen() {
               ))}
             </ul>
           </Panel>
+          <Panel title="Consultant effort by case">
+            <table className="w-full text-[16px]">
+              <tbody className="divide-y divide-line">
+                {data.cases.map((entry) => (
+                  <tr key={entry.case}>
+                    <th scope="row" className="py-2 text-left font-normal">{entry.case}</th>
+                    <td className="tnum py-2 text-right text-ink-2">{minutes(entry.consultant_seconds)}</td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </Panel>
           <Panel title="Measures">
             <table className="w-full text-[16px]">
               <tbody className="divide-y divide-line">
@@ -122,6 +139,46 @@ export function ScorecardScreen() {
           </ol>
         </Panel>
       </div>
+      <Panel
+        title="Mapping memory"
+        aside={
+          <span className="tnum text-[15px] text-ink-2">
+            {data.memory.precedents} precedents, {data.memory.approved} approved and {data.memory.rejected} rejected
+            here
+          </span>
+        }
+      >
+        {data.memory.entries.length === 0 ? (
+          <p className="text-[16px] text-ink-2">No decisions stored in this session yet.</p>
+        ) : (
+          <table className="w-full text-[15px]">
+            <thead>
+              <tr className="border-b border-line-strong text-left text-[13px] tracking-wide text-ink-3 uppercase">
+                <th className="py-1.5 font-semibold">Item</th>
+                <th className="py-1.5 font-semibold">Decision</th>
+                <th className="py-1.5 font-semibold">Review</th>
+                <th className="py-1.5 font-semibold">By</th>
+                <th className="py-1.5 font-semibold">Next similar item starts at</th>
+              </tr>
+            </thead>
+            <tbody className="divide-y divide-line">
+              {data.memory.entries.map((entry) => (
+                <tr key={entry.memory_id}>
+                  <td className="tnum py-1.5 pr-3">{entry.item_id}</td>
+                  <td className="py-1.5 pr-3">{outcomeLabel(entry.outcome)}</td>
+                  <td className="py-1.5 pr-3 capitalize">{entry.review_status}</td>
+                  <td className="py-1.5 pr-3">{entry.decided_by}</td>
+                  <td className="tnum py-1.5">
+                    {entry.next_outcome
+                      ? `${outcomeLabel(entry.next_outcome)}, ${entry.next_confidence}% confidence`
+                      : "No proposal yet"}
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        )}
+      </Panel>
     </Screen>
   );
 }

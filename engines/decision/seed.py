@@ -173,7 +173,7 @@ def seed_decisions(db: Connection) -> None:
         text("""
         TRUNCATE studio.audit_event, studio.customer_question, studio.approval, studio.decision,
                  studio.check_run, studio.mapping_memory, studio.artefact, studio.signoff_pack,
-                 studio.timing_event,
+                 studio.timing_event, studio.exception_resolution,
                  studio.proposal, studio.dependency RESTART IDENTITY CASCADE
     """)
     )

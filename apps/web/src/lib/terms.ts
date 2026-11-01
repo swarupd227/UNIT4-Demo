@@ -78,6 +78,7 @@ export const AUDIT_ACTIONS: Record<string, string> = {
   edited: "Changed the decision",
   asked_customer: "Asked the customer",
   answered: "Answered",
+  approved_exception: "Approved an exception",
   generated_pack: "Generated the sign-off pack",
   signed_pack: "Signed the pack",
 };

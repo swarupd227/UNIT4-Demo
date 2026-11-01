@@ -3,6 +3,7 @@ import { CheckCircle2, Hourglass, Play, RotateCw, ShieldCheck, XCircle } from "l
 import { motion } from "motion/react";
 import { useEffect, useRef, useState } from "react";
 import { api } from "../lib/api";
+import { formatTime } from "../lib/format";
 import { usePersona } from "../lib/persona";
 import { ROLES } from "../lib/terms";
 import { useToast } from "../lib/toast";
@@ -66,6 +67,35 @@ function ThresholdCard({ onAnswered }: { onAnswered: () => void }) {
   );
 }
 
+function ExceptionApproval({ exception }: { exception: ReconException }) {
+  const { role } = usePersona();
+  const toast = useToast();
+  const client = useQueryClient();
+  const approve = useMutation({
+    mutationFn: () => workbench.approveException(exception.exception_id, role),
+    onSuccess: (result) => {
+      client.setQueryData(["reconciliation"], result);
+      client.invalidateQueries({ predicate: (query) => query.queryKey[0] !== "reconciliation" });
+    },
+    onError: (error: Error) => toast(error.message, "bad"),
+  });
+  if (exception.approved_by) {
+    return (
+      <p className="mt-2 text-[15px] font-medium text-ok">
+        Approved by {exception.approved_by}, {formatTime(exception.approved_at!)}. Applies at the next trial load.
+      </p>
+    );
+  }
+  if (role !== exception.approver_role) {
+    return <p className="mt-2 text-[15px] text-ink-2">Waiting for {ROLES[exception.approver_role].person}.</p>;
+  }
+  return (
+    <Button className="mt-3" disabled={approve.isPending} onClick={() => approve.mutate()}>
+      Approve proposed action
+    </Button>
+  );
+}
+
 function CheckDrawer({ check, run, onClose }: { check: CheckResult; run: ReconRun; onClose: () => void }) {
   const { role } = usePersona();
   const { data: rows } = useQuery({
@@ -90,6 +120,7 @@ function CheckDrawer({ check, run, onClose }: { check: CheckResult; run: ReconRu
             <p className="mt-1 text-[14px] text-ink-3">
               {exception.exception_id} · Approver: {ROLES[exception.approver_role].label}
             </p>
+            <ExceptionApproval exception={exception} />
           </section>
         ))}
         {check.difference_count > 0 && (
@@ -260,7 +291,8 @@ export function ReconcileScreen() {
               <Panel className="flex items-center justify-between gap-6">
                 <p className="text-[17px]">
                   <strong className="tnum">{passed} of {latest.checks.length}</strong> checks pass.{" "}
-                  <strong className="tnum">{latest.exceptions.length}</strong> exceptions to resolve.
+                  <strong className="tnum">{latest.exceptions.filter((entry) => !entry.approved_by).length}</strong> exceptions
+                  to resolve.
                 </p>
                 <p className="tnum flex items-center gap-2 text-[15px] text-ink-2">
                   <ShieldCheck size={18} className="text-accent" aria-hidden />

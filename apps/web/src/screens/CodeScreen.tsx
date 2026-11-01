@@ -7,12 +7,12 @@ import { acceptLabel } from "../lib/terms";
 import { workbench } from "../lib/workbench";
 import { CodeView } from "../ui/CodeView";
 import { Panel, Screen, useDecision } from "../ui/layout";
-import { AiBadge, Button, Skeleton, StatusLabel } from "../ui/primitives";
+import { AiBadge, Button, Skeleton, SourceBadge, StatusLabel } from "../ui/primitives";
 import { AskDialog } from "./decisions/DecisionDialogs";
 import { useDecisionActions } from "./decisions/useDecisionActions";
 
 const ITEMS = ["CC-014", "CC-041", "CC-037"];
-type Tab = "rule" | "spec" | "tests";
+type Tab = "rule" | "spec" | "skeleton" | "tests";
 
 type Citation = { text: string; find: string; line: number };
 type Explanation = {
@@ -147,6 +147,7 @@ export function CodeScreen() {
   const tabs: [Tab, string, unknown][] = [
     ["rule", "Rule card", rule],
     ["spec", "Extension spec", spec],
+    ["skeleton", "Skeleton", spec?.code_skeleton],
     ["tests", "Tests", tests],
   ];
   const dependencies = item?.evidence.filter((entry) => entry.kind === "dependency") ?? [];
@@ -262,6 +263,7 @@ export function CodeScreen() {
                   <div tabIndex={0} role="region" aria-label={`${tab} detail`} className="scroll-quiet h-[484px] overflow-y-auto">
                     {tab === "rule" && rule && <RuleTab rule={rule} onHover={setLine} />}
                     {tab === "spec" && spec && <SpecTab spec={spec} />}
+                    {tab === "skeleton" && spec && <CodeView source={spec.code_skeleton.join("\n")} />}
                     {tab === "tests" && tests && <TestsTab tests={tests} />}
                   </div>
                 </>
@@ -275,6 +277,15 @@ export function CodeScreen() {
               )}
             </Panel>
           </div>
+
+          {spec?.agentification_idea && (
+            <section className="flex items-center gap-3 rounded-lg border border-line bg-surface px-4 py-3 text-[15px] text-ink-2">
+              <SourceBadge>Idea only</SourceBadge>
+              <p>
+                <strong className="font-semibold text-ink">Agentification.</strong> {spec.agentification_idea}
+              </p>
+            </section>
+          )}
         </>
       )}
       {asking && item && (

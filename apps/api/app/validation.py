@@ -1,9 +1,12 @@
+from datetime import UTC, datetime
 from typing import Any
 
-from fastapi import APIRouter, Query
+from fastapi import APIRouter, HTTPException, Query
 from sqlalchemy import Connection, text
 
-from app.decisions import Tx
+from app.decisions import PersonaRole, Tx
+from engines.decision import audit
+from engines.decision.policy import PERSONAS
 from engines.scoring.score import score
 from engines.validation.runner import run_checks
 
@@ -21,7 +24,12 @@ def _run_report(db: Connection, run_id: int) -> dict[str, Any]:
         text("SELECT * FROM studio.check_result WHERE run_id = :run_id ORDER BY check_id"), params
     ).mappings()
     exceptions = db.execute(
-        text("SELECT * FROM studio.exception WHERE run_id = :run_id ORDER BY exception_id"), params
+        text("""
+            SELECT e.*, r.approved_by, r.approved_at
+            FROM studio.exception e LEFT JOIN studio.exception_resolution r USING (code, title)
+            WHERE e.run_id = :run_id ORDER BY e.exception_id
+        """),
+        params,
     ).mappings()
     return {**run, "checks": [dict(c) for c in checks], "exceptions": [dict(e) for e in exceptions]}
 
@@ -35,6 +43,46 @@ def run_reconciliation(db: Tx) -> dict[str, Any]:
 def latest_reconciliation(db: Tx) -> dict[str, Any] | None:
     run_id = _latest_run_id(db)
     return _run_report(db, run_id) if run_id is not None else None
+
+
+@router.post("/reconciliation/exceptions/{exception_id}/approve")
+def approve_exception(exception_id: str, db: Tx, role: PersonaRole) -> dict[str, Any]:
+    """Approves the proposed action. The fix lands in the next trial load, so the check still fails."""
+    run_id = _latest_run_id(db)
+    if run_id is None:
+        raise HTTPException(status_code=404, detail="Reconciliation has not run yet.")
+    row = db.execute(
+        text("""
+            SELECT e.code, e.title, e.proposed_action, e.approver_role, r.approved_at
+            FROM studio.exception e LEFT JOIN studio.exception_resolution r USING (code, title)
+            WHERE e.run_id = :run_id AND e.exception_id = :exception_id
+        """),
+        {"run_id": run_id, "exception_id": exception_id},
+    ).first()
+    if row is None:
+        raise HTTPException(status_code=404, detail="This exception is not in the latest run.")
+    if role != row.approver_role:
+        raise HTTPException(status_code=403, detail=f"{PERSONAS[row.approver_role]} approves this exception.")
+    if row.approved_at:
+        raise HTTPException(status_code=409, detail="This exception is already approved.")
+    now = datetime.now(UTC)
+    db.execute(
+        text("""
+            INSERT INTO studio.exception_resolution (code, title, approved_by, approved_role, approved_at)
+            VALUES (:code, :title, :by, :role, :at)
+        """),
+        {"code": row.code, "title": row.title, "by": PERSONAS[role], "role": role, "at": now},
+    )
+    audit.record(
+        db,
+        now,
+        PERSONAS[role],
+        role,
+        "approved_exception",
+        exception_id,
+        {"title": row.title, "proposed_action": row.proposed_action},
+    )
+    return _run_report(db, run_id)
 
 
 @router.get("/reconciliation/{check_id}/differences")

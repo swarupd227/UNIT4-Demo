@@ -1,11 +1,11 @@
 import { useMutation, useQuery } from "@tanstack/react-query";
-import { ArrowRight, Send } from "lucide-react";
+import { ArrowRight, FileText, Send } from "lucide-react";
 import { motion } from "motion/react";
 import { useState } from "react";
 import { api } from "../lib/api";
 import { usePersona } from "../lib/persona";
 import { useToast } from "../lib/toast";
-import { workbench, type WorkflowVariant } from "../lib/workbench";
+import { WORKFLOW_PACK_PATH, workbench, type WorkflowVariant } from "../lib/workbench";
 import { useDecision, Panel, Screen } from "../ui/layout";
 import { AiBadge, Button, CodeBadge, Skeleton } from "../ui/primitives";
 import { useRefresh } from "./decisions/useDecisionActions";
@@ -101,6 +101,11 @@ export function WorkflowsScreen() {
                       <span className="tnum text-[14px] font-normal text-ink-3">{workflow.keeps}</span>
                     </div>
                     <p className="text-[15px] text-ink-2">{workflow.rule}</p>
+                    <ul className="mt-1 list-disc pl-5 text-[14px] leading-6 text-ink-2">
+                      {workflow.erpx_configuration.map((line) => (
+                        <li key={line}>{line}</li>
+                      ))}
+                    </ul>
                     {workflow.absorbs.length > 0 && (
                       <p className="tnum mt-1 flex items-center gap-1.5 text-[14px] text-ink-3">
                         {workflow.absorbs.join(", ")}
@@ -118,16 +123,38 @@ export function WorkflowsScreen() {
                 ))}
               </ul>
               <p className="mt-3 text-[15px] font-medium">{pack.decision_needed}</p>
-              <p className="mt-1 text-[14px] text-ink-3">{pack.tests.length} test cases generated with the configuration.</p>
-              <Button
-                variant="primary"
-                className="mt-3"
-                disabled={sent || !packItem?.allowed.ask || send.isPending}
-                onClick={() => send.mutate()}
-              >
-                <Send size={17} aria-hidden />
-                {sent ? "Sent to the customer" : "Send pack to customer"}
-              </Button>
+              <div className="mt-3 flex flex-wrap items-center gap-3">
+                <a
+                  href={WORKFLOW_PACK_PATH}
+                  target="_blank"
+                  rel="noopener"
+                  className="inline-flex h-11 items-center gap-2 rounded-lg border border-line-strong px-4 text-[15px] font-medium hover:bg-surface-2"
+                >
+                  <FileText size={17} aria-hidden />
+                  Open decision pack
+                </a>
+                <Button
+                  variant="primary"
+                  disabled={sent || !packItem?.allowed.ask || send.isPending}
+                  onClick={() => send.mutate()}
+                >
+                  <Send size={17} aria-hidden />
+                  {sent ? "Sent to the customer" : "Send pack to customer"}
+                </Button>
+              </div>
+            </Panel>
+            <Panel title="Test cases">
+              <table className="w-full text-[15px]">
+                <tbody className="divide-y divide-line">
+                  {pack.tests.map((test) => (
+                    <tr key={test.id}>
+                      <th scope="row" className="tnum py-1.5 pr-3 text-left align-top font-semibold">{test.id}</th>
+                      <td className="py-1.5 pr-3 align-top">{test.description}</td>
+                      <td className="py-1.5 align-top text-ink-2">{test.expected}</td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
             </Panel>
           </motion.div>
         )}

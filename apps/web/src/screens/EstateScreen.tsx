@@ -135,7 +135,7 @@ export function EstateScreen() {
                       <th scope="row" className="py-2 text-left font-normal">
                         {stage}
                       </th>
-                      <td className="py-2 text-right text-ink-3">Baseline pending</td>
+                      <td className="py-2 text-right text-ink-3">To be baselined</td>
                     </tr>
                   ))}
                 </tbody>

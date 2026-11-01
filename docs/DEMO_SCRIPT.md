@@ -44,6 +44,13 @@ The console shows these same notes.
 
 Scene 7 needs the four seeded customer questions answered first, plus the threshold. The fastest way is to switch to Jordan on the Sign-off screen and clear them there, or use **Prepare scene 7** beforehand. Allow for this, because it is not in the 1-minute budget.
 
+Optional if a scene runs short, each about 20 seconds:
+
+- **Code:** open the Skeleton tab. It is a starting point for review, and the API names need Unit4 to confirm them. The Ava note below the panels is an idea only.
+- **Workflows:** open the one-page decision pack.
+- **Reconcile:** open R6 and approve the duplicate value as Robin. It applies at the next trial load, so the check still fails until then.
+- **Results:** show consultant effort by case, and mapping memory after an edit in Decisions. Memory matches exact patterns, and with one customer it can only preview the next proposal.
+
 ## If something goes wrong
 
 | Problem | Do this |

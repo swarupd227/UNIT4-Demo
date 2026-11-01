@@ -87,6 +87,8 @@ export type ReconException = {
   approver_role: Role;
   amount_minor: number | null;
   detail: Record<string, unknown>;
+  approved_by: string | null;
+  approved_at: string | null;
 };
 
 export type ReconRun = {
@@ -145,11 +147,28 @@ export type Scorecard = {
   decision_quality: { matched: number; total: number; wrong: string[] };
   passed: boolean;
   stages: { stage: string; seconds: number; consultant_seconds: number }[];
+  cases: { case: string; consultant_seconds: number }[];
+  memory: {
+    precedents: number;
+    approved: number;
+    rejected: number;
+    entries: {
+      memory_id: number;
+      item_id: string;
+      outcome: string;
+      review_status: string;
+      decided_by: string;
+      next_outcome: string | null;
+      next_confidence: number | null;
+    }[];
+  };
   reconciliation: { run: boolean; seconds: number | null; passed: number; total: number };
   defects: { tested: number; failed: number };
   artefacts: { source: string; count: number; ms: number | null }[];
   signoff: { generated: boolean; signed: boolean; conditions: Condition[] };
 };
+
+export const WORKFLOW_PACK_PATH = "/api/workflows/decision-pack.pdf";
 
 export const workbench = {
   case: (role: Role): Promise<CaseSummary> => api.case(role),
@@ -161,6 +180,8 @@ export const workbench = {
   artefacts: (id: string, role: Role) => request<Artefact[]>(`/api/artefacts/${id}`, role),
   latestRun: (role: Role) => request<ReconRun | null>("/api/reconciliation/latest", role),
   runChecks: (role: Role) => post<ReconRun>("/api/reconciliation/run", role),
+  approveException: (id: string, role: Role) =>
+    post<ReconRun>(`/api/reconciliation/exceptions/${id}/approve`, role),
   differences: (id: string, role: Role) => request<Difference[]>(`/api/reconciliation/${id}/differences`, role),
   signoff: (role: Role) => request<SignoffState>("/api/signoff", role),
   generatePack: (role: Role) => post<SignoffState>("/api/signoff/generate", role),

@@ -107,7 +107,12 @@ def _gather(db: Connection, run_id: int) -> dict[str, Any]:
             text("SELECT * FROM studio.check_result WHERE run_id = :run_id ORDER BY check_id"), params
         ).all(),
         "exceptions": db.execute(
-            text("SELECT * FROM studio.exception WHERE run_id = :run_id ORDER BY exception_id"), params
+            text("""
+                SELECT e.*, r.approved_by, r.approved_at
+                FROM studio.exception e LEFT JOIN studio.exception_resolution r USING (code, title)
+                WHERE e.run_id = :run_id ORDER BY e.exception_id
+            """),
+            params,
         ).all(),
         "questions": db.execute(
             text("SELECT * FROM studio.customer_question ORDER BY asked_at, question_id")
@@ -170,9 +175,16 @@ def _render_pdf(data: dict[str, Any], summary: dict[str, Any], audit_head: str) 
         [[c.check_id, c.name, c.compares, c.status.capitalize()] for c in data["checks"]],
     )
     exceptions = _table(
-        ["ID", "Exception", "Cause", "Proposed action", "Amount"],
+        ["ID", "Exception", "Cause", "Proposed action", "Amount", "Approved by"],
         [
-            [e.exception_id, e.title, e.cause, e.proposed_action, _money(e.amount_minor)]
+            [
+                e.exception_id,
+                e.title,
+                e.cause,
+                e.proposed_action,
+                _money(e.amount_minor),
+                e.approved_by or "Open",
+            ]
             for e in data["exceptions"]
         ],
     )
@@ -224,6 +236,46 @@ def _render_pdf(data: dict[str, Any], summary: dict[str, Any], audit_head: str) 
     return HTML(string=document).write_pdf()
 
 
+def workflow_pack_html(customer: str, pack: dict[str, Any], usage: dict[str, int]) -> str:
+    """The one page the customer's finance lead decides from."""
+    proposed = _table(
+        ["Workflow", "Rule", "Replaces", "Uses in 12 months", "ERPx configuration"],
+        [
+            [
+                f"{workflow['name']} ({workflow['keeps']})",
+                workflow["rule"],
+                ", ".join(workflow["absorbs"]) or "None",
+                f"{sum(usage.get(item, 0) for item in [workflow['keeps'], *workflow['absorbs']]):,}",
+                "; ".join(workflow["erpx_configuration"]),
+            ]
+            for workflow in pack["proposed"]
+        ],
+    )
+    controls = "".join(f"<li>{html.escape(line)}</li>" for line in pack["control_impact"])
+    tests = _table(
+        ["Test", "Case", "Expected"],
+        [[test["id"], test["description"], test["expected"]] for test in pack["tests"]],
+    )
+    return f"""
+    <html><head><meta charset="utf-8"><style>{CSS}</style></head><body>
+    <h1>Workflow decision pack</h1>
+    <p class="lead">{html.escape(customer)} · CR to ERPx</p>
+    <p class="scope"><strong>Decision needed.</strong> {html.escape(pack["decision_needed"])}</p>
+    <h2>From {pack["from_count"]} workflows to {pack["to_count"]}</h2>
+    {proposed}
+    <p>Retire: {html.escape(", ".join(pack["retire"]))}</p>
+    <h2>Control impact</h2>
+    <ul>{controls}</ul>
+    <h2>Test cases</h2>
+    {tests}
+    </body></html>
+    """
+
+
+def render_workflow_pack(customer: str, pack: dict[str, Any], usage: dict[str, int]) -> bytes:
+    return HTML(string=workflow_pack_html(customer, pack, usage)).write_pdf()
+
+
 def build_pack(db: Connection, run_id: int) -> dict[str, Any]:
     data = _gather(db, run_id)
     summary = _summary(data)
@@ -259,6 +311,8 @@ def build_pack(db: Connection, run_id: int) -> dict[str, Any]:
                 "proposed_action",
                 "approver_role",
                 "amount_minor",
+                "approved_by",
+                "approved_at",
             ],
             [
                 (
@@ -269,6 +323,8 @@ def build_pack(db: Connection, run_id: int) -> dict[str, Any]:
                     e.proposed_action,
                     e.approver_role,
                     e.amount_minor,
+                    e.approved_by,
+                    e.approved_at,
                 )
                 for e in data["exceptions"]
             ],

@@ -63,8 +63,11 @@ test("scene 3 explains CC-014", async ({ page, request }) => {
   await page.getByRole("tab", { name: "Extension spec" }).click();
   await expect(page.getByText("Write-down approval", { exact: false }).first()).toBeVisible();
   await page.waitForTimeout(1000);
+  await page.getByRole("tab", { name: "Skeleton" }).click();
+  await expect(page.getByText("public sealed class WriteDownApproval")).toBeVisible();
   await page.getByRole("tab", { name: "Tests" }).click();
   await expect(page.getByText("where the two thresholds disagree")).toBeVisible();
+  await expect(page.getByText("Idea only")).toBeVisible();
   await page.waitForTimeout(1500);
 });
 
@@ -86,6 +89,12 @@ test("scene 5 moves nine workflows to three", async ({ page, request }) => {
   await timedGoto(page, "/workflows", "9 variants");
   await page.getByRole("button", { name: "View proposal" }).click();
   await expect(page.getByText("Used only by a dormant legal entity")).toBeVisible();
+  await expect(page.getByText("Two steps: line manager, budget holder")).toBeVisible();
+  await expect(page.getByRole("heading", { name: "Test cases" })).toBeVisible();
+  await expect(page.getByRole("link", { name: "Open decision pack" })).toHaveAttribute(
+    "href",
+    "/api/workflows/decision-pack.pdf",
+  );
   await page.getByRole("button", { name: "Send pack to customer" }).click();
   await expect(page.getByRole("button", { name: "Sent to the customer" })).toBeVisible();
   await page.waitForTimeout(1500);
@@ -111,6 +120,11 @@ test("scene 6 reconciles and proves determinism", async ({ page, request }) => {
   await expect(page.getByText("5 of 8").first()).toBeVisible();
   await page.getByRole("button", { name: "Run again" }).first().click();
   await expect(page.getByText(/Run again, identical result/)).toBeVisible({ timeout: 15_000 });
+  await page.getByRole("button", { name: /^R6/ }).click();
+  const drawer = page.getByRole("dialog");
+  await expect(drawer).toContainText("Waiting for Jordan Ashby.");
+  await drawer.getByRole("button", { name: "Approve proposed action" }).click();
+  await expect(drawer).toContainText("Applies at the next trial load");
   await page.waitForTimeout(1500);
 });
 
@@ -148,6 +162,8 @@ test("scene 8 shows measured results and no saving", async ({ page, request }) =
   await timedGoto(page, "/scorecard", "Known issues found");
   await expect(page.getByText("No baseline available")).toBeVisible();
   await expect(page.getByText("Signed by the customer")).toBeVisible();
+  await expect(page.getByText("Case 2: report estate")).toBeVisible();
+  await expect(page.getByRole("heading", { name: "Mapping memory" })).toBeVisible();
   await expect(page.getByLabel("Not found yet")).toHaveCount(0);
   await page.waitForTimeout(2500);
 });

@@ -11,10 +11,11 @@ from sqlalchemy import Connection, text
 from app.decisions import AnswerQuestion, AskCustomer, PersonaRole, Tx, answer, ask
 from app.storage import get_storage
 from engines.decision import audit
+from engines.decision.memory import next_proposal
 from engines.decision.policy import CONSULTANT, CUSTOMER, PERSONAS
 from engines.decision.seed import seed_decisions
 from engines.scoring.score import score
-from engines.signoff.pack import SCOPE, build_pack, gate
+from engines.signoff.pack import SCOPE, build_pack, gate, render_workflow_pack
 from engines.validation import checks
 from engines.validation.runner import run_checks
 
@@ -138,6 +139,24 @@ def workflows(db: Tx) -> dict[str, Any]:
         "pack": pack.content if pack else None,
         "pack_source": pack.source if pack else None,
     }
+
+
+@router.get("/workflows/decision-pack.pdf")
+def workflow_decision_pack(db: Tx) -> Response:
+    pack = db.execute(
+        text("SELECT content FROM studio.artefact WHERE kind = 'workflow_pack' LIMIT 1")
+    ).scalar()
+    if pack is None:
+        raise HTTPException(status_code=404, detail="No workflow proposal exists yet.")
+    customer: str = db.execute(text("SELECT name FROM studio.customer LIMIT 1")).scalar_one()
+    usage: dict[str, int] = dict(
+        db.execute(text("SELECT item_id, usage_12m FROM studio.estate_item WHERE item_type = 'WF'")).all()
+    )
+    return Response(
+        render_workflow_pack(customer, pack, usage),
+        media_type="application/pdf",
+        headers={"Content-Disposition": "inline; filename=workflow_decision_pack.pdf"},
+    )
 
 
 def _latest_pack(db: Connection) -> dict[str, Any] | None:
@@ -298,6 +317,39 @@ STAGE_GROUPS = {
     "Validation": ["reconcile"],
     "Customer acceptance": ["signoff"],
 }
+CASE_STAGES = {
+    "Case 1: custom code": "code",
+    "Case 2: report estate": "reports",
+    "Case 3: approval workflows": "workflows",
+}
+MEMORY_ENTRIES_SHOWN = 8
+
+
+def _memory(db: Connection) -> dict[str, Any]:
+    """Past decisions, each with what the next item of that pattern would start from."""
+    precedents = _rows(db, "SELECT pattern, outcome, review_status FROM studio.mapping_precedent")
+    entries = _rows(
+        db,
+        """
+        SELECT memory_id, item_id, pattern, outcome, review_status, decided_by, decided_at
+        FROM studio.mapping_memory ORDER BY memory_id DESC
+        """,
+    )
+    history = [*precedents, *entries]
+
+    def preview(entry: dict[str, Any]) -> dict[str, Any]:
+        same = [
+            (row["outcome"], row["review_status"]) for row in history if row["pattern"] == entry["pattern"]
+        ]
+        outcome, confidence = next_proposal(same)
+        return {**entry, "next_outcome": outcome, "next_confidence": confidence}
+
+    return {
+        "precedents": len(precedents),
+        "approved": sum(entry["review_status"] == "approved" for entry in entries),
+        "rejected": sum(entry["review_status"] == "rejected" for entry in entries),
+        "entries": [preview(entry) for entry in entries[:MEMORY_ENTRIES_SHOWN]],
+    }
 
 
 @router.get("/scorecard")
@@ -368,6 +420,11 @@ def scorecard(db: Tx) -> dict[str, Any]:
         "decision_quality": result["decision_quality"],
         "passed": result["passed"],
         "stages": stages,
+        "cases": [
+            {"case": label, "consultant_seconds": int(timing.get(key, {}).get("consultant_seconds") or 0)}
+            for label, key in CASE_STAGES.items()
+        ],
+        "memory": _memory(db),
         "reconciliation": {
             "run": bool(run),
             "seconds": float(run["seconds"]) if run else None,

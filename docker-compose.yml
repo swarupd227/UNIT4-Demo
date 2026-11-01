@@ -23,6 +23,7 @@ services:
     environment:
       STUDIO_DATABASE_URL: postgresql+psycopg://studio:studio@db:5432/studio
       STUDIO_LLM_MODE: ${STUDIO_LLM_MODE:-replay}
+      ANTHROPIC_API_KEY: ${ANTHROPIC_API_KEY:-}
       STUDIO_STORAGE_ROOT: /workspace/storage
       PYTHONPATH: /workspace:/workspace/apps/api
     volumes:

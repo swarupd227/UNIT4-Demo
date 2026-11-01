@@ -53,6 +53,8 @@ class ExtensionSpec(Strict):
     dependencies: list[str]
     open_points: list[str]
     caveat: str
+    code_skeleton: list[str] = Field(description="Source lines. A starting point for a developer to review.")
+    agentification_idea: str
 
 
 class RuleTestCase(Strict):
