@@ -9,6 +9,7 @@ import { WORKFLOW_PACK_PATH, workbench, type WorkflowVariant } from "../lib/work
 import { useDecision, Panel, Screen } from "../ui/layout";
 import { AiBadge, Button, CodeBadge, Skeleton } from "../ui/primitives";
 import { useRefresh } from "./decisions/useDecisionActions";
+import { LiveAgentButton } from "./LiveAgentButton";
 
 const PACK_ITEM = "WF-001";
 const PACK_OPTIONS = ["Adopt the three workflows", "Keep the nine workflows"];
@@ -37,7 +38,7 @@ export function WorkflowsScreen() {
   });
 
   if (!data) return <Skeleton className="m-5 h-96" />;
-  const { variants, pack } = data;
+  const { variants, pack, pack_source: packSource } = data;
   const max = Math.max(...variants.map((variant) => variant.usage_12m));
   const total = variants.reduce((sum, variant) => sum + variant.usage_12m, 0);
   const topTwo = variants[0].usage_12m + variants[1].usage_12m;
@@ -92,7 +93,15 @@ export function WorkflowsScreen() {
 
         {proposal && (
           <motion.div initial={{ opacity: 0, x: 12 }} animate={{ opacity: 1, x: 0 }} className="space-y-4">
-            <Panel title={pack.headline} aside={<AiBadge />}>
+            <Panel
+              title={pack.headline}
+              aside={
+                <span className="flex items-center gap-2">
+                  <AiBadge source={packSource} />
+                  <LiveAgentButton agent="workflow_pack" subject={PACK_ITEM} />
+                </span>
+              }
+            >
               <ul className="space-y-3">
                 {pack.proposed.map((workflow) => (
                   <li key={workflow.keeps} className="rounded-lg border border-line p-3">

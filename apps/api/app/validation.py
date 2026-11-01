@@ -1,12 +1,16 @@
+import os
 from datetime import UTC, datetime
 from typing import Any
 
 from fastapi import APIRouter, HTTPException, Query
 from sqlalchemy import Connection, text
 
+from app.config import get_settings
 from app.decisions import PersonaRole, Tx
+from engines.agents.gateway import ClaudeGateway, LiveAgentError, LLMGateway
+from engines.agents.pipeline import request_for, run_live
 from engines.decision import audit
-from engines.decision.policy import PERSONAS
+from engines.decision.policy import CONSULTANT, PERSONAS
 from engines.scoring.score import score
 from engines.validation.runner import run_checks
 
@@ -103,12 +107,65 @@ def check_differences(check_id: str, db: Tx, limit: int = Query(200, le=1000)) -
 def artefacts(item_id: str, db: Tx) -> list[dict[str, Any]]:
     rows = db.execute(
         text("""
-            SELECT kind, content, source, model, duration_ms, prompt_version
+            SELECT kind, content, source, model, duration_ms, prompt_version, input_tokens, output_tokens
             FROM studio.artefact WHERE item_id = :item_id ORDER BY kind
         """),
         {"item_id": item_id},
     ).mappings()
     return [dict(row) for row in rows]
+
+
+def _live_gateway() -> LLMGateway:
+    return ClaudeGateway(get_settings().llm_model)
+
+
+def _live_available() -> bool:
+    return bool(os.getenv("ANTHROPIC_API_KEY"))
+
+
+@router.get("/agents/status")
+def agent_status() -> dict[str, Any]:
+    return {"live": _live_available(), "model": get_settings().llm_model}
+
+
+@router.post("/agents/{agent}/{subject}/run")
+def run_agent(agent: str, subject: str, db: Tx, role: PersonaRole) -> dict[str, Any]:
+    """Runs one agent live. A person still reviews the result, and a reset restores the cached one."""
+    if role != CONSULTANT:
+        raise HTTPException(status_code=403, detail="The consultant runs the agents.")
+    if not _live_available():
+        raise HTTPException(status_code=409, detail="Live agents are not set up on this environment.")
+    found = request_for(db, agent, subject)
+    if found is None:
+        raise HTTPException(status_code=404, detail="This agent does not cover this item.")
+    spec, request = found
+    try:
+        result = run_live(db, spec, request, _live_gateway())
+    except LiveAgentError as error:
+        raise HTTPException(
+            status_code=502, detail=f"{error} The previous result is still in place."
+        ) from error
+    except ValueError as error:
+        raise HTTPException(
+            status_code=502,
+            detail="The result failed its checks, so it was rejected. The previous result is still in place.",
+        ) from error
+    audit.record(
+        db,
+        datetime.now(UTC),
+        PERSONAS[role],
+        role,
+        "ran_agent",
+        subject,
+        {"agent": agent, "model": result.model, "input_hash": request.input_hash},
+    )
+    return {
+        "source": result.source,
+        "model": result.model,
+        "duration_ms": result.duration_ms,
+        "input_tokens": result.input_tokens,
+        "output_tokens": result.output_tokens,
+    }
 
 
 @router.get("/score")

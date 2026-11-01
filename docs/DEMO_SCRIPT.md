@@ -44,6 +44,8 @@ The console shows these same notes.
 
 Scene 7 needs the four seeded customer questions answered first, plus the threshold. The fastest way is to switch to Jordan on the Sign-off screen and clear them there, or use **Prepare scene 7** beforehand. Allow for this, because it is not in the 1-minute budget.
 
+**Live agents.** `.env` must hold `ANTHROPIC_API_KEY`, and the button shows only for Robin. On the Code screen, press **Run live** on the explanation panel as the visible AI moment, or on the workflow proposal. A run can take a minute, so talk through it. The badge changes to AI analysis only when a model wrote the result. If a run fails, the cached result stays and a message says so. **Reset** restores the cached results.
+
 Optional if a scene runs short, each about 20 seconds:
 
 - **Code:** open the Skeleton tab. It is a starting point for review, and the API names need Unit4 to confirm them. The Ava note below the panels is an idea only.

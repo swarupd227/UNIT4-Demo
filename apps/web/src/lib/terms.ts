@@ -79,6 +79,7 @@ export const AUDIT_ACTIONS: Record<string, string> = {
   asked_customer: "Asked the customer",
   answered: "Answered",
   approved_exception: "Approved an exception",
+  ran_agent: "Ran an agent live",
   generated_pack: "Generated the sign-off pack",
   signed_pack: "Signed the pack",
 };

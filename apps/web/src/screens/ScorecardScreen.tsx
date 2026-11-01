@@ -33,6 +33,7 @@ export function ScorecardScreen() {
   const { data } = useQuery({ queryKey: ["scorecard"], queryFn: () => workbench.scorecard(role) });
   if (!data) return <Skeleton className="m-5 h-96" />;
   const authored = data.artefacts.find((row) => row.source === "hand_authored");
+  const live = data.artefacts.find((row) => row.source === "live_model");
   const max = Math.max(...data.stages.map((stage) => stage.seconds), 1);
 
   const measures: [string, string, string][] = [
@@ -46,8 +47,8 @@ export function ScorecardScreen() {
     ["Defects", data.defects.tested ? `${data.defects.failed} of ${data.defects.tested} rebuilds failed first run` : "Not tested", "Measured"],
     [
       "Agent run time",
-      authored ? "Not measured" : "Recorded run",
-      authored ? `${authored.count} prepared analyses` : "From the recorded run",
+      live ? `${((live.ms ?? 0) / 1000).toFixed(1)} sec` : "Not measured",
+      `${live?.count ?? 0} live, ${authored?.count ?? 0} prepared`,
     ],
     ["Full customer journey", "Pilot measure", "Not measured here"],
     ["Saving against baseline", "Not calculated", "No baseline available"],

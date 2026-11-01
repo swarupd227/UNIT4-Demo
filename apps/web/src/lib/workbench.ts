@@ -187,5 +187,8 @@ export const workbench = {
   generatePack: (role: Role) => post<SignoffState>("/api/signoff/generate", role),
   signPack: (role: Role) => post<SignoffState>("/api/signoff/sign", role),
   scorecard: (role: Role) => request<Scorecard>("/api/scorecard", role),
+  agentStatus: (role: Role) => request<{ live: boolean; model: string }>("/api/agents/status", role),
+  runAgent: (agent: string, subject: string, role: Role) =>
+    post<{ duration_ms: number; model: string }>(`/api/agents/${agent}/${subject}/run`, role),
   timing: (stage: string, seconds: number, role: Role) => post("/api/timing", role, { stage, seconds }),
 };

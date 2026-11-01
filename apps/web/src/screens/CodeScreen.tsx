@@ -9,6 +9,7 @@ import { CodeView } from "../ui/CodeView";
 import { Panel, Screen, useDecision } from "../ui/layout";
 import { AiBadge, Button, Skeleton, SourceBadge, StatusLabel } from "../ui/primitives";
 import { AskDialog } from "./decisions/DecisionDialogs";
+import { LiveAgentButton } from "./LiveAgentButton";
 import { useDecisionActions } from "./decisions/useDecisionActions";
 
 const ITEMS = ["CC-014", "CC-041", "CC-037"];
@@ -141,6 +142,7 @@ export function CodeScreen() {
 
   const content = (kind: string): any => artefacts?.find((a) => a.kind === kind)?.content;
   const explanation: Explanation | undefined = content("code_explanation");
+  const explanationSource = artefacts?.find((a) => a.kind === "code_explanation")?.source;
   const rule = content("rule_card");
   const spec = content("extension_spec");
   const tests = content("test_cases");
@@ -224,8 +226,16 @@ export function CodeScreen() {
                 <CodeView source={item.source_text ?? ""} focusLine={line} />
               </div>
             </Panel>
-            <Panel title="Explanation" aside={<AiBadge />}>
-              <div className="scroll-quiet h-[500px] space-y-4 overflow-y-auto">
+            <Panel
+              title="Explanation"
+              aside={
+                <span className="flex items-center gap-2">
+                  <AiBadge source={explanationSource} />
+                  <LiveAgentButton agent="code_explainer" subject={itemId} />
+                </span>
+              }
+            >
+              <div tabIndex={0} role="region" aria-label="Explanation" className="scroll-quiet h-[488px] space-y-4 overflow-y-auto">
                 <CitationList title="Logic" items={explanation.steps} onHover={setLine} />
                 <CitationList title="Embedded rules" items={explanation.hidden_rules} onHover={setLine} />
                 <CitationList title="Cloud blockers" items={explanation.cloud_blockers} onHover={setLine} />

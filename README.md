@@ -66,4 +66,10 @@ To run the production images with the Azure layout on this machine, at http://lo
 npm run sim
 ```
 
+Live agents need `ANTHROPIC_API_KEY=` in a local `.env`, which Git ignores. Without it the app replays cached results and hides the Run live buttons. To run every agent, check the results and see the cost:
+
+```bash
+docker compose run --rm api python -m engines.agents.record
+```
+
 See [docs/DEVELOPMENT_PLAN.md](docs/DEVELOPMENT_PLAN.md) for the plan and spec decisions, and [docs/AZURE_DEPLOYMENT.md](docs/AZURE_DEPLOYMENT.md) to deploy.

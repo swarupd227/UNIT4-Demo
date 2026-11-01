@@ -234,7 +234,7 @@ Status: prepared, not deployed. Templates, images, pipelines and [the runbook](A
 | Item | From | Needed by | If it is not available |
 |---|---|---|---|
 | Unit4 FS review of estate, terms and items 1 to 8 in section 3 | Functional specialist | Phases 1 and 5 | The plain terms in the spec stay, at a credibility risk |
-| LLM API key | You | Phase 3 | Hand-authored cache; the demo still runs, but it cannot make a live agent call |
+| LLM API key | You | Done | Held in a local `.env`. Without it the demo replays the hand-authored cache and hides Run live |
 | Astra RE Harness access | Artizent | Phase 3 | Direct LLM code reading behind the same interface. The "built on Astra" claim should then be softened on stage |
 | Azure subscription and resource group | Artizent | Phase 6 | Stays local |
 | ERPx test tenant | Unit4 | Optional | Simulated target, stated openly |

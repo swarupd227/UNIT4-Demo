@@ -1,6 +1,6 @@
 """The shape every agent result must take, whether a model or a person produced it."""
 
-from typing import Literal
+from typing import Annotated, Literal
 
 from pydantic import BaseModel, ConfigDict, Field
 
@@ -82,11 +82,14 @@ class ReportRebuild(Strict):
     parity_plan: list[str]
 
 
+WorkflowId = Annotated[str, Field(pattern=r"^WF-\d{3}$")]
+
+
 class ProposedWorkflow(Strict):
-    keeps: str
+    keeps: WorkflowId
     name: str
     rule: str
-    absorbs: list[str]
+    absorbs: list[WorkflowId]
     erpx_configuration: list[str]
 
 
@@ -101,7 +104,7 @@ class WorkflowPack(Strict):
     from_count: int
     to_count: int
     proposed: list[ProposedWorkflow]
-    retire: list[str]
+    retire: list[WorkflowId]
     control_impact: list[str]
     tests: list[WorkflowTest]
     decision_needed: str
