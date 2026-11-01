@@ -95,7 +95,7 @@ React SPA  ──REST + SSE──▶  FastAPI  ──▶  PostgreSQL (decisions,
 | Files | Local folder behind a storage interface | Blob Storage |
 | Secrets | `.env` (git-ignored) | Key Vault with managed identity |
 | LLM | Replay cache, optional direct API key | Azure-hosted model. Confirm Claude availability, region and data residency |
-| Sign-in | None; persona switcher only | Microsoft Entra ID in front of the app |
+| Sign-in | None; persona switcher only | None, by decision: the site is open to anyone with the URL |
 | Telemetry | Console logs | Application Insights |
 
 ### Repository layout
@@ -209,7 +209,7 @@ Presenter mode, reset, fallback switch and recordings, performance pass, accessi
 Status: three consecutive clean scripted passes on the production build, with every scene under 2 seconds and no critical or serious axe findings. A presenter's 22-minute timing still needs a person. An earlier run saw loads up to 3.8 seconds; the cause was not isolated, so present with `npm run demo` and other Docker projects closed.
 
 ### Phase 6: Azure deployment
-Bicep for Container Apps, Postgres, Blob Storage, Key Vault, Container Registry and Application Insights. Add Entra sign-in and a CI pipeline, then install the Azure CLI, which this machine does not have yet.
+Bicep for Container Apps, Postgres, Blob Storage, Key Vault, Container Registry and Application Insights, plus a CI pipeline. Deployed by hand from Azure Cloud Shell, with no sign-in.
 **Exit:** a full rehearsal passes on the Azure URL, with replay mode behaving identically to local.
 
 Status: prepared, not deployed. Templates, images, pipelines and [the runbook](AZURE_DEPLOYMENT.md) exist and were tested on this machine as far as that is possible. The code is on GitHub, and the exit gate can only be met on Azure.
@@ -236,7 +236,7 @@ Status: prepared, not deployed. Templates, images, pipelines and [the runbook](A
 | Unit4 FS review of estate, terms and items 1 to 8 in section 3 | Functional specialist | Phases 1 and 5 | The plain terms in the spec stay, at a credibility risk |
 | LLM API key | You | Phase 3 | Hand-authored cache; the demo still runs, but it cannot make a live agent call |
 | Astra RE Harness access | Artizent | Phase 3 | Direct LLM code reading behind the same interface. The "built on Astra" claim should then be softened on stage |
-| Azure subscription, resource group and Entra access | Artizent | Phase 6 | Stays local |
+| Azure subscription and resource group | Artizent | Phase 6 | Stays local |
 | ERPx test tenant | Unit4 | Optional | Simulated target, stated openly |
 | Real J2X format | Unit4 | Optional | Simulated output, swappable through its parser |
 

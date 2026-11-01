@@ -4,8 +4,6 @@
 set -euo pipefail
 
 : "${AZURE_RESOURCE_GROUP:?Set AZURE_RESOURCE_GROUP}"
-: "${ENTRA_CLIENT_ID:?Set ENTRA_CLIENT_ID}"
-: "${ENTRA_CLIENT_SECRET:?Set ENTRA_CLIENT_SECRET}"
 : "${POSTGRES_ADMIN_PASSWORD:?Set POSTGRES_ADMIN_PASSWORD}"
 
 cd "$(dirname "$0")/.."
@@ -39,20 +37,10 @@ echo "Deploying the apps"
 deploy "$tag" > /dev/null
 url="$(output webUrl)"
 
-# Sign-in is the only thing between the internet and the demo, so prove it is on.
 status="$(curl --silent --output /dev/null --write-out '%{http_code}' "$url/healthz")"
-location="$(curl --silent --output /dev/null --write-out '%{redirect_url}' "$url/")"
 if [ "$status" != "200" ]; then
   echo "Health check failed with $status at $url/healthz" >&2
   exit 1
 fi
-case "$location" in
-  */.auth/login/aad*|https://login.microsoftonline.com/*) ;;
-  *)
-    echo "The site did not send a signed-out visitor to sign-in. It sent: ${location:-nothing}" >&2
-    exit 1
-    ;;
-esac
 
 echo "Deployed $tag to $url"
-echo "Entra redirect URI: $url/.auth/login/aad/callback"

@@ -1,22 +1,17 @@
 // Migration Studio on Azure. See docs/AZURE_DEPLOYMENT.md.
 //
-// Only the web app has a public address, and it sits behind Entra sign-in. The API and Postgres
-// are reachable from inside the virtual network only. With an empty imageTag this deploys the
-// foundation alone, because the apps cannot start until their images are in the registry.
+// Only the web app has a public address, and it has no sign-in. The API and Postgres are reachable
+// from inside the virtual network only. With an empty imageTag this deploys the foundation alone,
+// because the apps cannot start until their images are in the registry.
 
 targetScope = 'resourceGroup'
 
 param location string = 'uksouth'
 param imageTag string = ''
-param entraTenantId string = tenant().tenantId
-param entraClientId string
 param postgresSku string = 'Standard_B2s'
 
 @secure()
 param postgresAdminPassword string
-
-@secure()
-param entraClientSecret string
 
 var suffix = uniqueString(resourceGroup().id)
 var deployApps = !empty(imageTag)
@@ -209,12 +204,6 @@ resource databaseUrl 'Microsoft.KeyVault/vaults/secrets@2023-07-01' = {
   }
 }
 
-resource entraSecret 'Microsoft.KeyVault/vaults/secrets@2023-07-01' = {
-  parent: vault
-  name: 'entra-client-secret'
-  properties: { value: entraClientSecret }
-}
-
 resource appEnvironment 'Microsoft.App/managedEnvironments@2024-03-01' = {
   name: 'cae-studio'
   location: location
@@ -299,9 +288,6 @@ resource web 'Microsoft.App/containerApps@2024-03-01' = if (deployApps) {
       activeRevisionsMode: 'Single'
       ingress: { external: true, targetPort: 8080, transport: 'auto' }
       registries: registries
-      secrets: [
-        { name: 'entra-client-secret', keyVaultUrl: entraSecret.properties.secretUri, identity: identity.id }
-      ]
     }
     template: {
       containers: [
@@ -319,30 +305,7 @@ resource web 'Microsoft.App/containerApps@2024-03-01' = if (deployApps) {
       scale: { minReplicas: 1, maxReplicas: 1 }
     }
   }
-  dependsOn: [registryPull, vaultAccess]
-}
-
-resource signIn 'Microsoft.App/containerApps/authConfigs@2024-03-01' = if (deployApps) {
-  parent: web
-  name: 'current'
-  properties: {
-    platform: { enabled: true }
-    globalValidation: {
-      unauthenticatedClientAction: 'RedirectToLoginPage'
-      redirectToProvider: 'azureactivedirectory'
-      excludedPaths: ['/healthz']
-    }
-    identityProviders: {
-      azureActiveDirectory: {
-        registration: {
-          clientId: entraClientId
-          clientSecretSettingName: 'entra-client-secret'
-          openIdIssuer: '${environment().authentication.loginEndpoint}${entraTenantId}/v2.0'
-        }
-        validation: { allowedAudiences: [entraClientId, 'api://${entraClientId}'] }
-      }
-    }
-  }
+  dependsOn: [registryPull]
 }
 
 // Started by hand, because it rebuilds the whole estate. It runs inside the network to reach Postgres.

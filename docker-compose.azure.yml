@@ -1,6 +1,6 @@
 # The Azure images and layout on this machine: production containers, Blob Storage through the
-# Azurite emulator, and no route to the API except through the web container. Sign-in is the one
-# part that needs Azure. This is a separate project, so it never touches the local demo's data.
+# Azurite emulator, and no route to the API except through the web container. This is a separate
+# project, so it never touches the local demo's data.
 name: unit4-azure-sim
 
 x-api: &api

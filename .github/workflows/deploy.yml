@@ -30,6 +30,4 @@ jobs:
         run: bash infra/deploy.sh
         env:
           AZURE_RESOURCE_GROUP: ${{ vars.AZURE_RESOURCE_GROUP }}
-          ENTRA_CLIENT_ID: ${{ vars.ENTRA_CLIENT_ID }}
-          ENTRA_CLIENT_SECRET: ${{ secrets.ENTRA_CLIENT_SECRET }}
           POSTGRES_ADMIN_PASSWORD: ${{ secrets.POSTGRES_ADMIN_PASSWORD }}
