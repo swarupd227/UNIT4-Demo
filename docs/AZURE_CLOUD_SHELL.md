@@ -133,7 +133,6 @@ Push your changes to `main`, then run steps 4 and 5. Your data stays as it is, a
 | `LocationIsOfferRestricted`, or a similar region or SKU refusal in step 3 | Sponsorship offers can limit regions and sizes | Change `uksouth` to another region, such as `westeurope`, in steps 3 and 5, and rerun step 3 |
 | `TasksOperationsNotAllowed` in step 4 | The subscription doesn't allow registry builds | Use the fallback below |
 | `toomanyrequests` in step 4 | Docker Hub limited the build | Wait a while, then rerun step 4 |
-| `AuthorizationFailed` on a role assignment in step 3 | You need Owner on the group, not Contributor | Ask a subscription owner for it, then rerun step 3 |
 | The site shows an error, or step 6 ends on `Failed` | The app or the job failed at startup | Run the logs block below |
 
 ### Reading the logs

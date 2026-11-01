@@ -12,7 +12,7 @@ class Settings(BaseSettings):
     storage_root: str = "/workspace/storage"
     # Blob Storage replaces the local folder when either of these is set.
     blob_account_url: str = ""
-    blob_connection_string: str = ""  # The local emulator only. Azure signs in with managed identity.
+    blob_connection_string: str = ""
     blob_container: str = "studio"
 
 

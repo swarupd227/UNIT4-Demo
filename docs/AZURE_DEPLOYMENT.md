@@ -10,9 +10,9 @@ This is the reference for Phase 6. For copy-paste commands from the Azure portal
 | API | Container Apps, internal only | Runs database migrations when it starts |
 | Seed | Container Apps job, started by hand | Rebuilds the whole estate |
 | Database | PostgreSQL Flexible Server 16 | Private to the virtual network, with `vector` allow-listed |
-| Files | Blob Storage | Sign-off packs. Managed identity only, shared keys off |
-| Secrets | Key Vault | Read by managed identity |
-| Images | Container Registry | Pulled by managed identity |
+| Files | Blob Storage | Sign-off packs. Private, reached with the account key |
+| Secrets | Key Vault | Read by a managed identity through an access policy |
+| Images | Container Registry | Pulled with the registry's admin credential |
 | Telemetry | Application Insights, Log Analytics | Traces from the API, logs from all containers |
 
 The region defaults to UK South. Set `AZURE_LOCATION` to change it. All data is synthetic, and the demo stays in replay mode, so nothing leaves for an LLM provider.
@@ -25,7 +25,7 @@ There is one shared case. Two people using the site at the same time will see ea
 
 ## What you need first
 
-- An Azure subscription and a resource group, with Owner on the group. The templates assign roles to the managed identity, so Contributor alone is not enough.
+- An Azure subscription and a resource group, with Contributor on the group. The templates assign no roles, so the registry and storage keys sit in Key Vault instead. Move to managed identity roles if this goes beyond a demo.
 - The steps in [the Cloud Shell runbook](AZURE_CLOUD_SHELL.md), or Azure CLI 2.61 or newer, Docker and Git Bash to use `infra/deploy.sh`.
 - The scene recordings, which are kept in Git. Run `npm run record` and commit them if the screens change. The web image refuses to build without all nine.
 
@@ -33,7 +33,7 @@ There is one shared case. Two people using the site at the same time will see ea
 
 `.github/workflows/ci.yml` runs every check on pull requests. `.github/workflows/deploy.yml` is started by hand from https://github.com/swarupd227/UNIT4-Demo.
 
-To enable deployment, create a GitHub environment called `azure`, plus an Entra identity with Owner on the resource group and a federated credential for that environment. Then set:
+To enable deployment, create a GitHub environment called `azure`, plus an Entra identity with Contributor on the resource group and a federated credential for that environment. Then set:
 
 | Kind | Names |
 |---|---|

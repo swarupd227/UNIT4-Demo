@@ -3,6 +3,9 @@
 // Only the web app has a public address, and it has no sign-in. The API and Postgres are reachable
 // from inside the virtual network only. With an empty imageTag this deploys the foundation alone,
 // because the apps cannot start until their images are in the registry.
+//
+// Nothing here assigns a role, so a Contributor can deploy it. The apps read their secrets from Key
+// Vault through an access policy, and those secrets include the registry and storage keys.
 
 targetScope = 'resourceGroup'
 
@@ -17,12 +20,6 @@ var suffix = uniqueString(resourceGroup().id)
 var deployApps = !empty(imageTag)
 var postgresUser = 'studio'
 var blobContainer = 'studio'
-
-var roles = {
-  acrPull: '7f951dda-4ed3-4680-a7ca-43fe172d538d'
-  keyVaultSecretsUser: '4633458b-17de-408a-b874-0445c86b69e6'
-  storageBlobDataContributor: 'ba92f5b4-2d11-453d-a403-e96b0029c9fe'
-}
 
 resource identity 'Microsoft.ManagedIdentity/userAssignedIdentities@2023-01-31' = {
   name: 'id-studio'
@@ -52,17 +49,7 @@ resource registry 'Microsoft.ContainerRegistry/registries@2023-07-01' = {
   name: 'crstudio${suffix}'
   location: location
   sku: { name: 'Basic' }
-  properties: { adminUserEnabled: false }
-}
-
-resource registryPull 'Microsoft.Authorization/roleAssignments@2022-04-01' = {
-  scope: registry
-  name: guid(registry.id, identity.id, roles.acrPull)
-  properties: {
-    principalId: identity.properties.principalId
-    principalType: 'ServicePrincipal'
-    roleDefinitionId: subscriptionResourceId('Microsoft.Authorization/roleDefinitions', roles.acrPull)
-  }
+  properties: { adminUserEnabled: true }
 }
 
 resource vnet 'Microsoft.Network/virtualNetworks@2023-11-01' = {
@@ -146,7 +133,6 @@ resource storage 'Microsoft.Storage/storageAccounts@2023-05-01' = {
   sku: { name: 'Standard_LRS' }
   properties: {
     allowBlobPublicAccess: false
-    allowSharedKeyAccess: false
     minimumTlsVersion: 'TLS1_2'
     supportsHttpsTrafficOnly: true
   }
@@ -162,37 +148,21 @@ resource container 'Microsoft.Storage/storageAccounts/blobServices/containers@20
   name: blobContainer
 }
 
-resource storageAccess 'Microsoft.Authorization/roleAssignments@2022-04-01' = {
-  scope: storage
-  name: guid(storage.id, identity.id, roles.storageBlobDataContributor)
-  properties: {
-    principalId: identity.properties.principalId
-    principalType: 'ServicePrincipal'
-    roleDefinitionId: subscriptionResourceId(
-      'Microsoft.Authorization/roleDefinitions',
-      roles.storageBlobDataContributor
-    )
-  }
-}
-
 resource vault 'Microsoft.KeyVault/vaults@2023-07-01' = {
   name: 'kv-studio-${suffix}'
   location: location
   properties: {
     tenantId: tenant().tenantId
     sku: { family: 'A', name: 'standard' }
-    enableRbacAuthorization: true
+    enableRbacAuthorization: false
     softDeleteRetentionInDays: 7
-  }
-}
-
-resource vaultAccess 'Microsoft.Authorization/roleAssignments@2022-04-01' = {
-  scope: vault
-  name: guid(vault.id, identity.id, roles.keyVaultSecretsUser)
-  properties: {
-    principalId: identity.properties.principalId
-    principalType: 'ServicePrincipal'
-    roleDefinitionId: subscriptionResourceId('Microsoft.Authorization/roleDefinitions', roles.keyVaultSecretsUser)
+    accessPolicies: [
+      {
+        tenantId: tenant().tenantId
+        objectId: identity.properties.principalId
+        permissions: { secrets: ['get'] }
+      }
+    ]
   }
 }
 
@@ -201,6 +171,20 @@ resource databaseUrl 'Microsoft.KeyVault/vaults/secrets@2023-07-01' = {
   name: 'database-url'
   properties: {
     value: 'postgresql+psycopg://${postgresUser}:${postgresAdminPassword}@${postgres.properties.fullyQualifiedDomainName}:5432/${postgresDatabase.name}?sslmode=require'
+  }
+}
+
+resource registryPassword 'Microsoft.KeyVault/vaults/secrets@2023-07-01' = {
+  parent: vault
+  name: 'registry-password'
+  properties: { value: registry.listCredentials().passwords[0].value }
+}
+
+resource storageConnection 'Microsoft.KeyVault/vaults/secrets@2023-07-01' = {
+  parent: vault
+  name: 'storage-connection'
+  properties: {
+    value: 'DefaultEndpointsProtocol=https;AccountName=${storage.name};AccountKey=${storage.listKeys().keys[0].value};EndpointSuffix=${environment().suffixes.storage}'
   }
 }
 
@@ -224,17 +208,29 @@ var identityBlock = {
   type: 'UserAssigned'
   userAssignedIdentities: { '${identity.id}': {} }
 }
-var registries = [{ server: registry.properties.loginServer, identity: identity.id }]
+var registries = [
+  {
+    server: registry.properties.loginServer
+    username: registry.name
+    passwordSecretRef: 'registry-password'
+  }
+]
 var apiImage = '${registry.properties.loginServer}/studio-api:${imageTag}'
+var registrySecret = {
+  name: 'registry-password'
+  keyVaultUrl: registryPassword.properties.secretUri
+  identity: identity.id
+}
 var apiSecrets = [
+  registrySecret
   { name: 'database-url', keyVaultUrl: databaseUrl.properties.secretUri, identity: identity.id }
+  { name: 'storage-connection', keyVaultUrl: storageConnection.properties.secretUri, identity: identity.id }
 ]
 var apiEnv = [
   { name: 'STUDIO_DATABASE_URL', secretRef: 'database-url' }
   { name: 'STUDIO_LLM_MODE', value: 'replay' }
-  { name: 'STUDIO_BLOB_ACCOUNT_URL', value: storage.properties.primaryEndpoints.blob }
+  { name: 'STUDIO_BLOB_CONNECTION_STRING', secretRef: 'storage-connection' }
   { name: 'STUDIO_BLOB_CONTAINER', value: blobContainer }
-  { name: 'AZURE_CLIENT_ID', value: identity.properties.clientId }
   { name: 'APPLICATIONINSIGHTS_CONNECTION_STRING', value: appInsights.properties.ConnectionString }
 ]
 
@@ -274,7 +270,7 @@ resource api 'Microsoft.App/containerApps@2024-03-01' = if (deployApps) {
       scale: { minReplicas: 1, maxReplicas: 1 }
     }
   }
-  dependsOn: [registryPull, vaultAccess, storageAccess, container]
+  dependsOn: [container]
 }
 
 resource web 'Microsoft.App/containerApps@2024-03-01' = if (deployApps) {
@@ -288,6 +284,7 @@ resource web 'Microsoft.App/containerApps@2024-03-01' = if (deployApps) {
       activeRevisionsMode: 'Single'
       ingress: { external: true, targetPort: 8080, transport: 'auto' }
       registries: registries
+      secrets: [registrySecret]
     }
     template: {
       containers: [
@@ -305,7 +302,6 @@ resource web 'Microsoft.App/containerApps@2024-03-01' = if (deployApps) {
       scale: { minReplicas: 1, maxReplicas: 1 }
     }
   }
-  dependsOn: [registryPull]
 }
 
 // Started by hand, because it rebuilds the whole estate. It runs inside the network to reach Postgres.
@@ -336,7 +332,7 @@ resource seed 'Microsoft.App/jobs@2024-03-01' = if (deployApps) {
       ]
     }
   }
-  dependsOn: [registryPull, vaultAccess, api]
+  dependsOn: [api]
 }
 
 output registryName string = registry.name
