@@ -10,3 +10,5 @@ __pycache__/
 data/generated/
 storage/
 *.log
+e2e-results/
+apps/web/public/fallback/

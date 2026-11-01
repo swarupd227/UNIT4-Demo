@@ -16,7 +16,7 @@ In a second terminal, the first time and whenever the data should be rebuilt:
 npm run seed
 ```
 
-- Web: http://localhost:5183
+- Web: http://localhost:5183, or http://localhost:5184 with `npm run demo`, the production build for presenting
 - API: http://localhost:8000/docs
 - Postgres: `localhost:5544` (user, password and database are all `studio`)
 
@@ -40,6 +40,18 @@ npm run test:web
 
 ```bash
 npm run lint:web
+```
+
+Browser tests run against the production build, with the journey, accessibility audit and timings:
+
+```bash
+npm run e2e
+```
+
+To record the scene fallbacks. Run this before `npm run demo`, because the build includes them:
+
+```bash
+npm run record
 ```
 
 If a hand-authored agent result is reviewed against a changed input, record that with:

@@ -156,3 +156,22 @@ def test_hero_items_stay_open(client: TestClient) -> None:
 def test_pack_states_how_much_is_seeded(client: TestClient) -> None:
     summary = ready_pack(client)["pack"]["summary"]
     assert 0 < summary["seeded_history"] < summary["agreed"]
+
+
+@pytest.mark.parametrize(
+    ("scene", "questions", "reconciled", "signed"),
+    [(0, 4, False, False), (6, 4, False, False), (7, 0, True, False), (8, 0, True, True)],
+)
+def test_prepare_rebuilds_the_state_each_scene_expects(
+    client: TestClient, scene: int, questions: int, reconciled: bool, signed: bool
+) -> None:
+    assert client.post(f"/api/demo/prepare/{scene}").status_code == 200
+    state = client.get("/api/signoff").json()
+    assert len(state["open_questions"]) == questions
+    assert (client.get("/api/reconciliation/latest").json() is not None) == reconciled
+    assert bool(state["pack"] and state["pack"]["signed_at"]) == signed
+    assert client.get("/api/audit/verify").json() == {"intact": True}
+
+
+def test_prepare_rejects_an_unknown_scene(client: TestClient) -> None:
+    assert client.post("/api/demo/prepare/9").status_code == 404

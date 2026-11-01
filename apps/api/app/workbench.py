@@ -9,13 +9,15 @@ from pydantic import BaseModel, Field
 from sqlalchemy import Connection, text
 
 from app.config import get_settings
-from app.decisions import PersonaRole, Tx
+from app.decisions import AnswerQuestion, AskCustomer, PersonaRole, Tx, answer, ask
 from app.storage import LocalStorage
 from engines.decision import audit
-from engines.decision.policy import CUSTOMER, PERSONAS
+from engines.decision.policy import CONSULTANT, CUSTOMER, PERSONAS
+from engines.decision.seed import seed_decisions
 from engines.scoring.score import score
 from engines.signoff.pack import SCOPE, build_pack, gate
 from engines.validation import checks
+from engines.validation.runner import run_checks
 
 router = APIRouter(prefix="/api")
 
@@ -263,6 +265,35 @@ def record_timing(body: Timing, db: Tx, role: PersonaRole) -> dict[str, str]:
         """),
         {"stage": body.stage, "role": role, "seconds": body.seconds, "at": datetime.now(UTC)},
     )
+    return {"status": "ok"}
+
+
+SCENE_ANSWERS = {
+    "CC-014": "15% (as the policy says)",
+    "RP-058": "Retire it",
+    "RP-112": "Keep it",
+    "WF-006": "Retire it",
+    "CC-037": "The finance systems lead can explain it",
+}
+
+
+@router.post("/demo/prepare/{scene}")
+def prepare_scene(scene: int, db: Tx) -> dict[str, str]:
+    """Rebuilds the state a scene expects, so the presenter can resume anywhere."""
+    if not 0 <= scene <= 8:
+        raise HTTPException(status_code=404, detail="Scenes run from 0 to 8.")
+    seed_decisions(db)
+    if scene >= 7:
+        conflict: dict[str, Any] = db.execute(
+            text("SELECT conflict FROM studio.agent_signal WHERE item_id = 'CC-014'")
+        ).scalar_one()
+        ask("CC-014", AskCustomer(question=conflict["question"], options=conflict["options"]), db, CONSULTANT)
+        for item_id, text_answer in SCENE_ANSWERS.items():
+            answer(item_id, AnswerQuestion(answer=text_answer), db, CUSTOMER)
+        run_checks(db)
+    if scene == 8:
+        generate_pack(db, CONSULTANT)
+        sign_pack(db, CUSTOMER)
     return {"status": "ok"}
 
 

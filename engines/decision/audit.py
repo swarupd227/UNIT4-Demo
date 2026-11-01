@@ -52,6 +52,45 @@ def record(
     )
 
 
+class Writer:
+    """Records many events in one statement, for the seed, which is the only writer at that point."""
+
+    def __init__(self, db: Connection) -> None:
+        self._db = db
+        self._rows: list[dict[str, Any]] = []
+        head = db.execute(text("SELECT hash FROM studio.audit_event ORDER BY seq DESC LIMIT 1")).scalar()
+        self._prev: str = head or GENESIS
+
+    def record(
+        self, at: datetime, actor: str, role: str, action: str, item_id: str, detail: dict[str, Any]
+    ) -> None:
+        current = event_hash(self._prev, at, actor, role, action, item_id, detail)
+        self._rows.append(
+            {
+                "at": at,
+                "actor": actor,
+                "role": role,
+                "action": action,
+                "item_id": item_id,
+                "detail": json.dumps(detail, sort_keys=True),
+                "prev_hash": self._prev,
+                "hash": current,
+            }
+        )
+        self._prev = current
+
+    def flush(self) -> None:
+        if self._rows:
+            self._db.execute(
+                text("""
+                    INSERT INTO studio.audit_event (at, actor, role, action, item_id, detail, prev_hash, hash)
+                    VALUES (:at, :actor, :role, :action, :item_id, CAST(:detail AS jsonb), :prev_hash, :hash)
+                """),
+                self._rows,
+            )
+        self._rows = []
+
+
 def verify_chain(db: Connection) -> bool:
     prev_hash = GENESIS
     rows = db.execute(

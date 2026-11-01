@@ -185,7 +185,7 @@ export function CodeScreen() {
             </div>
             <div className="flex shrink-0 items-center gap-3">
               <StatusLabel status={item.status} />
-              <Button variant="primary" disabled={!item.allowed.accept} onClick={() => actions.accept.mutate()}>
+              <Button variant="primary" disabled={!item.allowed.accept} onClick={() => actions.accept.mutate(itemId)}>
                 {acceptLabel(role, item.outcome)} design
               </Button>
               <Button disabled={!item.allowed.ask} onClick={() => setAsking(true)}>
@@ -219,7 +219,7 @@ export function CodeScreen() {
 
           <div className="grid grid-cols-[minmax(0,1fr)_420px_460px] gap-4">
             <Panel className="overflow-hidden !p-0">
-              <div className="scroll-quiet h-[560px] overflow-y-auto">
+              <div tabIndex={0} role="region" aria-label="Source code" className="scroll-quiet h-[560px] overflow-y-auto">
                 <CodeView source={item.source_text ?? ""} focusLine={line} />
               </div>
             </Panel>
@@ -259,7 +259,7 @@ export function CodeScreen() {
                         </button>
                       ))}
                   </div>
-                  <div className="scroll-quiet h-[484px] overflow-y-auto">
+                  <div tabIndex={0} role="region" aria-label={`${tab} detail`} className="scroll-quiet h-[484px] overflow-y-auto">
                     {tab === "rule" && rule && <RuleTab rule={rule} onHover={setLine} />}
                     {tab === "spec" && spec && <SpecTab spec={spec} />}
                     {tab === "tests" && tests && <TestsTab tests={tests} />}

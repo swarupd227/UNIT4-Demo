@@ -169,8 +169,9 @@ export function DecisionsScreen() {
     onSettled: () => client.invalidateQueries(),
   });
 
-  const currentDetail = (): DecisionDetail | undefined =>
-    client.getQueryData<DecisionDetail>(["decision", itemId, role]);
+  // Quick presses can beat the render, so read the row from the address and fetch it if needed.
+  const liveDetail = (id: string): Promise<DecisionDetail> =>
+    client.ensureQueryData({ queryKey: ["decision", id, role], queryFn: () => api.decision(id, role) });
 
   useEffect(() => {
     function onKey(event: KeyboardEvent) {
@@ -181,7 +182,9 @@ export function DecisionsScreen() {
         event.preventDefault();
         searchRef.current?.focus();
       } else if (key === "j" || key === "k") {
-        const index = itemId ? order.current.indexOf(itemId) : -1;
+        // The address updates at once, so quick presses never act on a stale row.
+        const current = window.location.pathname.split("/")[2];
+        const index = current ? order.current.indexOf(current) : -1;
         const next = order.current[index + (key === "j" ? 1 : -1)];
         if (next) open(next);
       } else if (key === "x" && itemId) {
@@ -192,17 +195,14 @@ export function DecisionsScreen() {
           return next;
         });
       } else {
-        const item = currentDetail();
-        if (!item) return;
-        if (key === "a" && item.allowed.accept) actions.accept.mutate();
-        if (key === "e" && item.allowed.edit) {
-          event.preventDefault(); // Otherwise the letter lands in the dialog's autofocused field.
-          setDialog({ kind: "edit", item });
-        }
-        if (key === "q" && item.allowed.ask) {
-          event.preventDefault();
-          setDialog({ kind: "ask", item });
-        }
+        const id = window.location.pathname.split("/")[2];
+        if (!id || !["a", "e", "q"].includes(key)) return;
+        event.preventDefault(); // Otherwise the letter lands in the dialog's autofocused field.
+        liveDetail(id).then((item) => {
+          if (key === "a" && item.allowed.accept) actions.accept.mutate(id);
+          if (key === "e" && item.allowed.edit) setDialog({ kind: "edit", item });
+          if (key === "q" && item.allowed.ask) setDialog({ kind: "ask", item });
+        });
       }
     }
     window.addEventListener("keydown", onKey);
@@ -343,7 +343,7 @@ export function DecisionsScreen() {
           onEvidence={(item, chosen) => setEvidence({ item, evidence: chosen })}
           onEdit={(item) => setDialog({ kind: "edit", item })}
           onAsk={(item) => setDialog({ kind: "ask", item })}
-          onAccept={() => actions.accept.mutate()}
+          onAccept={() => itemId && actions.accept.mutate(itemId)}
           onAnswer={(answer) => actions.answer.mutate(answer)}
         />
       </aside>

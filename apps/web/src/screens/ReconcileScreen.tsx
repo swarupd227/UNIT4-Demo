@@ -155,8 +155,7 @@ export function ReconcileScreen() {
   const client = useQueryClient();
   const { data: latest, isPending } = useQuery({
     queryKey: ["reconciliation"],
-    queryFn: () => workbench.latestRun(role).catch(() => null),
-    retry: false,
+    queryFn: () => workbench.latestRun(role),
   });
   const [selected, setSelected] = useState<string | null>(null);
   const [revealed, setRevealed] = useState(99);

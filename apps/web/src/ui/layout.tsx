@@ -16,7 +16,7 @@ export function Screen({ title, lead, next, aside, children }: {
 }) {
   const stage = STAGES.find((entry) => entry.key === next);
   return (
-    <div className="scroll-quiet min-h-0 flex-1 overflow-y-auto">
+    <div tabIndex={0} role="region" aria-label={title} className="scroll-quiet min-h-0 flex-1 overflow-y-auto outline-none">
       <div className="mx-auto max-w-[1760px] space-y-5 p-5">
         <header className="flex items-end justify-between gap-6">
           <div>

@@ -133,5 +133,6 @@ export const api = {
     post(`/api/decisions/${id}/ask`, role, { question, options }),
   answer: (id: string, role: Role, answer: string) => post(`/api/decisions/${id}/answer`, role, { answer }),
   reset: (role: Role) => post("/api/demo/reset", role),
+  prepare: (scene: number, role: Role) => post(`/api/demo/prepare/${scene}`, role),
   auditIntact: (role: Role) => request<{ intact: boolean }>("/api/audit/verify", role),
 };

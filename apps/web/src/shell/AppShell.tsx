@@ -1,10 +1,12 @@
 import * as Dropdown from "@radix-ui/react-dropdown-menu";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
-import { Check, ChevronDown, RotateCcw } from "lucide-react";
+import { Check, ChevronDown, MonitorPlay, RotateCcw } from "lucide-react";
 import { useEffect, useState } from "react";
 import { NavLink, Outlet, useLocation, useNavigate } from "react-router-dom";
 import { api } from "../lib/api";
 import { usePersona } from "../lib/persona";
+import { clearEstateLoaded, useAudienceLink } from "../lib/presenter";
+import { recordingPath, sceneForPath, SCENES } from "../lib/scenes";
 import { ROLE_KEYS, ROLES, STAGES } from "../lib/terms";
 import { useToast } from "../lib/toast";
 import { workbench } from "../lib/workbench";
@@ -31,11 +33,7 @@ function PersonaMenu() {
     mutationFn: () => api.reset(role),
     onSuccess: () => {
       client.invalidateQueries();
-      try {
-        sessionStorage.removeItem("studio.estate-loaded");
-      } catch {
-        // Nothing to clear.
-      }
+      clearEstateLoaded();
       navigate("/customer");
       toast("Demo reset to the start state");
     },
@@ -87,6 +85,13 @@ function PersonaMenu() {
           >
             <RotateCcw size={16} aria-hidden />
             Reset demo
+          </Dropdown.Item>
+          <Dropdown.Item
+            onSelect={() => window.open("/presenter", "studio-presenter", "popup,width=1280,height=800")}
+            className="flex cursor-pointer items-center gap-2 rounded-lg px-2.5 py-2 text-[15px] outline-none data-[highlighted]:bg-selected"
+          >
+            <MonitorPlay size={16} aria-hidden />
+            Open presenter console
           </Dropdown.Item>
         </Dropdown.Content>
       </Dropdown.Portal>
@@ -176,6 +181,8 @@ function useStageTiming(stage: string) {
 export function AppShell() {
   const location = useLocation();
   const [paletteOpen, setPaletteOpen] = useState(false);
+  const navigate = useNavigate();
+  const { fallback, closeFallback } = useAudienceLink();
   useStageTiming(location.pathname.split("/")[1]);
 
   useEffect(() => {
@@ -183,11 +190,17 @@ export function AppShell() {
       if ((event.ctrlKey || event.metaKey) && event.key.toLowerCase() === "k") {
         event.preventDefault();
         setPaletteOpen((open) => !open);
+        return;
       }
+      const target = event.target as HTMLElement;
+      const busy = /INPUT|TEXTAREA|SELECT/.test(target.tagName) || document.querySelector("[role=dialog]");
+      if (busy || !["ArrowLeft", "ArrowRight"].includes(event.key)) return;
+      const next = SCENES[sceneForPath(window.location.pathname) + (event.key === "ArrowRight" ? 1 : -1)];
+      if (next) navigate(next.path);
     }
     window.addEventListener("keydown", onKey);
     return () => window.removeEventListener("keydown", onKey);
-  }, []);
+  }, [navigate]);
 
   useEffect(() => setPaletteOpen(false), [location.pathname]);
 
@@ -199,6 +212,14 @@ export function AppShell() {
         <Outlet />
       </main>
       <CommandPalette open={paletteOpen} onClose={() => setPaletteOpen(false)} />
-    </div>
+      {fallback !== null && (
+        <video
+          src={recordingPath(fallback)}
+          autoPlay
+          muted
+          onEnded={closeFallback}
+          className="fixed inset-0 z-50 size-full bg-spine object-contain"
+        />
+      )}    </div>
   );
 }

@@ -1,6 +1,6 @@
 from typing import Any
 
-from fastapi import APIRouter, HTTPException, Query
+from fastapi import APIRouter, Query
 from sqlalchemy import Connection, text
 
 from app.decisions import Tx
@@ -32,11 +32,9 @@ def run_reconciliation(db: Tx) -> dict[str, Any]:
 
 
 @router.get("/reconciliation/latest")
-def latest_reconciliation(db: Tx) -> dict[str, Any]:
+def latest_reconciliation(db: Tx) -> dict[str, Any] | None:
     run_id = _latest_run_id(db)
-    if run_id is None:
-        raise HTTPException(status_code=404, detail="Reconciliation has not been run.")
-    return _run_report(db, run_id)
+    return _run_report(db, run_id) if run_id is not None else None
 
 
 @router.get("/reconciliation/{check_id}/differences")

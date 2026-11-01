@@ -20,8 +20,9 @@ export function useDecisionActions(itemId: string | null) {
 
   const accept = useMutation({
     ...options,
-    mutationFn: () => api.accept(id, role),
-    onSuccess: () => toast(`${id} accepted`),
+    // The item is passed in, so a quick key press can never accept the row it just left.
+    mutationFn: (target: string) => api.accept(target, role),
+    onSuccess: (_, target) => toast(`${target} accepted`),
   });
   const edit = useMutation({
     ...options,

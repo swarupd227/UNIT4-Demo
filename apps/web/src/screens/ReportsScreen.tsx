@@ -153,7 +153,7 @@ export function ReportsScreen() {
       <div className="grid grid-cols-[minmax(0,5fr)_minmax(0,7fr)] gap-4">
         <div className="space-y-4">
           <Panel title={`${data.merged} near-duplicates become ${data.merged_into}`}>
-            <ul className="scroll-quiet max-h-[340px] divide-y divide-line overflow-y-auto">
+            <ul tabIndex={0} aria-label="Merge groups" className="scroll-quiet max-h-[340px] divide-y divide-line overflow-y-auto">
               {data.groups.map((group) => (
                 <li key={group.lead.item_id} className="py-2">
                   <div className="flex justify-between gap-3 text-[16px]">

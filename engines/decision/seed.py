@@ -6,6 +6,7 @@ Also used by the presenter's reset, so it must stay fast and repeatable.
 import json
 from collections import defaultdict
 from datetime import UTC, datetime, timedelta
+from typing import Any
 
 from sqlalchemy import Connection, text
 
@@ -119,29 +120,37 @@ def load_facts(db: Connection) -> list[ItemFacts]:
     return facts
 
 
-def _store_proposal(db: Connection, item_id: str, proposal: Proposal) -> None:
-    db.execute(
-        text("""
-            INSERT INTO studio.proposal (item_id, outcome, candidate_outcome, action, state, reason,
-                                         confidence,
-                                         rule, flags, evidence, engine_version)
-            VALUES (:item_id, :outcome, :candidate_outcome, :action, :state, :reason, :confidence, :rule,
-                    CAST(:flags AS jsonb), CAST(:evidence AS jsonb), :engine_version)
-        """),
-        {
-            "item_id": item_id,
-            "outcome": proposal.outcome,
-            "candidate_outcome": proposal.candidate_outcome,
-            "action": proposal.action,
-            "state": proposal.state,
-            "reason": proposal.reason,
-            "confidence": proposal.confidence,
-            "rule": proposal.rule,
-            "flags": json.dumps(proposal.flags),
-            "evidence": json.dumps(proposal.evidence),
-            "engine_version": ENGINE_VERSION,
-        },
-    )
+INSERT_PROPOSAL = text("""
+    INSERT INTO studio.proposal (item_id, outcome, candidate_outcome, action, state, reason, confidence,
+                                 rule, flags, evidence, engine_version)
+    VALUES (:item_id, :outcome, :candidate_outcome, :action, :state, :reason, :confidence, :rule,
+            CAST(:flags AS jsonb), CAST(:evidence AS jsonb), :engine_version)
+""")
+INSERT_DECISION = text("""
+    INSERT INTO studio.decision (item_id, outcome, action, status, conflict_open, updated_at)
+    VALUES (:item_id, :outcome, :action, :status, :conflict_open, :updated_at)
+""")
+INSERT_QUESTION = text("""
+    INSERT INTO studio.customer_question (item_id, question, options, status, asked_by, asked_at)
+    VALUES (:item_id, :question, CAST(:options AS jsonb), 'open', :asked_by, :asked_at)
+""")
+INSERT_APPROVAL = text("INSERT INTO studio.approval VALUES (:item_id, :role, :person, :decided_at)")
+
+
+def _proposal_row(item_id: str, proposal: Proposal) -> dict[str, Any]:
+    return {
+        "item_id": item_id,
+        "outcome": proposal.outcome,
+        "candidate_outcome": proposal.candidate_outcome,
+        "action": proposal.action,
+        "state": proposal.state,
+        "reason": proposal.reason,
+        "confidence": proposal.confidence,
+        "rule": proposal.rule,
+        "flags": json.dumps(proposal.flags),
+        "evidence": json.dumps(proposal.evidence),
+        "engine_version": ENGINE_VERSION,
+    }
 
 
 def _is_routine(item_type: str, proposal: Proposal, required: list[str], has_question: bool) -> bool:
@@ -176,9 +185,11 @@ def seed_decisions(db: Connection) -> None:
             )
 
     store_artefacts(db)
+    writer = audit.Writer(db)
+    proposals, decisions, questions, approvals = [], [], [], []
     for facts in load_facts(db):
         proposal = propose(facts)
-        _store_proposal(db, facts.item_id, proposal)
+        proposals.append(_proposal_row(facts.item_id, proposal))
         conflict = facts.signal.get("conflict") or {}
         conflict_open = bool(conflict.get("blocks_acceptance"))
         question = facts.signal.get("question")
@@ -190,11 +201,7 @@ def seed_decisions(db: Connection) -> None:
         if facts.item_id == AGREED_AT_START:
             approved = [CONSULTANT, CUSTOMER]
         status = status_for(required, approved, bool(question), conflict_open)
-        db.execute(
-            text("""
-                INSERT INTO studio.decision (item_id, outcome, action, status, conflict_open, updated_at)
-                VALUES (:item_id, :outcome, :action, :status, :conflict_open, :updated_at)
-            """),
+        decisions.append(
             {
                 "item_id": facts.item_id,
                 "outcome": proposal.outcome,
@@ -202,10 +209,9 @@ def seed_decisions(db: Connection) -> None:
                 "status": status,
                 "conflict_open": conflict_open,
                 "updated_at": START_TIME,
-            },
+            }
         )
-        audit.record(
-            db,
+        writer.record(
             START_TIME,
             ENGINE_ACTOR,
             "engine",
@@ -215,12 +221,7 @@ def seed_decisions(db: Connection) -> None:
         )
         if question:
             asked_at = START_TIME + timedelta(minutes=10)
-            db.execute(
-                text("""
-                    INSERT INTO studio.customer_question
-                        (item_id, question, options, status, asked_by, asked_at)
-                    VALUES (:item_id, :question, CAST(:options AS jsonb), 'open', :asked_by, :asked_at)
-                """),
+            questions.append(
                 {
                     "item_id": facts.item_id,
                     "question": question,
@@ -230,10 +231,9 @@ def seed_decisions(db: Connection) -> None:
                     ),
                     "asked_by": PERSONAS[CONSULTANT],
                     "asked_at": asked_at,
-                },
+                }
             )
-            audit.record(
-                db,
+            writer.record(
                 asked_at,
                 PERSONAS[CONSULTANT],
                 CONSULTANT,
@@ -243,12 +243,10 @@ def seed_decisions(db: Connection) -> None:
             )
         for offset, role in enumerate(approved, start=1):
             approved_at = START_TIME + timedelta(minutes=30 if routine else 60 * offset)
-            db.execute(
-                text("INSERT INTO studio.approval VALUES (:item_id, :role, :person, :decided_at)"),
-                {"item_id": facts.item_id, "role": role, "person": PERSONAS[role], "decided_at": approved_at},
+            approvals.append(
+                {"item_id": facts.item_id, "role": role, "person": PERSONAS[role], "decided_at": approved_at}
             )
-            audit.record(
-                db,
+            writer.record(
                 approved_at,
                 PERSONAS[role],
                 role,
@@ -256,3 +254,8 @@ def seed_decisions(db: Connection) -> None:
                 facts.item_id,
                 {"outcome": proposal.outcome},
             )
+    db.execute(INSERT_PROPOSAL, proposals)
+    db.execute(INSERT_DECISION, decisions)
+    db.execute(INSERT_QUESTION, questions)
+    db.execute(INSERT_APPROVAL, approvals)
+    writer.flush()

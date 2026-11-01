@@ -202,9 +202,11 @@ If no LLM key is available yet, the replay cache is hand-authored in the same sc
 Customer card, Estate, Code, Reports, Workflows, Reconcile, Sign-off and Scorecard, all to the Phase 2 standard, along with the PDF pack and ZIP manifest.
 **Exit:** the full journey runs start to finish on real local data, with the sign-off gate working and a scorecard computed from the database.
 
-### Phase 5: Stage readiness (`#19`–`#21`)
+### Phase 5: Stage readiness (`#19`–`#21`) (built; human rehearsals and specialist review outstanding)
 Presenter mode, reset, fallback switch and recordings, performance pass, accessibility audit, FS terminology review, timed rehearsals.
 **Exit:** three clean timed runs of 22 minutes or less; every scene loads in under 2 seconds; zero critical accessibility issues.
+
+Status: three consecutive clean scripted passes on the production build, with every scene under 2 seconds and no critical or serious axe findings. A presenter's 22-minute timing still needs a person. An earlier run saw loads up to 3.8 seconds; the cause was not isolated, so present with `npm run demo` and other Docker projects closed.
 
 ### Phase 6: Azure deployment
 Bicep for Container Apps, Postgres, Blob Storage, Key Vault, Container Registry and Application Insights. Add Entra sign-in and a CI pipeline, then install the Azure CLI, which this machine does not have yet.

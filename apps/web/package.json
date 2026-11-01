@@ -6,9 +6,10 @@
   "scripts": {
     "dev": "vite",
     "build": "tsc --noEmit && vite build",
-    "test": "vitest run",
+    "test": "vitest run src",
     "lint": "eslint src",
-    "typecheck": "tsc --noEmit"
+    "typecheck": "tsc --noEmit",
+    "e2e": "playwright test"
   },
   "dependencies": {
     "@fontsource-variable/inter": "^5.1.0",
@@ -27,7 +28,9 @@
     "shiki": "^1.22.0"
   },
   "devDependencies": {
+    "@axe-core/playwright": "4.10.1",
     "@eslint/js": "^9.12.0",
+    "@playwright/test": "1.49.1",
     "@tailwindcss/vite": "^4.0.0",
     "@types/react": "^19.0.0",
     "@types/react-dom": "^19.0.0",

@@ -159,7 +159,7 @@ export const workbench = {
   workflows: (role: Role) =>
     request<{ variants: WorkflowVariant[]; pack: WorkflowPack; pack_source: string }>("/api/workflows", role),
   artefacts: (id: string, role: Role) => request<Artefact[]>(`/api/artefacts/${id}`, role),
-  latestRun: (role: Role) => request<ReconRun>("/api/reconciliation/latest", role),
+  latestRun: (role: Role) => request<ReconRun | null>("/api/reconciliation/latest", role),
   runChecks: (role: Role) => post<ReconRun>("/api/reconciliation/run", role),
   differences: (id: string, role: Role) => request<Difference[]>(`/api/reconciliation/${id}/differences`, role),
   signoff: (role: Role) => request<SignoffState>("/api/signoff", role),
