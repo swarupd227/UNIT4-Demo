@@ -267,3 +267,18 @@ def test_an_edit_reaches_mapping_memory_on_the_scorecard(client: TestClient) -> 
     assert memory["rejected"] == 1
     assert memory["entries"][0]["item_id"] == row["item_id"]
     assert memory["entries"][0]["next_outcome"] != row["outcome"]
+
+
+def test_answering_open_questions_keeps_the_run_so_far(client: TestClient) -> None:
+    run = client.post("/api/reconciliation/run").json()
+    assert client.post("/api/workspace/answer-open").json()["answered"] == 4
+    assert client.get("/api/signoff").json()["open_questions"] == []
+    assert client.get("/api/reconciliation/latest").json()["run_id"] == run["run_id"]
+
+
+def test_the_pack_has_a_page_to_show_on_screen(client: TestClient) -> None:
+    pack = ready_pack(client)["pack"]
+    page = client.get(f"/api/signoff/{pack['pack_id']}/signoff_pack.html")
+    assert page.status_code == 200
+    assert page.headers["content-type"].startswith("text/html")
+    assert "Customer sign-off pack" in page.text

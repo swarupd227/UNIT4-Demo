@@ -133,6 +133,7 @@ export const api = {
     post(`/api/decisions/${id}/ask`, role, { question, options }),
   answer: (id: string, role: Role, answer: string) => post(`/api/decisions/${id}/answer`, role, { answer }),
   reset: (role: Role) => post("/api/workspace/reset", role),
+  answerOpen: (role: Role) => post<{ answered: number }>("/api/workspace/answer-open", role),
   prepare: (scene: number, role: Role) => post(`/api/workspace/prepare/${scene}`, role),
   auditIntact: (role: Role) => request<{ intact: boolean }>("/api/audit/verify", role),
 };

@@ -31,7 +31,7 @@ export function LiveAgentButton({ agent, subject }: { agent: string; subject: st
 
   if (!status?.live || role !== "consultant") return null;
   return (
-    <Button disabled={run.isPending} onClick={() => run.mutate()}>
+    <Button className="shrink-0 whitespace-nowrap" disabled={run.isPending} onClick={() => run.mutate()}>
       <Play size={15} aria-hidden />
       {run.isPending ? `Analysing… ${seconds} sec` : "Run live"}
     </Button>

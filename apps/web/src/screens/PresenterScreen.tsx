@@ -79,6 +79,10 @@ export function PresenterScreen() {
     mutationFn: () => api.prepare(index, role),
     onSuccess: () => send({ type: "refresh" }),
   });
+  const answerOpen = useMutation({
+    mutationFn: () => api.answerOpen(role),
+    onSuccess: () => send({ type: "refresh" }),
+  });
   const reset = useMutation({
     mutationFn: () => api.reset(role),
     onSuccess: () => {
@@ -160,6 +164,9 @@ export function PresenterScreen() {
           </Button>
           <Button onClick={() => prepare.mutate()} disabled={prepare.isPending}>
             {prepare.isPending ? "Preparing…" : `Prepare scene ${index}`}
+          </Button>
+          <Button onClick={() => answerOpen.mutate()} disabled={answerOpen.isPending}>
+            Answer customer questions
           </Button>
           <Button onClick={() => reset.mutate()} disabled={reset.isPending}>
             <RotateCcw size={16} aria-hidden /> Reset

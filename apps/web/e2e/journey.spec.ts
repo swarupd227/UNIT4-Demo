@@ -147,7 +147,7 @@ test("scene 7 generates and signs the pack", async ({ page, request }) => {
   await timedGoto(page, "/signoff", "Customer sign-off");
   const started = Date.now();
   await page.getByRole("button", { name: "Generate the pack" }).click();
-  await expect(page.getByTitle("Sign-off pack")).toBeVisible();
+  await expect(page.frameLocator('iframe[title="Sign-off pack"]').getByText("Customer sign-off pack")).toBeVisible();
   console.log(`PACK generated in ${Date.now() - started}ms`);
   await expect(page.getByText("Of which accepted in earlier sessions")).toBeVisible();
   await page.waitForTimeout(1000);

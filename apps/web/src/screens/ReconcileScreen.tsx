@@ -260,11 +260,11 @@ export function ReconcileScreen() {
                   disabled={!shown}
                   onClick={() => setSelected(entry.check_id)}
                   animate={{ opacity: shown ? 1 : 0.45 }}
-                  className={`h-[150px] rounded-xl border bg-surface p-4 text-left shadow-panel transition-colors hover:border-ink-3 ${
+                  className={`flex h-[150px] flex-col justify-start overflow-hidden rounded-xl border bg-surface p-4 text-left shadow-panel transition-colors hover:border-ink-3 ${
                     shown ? status.ring : "border-line"
                   }`}
                 >
-                  <span className="flex items-center justify-between">
+                  <span className="flex w-full items-center justify-between">
                     <span className="tnum text-[15px] font-semibold text-ink-3">{entry.check_id}</span>
                     {shown ? (
                       <span className={`inline-flex items-center gap-1.5 text-[15px] font-semibold ${status.text}`}>
@@ -277,7 +277,7 @@ export function ReconcileScreen() {
                   </span>
                   <span className="mt-1 block text-[18px] font-semibold">{entry.name}</span>
                   {shown && (
-                    <span className="tnum mt-1 line-clamp-2 block text-[15px] leading-6 text-ink-2">
+                    <span className="tnum mt-1 line-clamp-2 text-[15px] leading-6 text-ink-2">
                       {headline(entry, exceptions)}
                     </span>
                   )}

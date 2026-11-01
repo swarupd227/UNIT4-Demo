@@ -19,8 +19,9 @@ can be matched by a plain text search. It must not span lines."""
 
 TASKS = {
     "code_explainer": """\
-Explain this custom code item. Give a plain-English summary, the logic step by step, any business
-rules buried in the code, and anything that stops it moving to the cloud as it stands. Set
+Explain this custom code item. Give a plain-English summary of at most two sentences, the logic
+step by step, any business rules buried in the code, and anything that stops it moving to the cloud
+as it stands. Keep each entry to one sentence. Set
 `purpose_known` to false if the business purpose cannot be established from the code.""",
     "rule_extractor": """\
 Extract the business rule this code enforces, with its threshold as a whole-number percentage.
@@ -48,6 +49,7 @@ each one enforces. `keeps`, `absorbs` and `retire` hold item IDs only, such as W
 used only by a dormant legal entity in `retire`, not `absorbs`, and give that evidence in the
 control impact, because no live control depends on it. The customer still decides. List the ERPx
 configuration for each proposed workflow, the impact on controls, test cases, and the one decision
-the customer's finance lead has to make. `decision_needed` must begin with "Ardleigh's finance
-lead".""",
+the customer's finance lead has to make. `headline` is at most eight words. `rule` is a short
+phrase. Give at most three short configuration points per workflow. `decision_needed` must begin
+with "Ardleigh's finance lead".""",
 }

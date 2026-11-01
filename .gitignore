@@ -11,3 +11,5 @@ data/generated/
 storage/
 *.log
 e2e-results/
+demo-video/
+deliverables/

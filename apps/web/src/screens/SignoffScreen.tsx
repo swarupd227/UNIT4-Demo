@@ -154,13 +154,24 @@ export function SignoffScreen() {
                 <dd>{pack.summary.audit_events}</dd>
               </dl>
               <p className="tnum mt-3 text-[14px] break-all text-ink-3">Manifest {pack.manifest_hash.slice(0, 24)}…</p>
-              <a
-                href={`/api/signoff/${pack.pack_id}/signoff_pack.zip`}
-                className="mt-3 inline-flex h-11 items-center gap-2 rounded-lg border border-line-strong px-4 text-[15px] font-medium hover:bg-surface-2"
-              >
-                <Download size={17} aria-hidden />
-                Download the evidence
-              </a>
+              <div className="mt-3 flex flex-wrap gap-2">
+                <a
+                  href={`/api/signoff/${pack.pack_id}/signoff_pack.zip`}
+                  className="inline-flex h-11 items-center gap-2 rounded-lg border border-line-strong px-4 text-[15px] font-medium hover:bg-surface-2"
+                >
+                  <Download size={17} aria-hidden />
+                  Download the evidence
+                </a>
+                <a
+                  href={`/api/signoff/${pack.pack_id}/signoff_pack.pdf`}
+                  target="_blank"
+                  rel="noopener"
+                  className="inline-flex h-11 items-center gap-2 rounded-lg border border-line-strong px-4 text-[15px] font-medium hover:bg-surface-2"
+                >
+                  <FileText size={17} aria-hidden />
+                  Open PDF
+                </a>
+              </div>
             </Panel>
           )}
         </div>
@@ -195,7 +206,8 @@ export function SignoffScreen() {
               </div>
               <iframe
                 title="Sign-off pack"
-                src={`/api/signoff/${pack.pack_id}/signoff_pack.pdf`}
+                sandbox=""
+                src={`/api/signoff/${pack.pack_id}/signoff_pack.html`}
                 className="min-h-0 w-full flex-1 rounded-b-xl"
               />
             </>

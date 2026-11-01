@@ -50,7 +50,27 @@ export function WorkflowsScreen() {
       lead={`${variants.length} variants, ${pack.to_count} proposed. The top two handle ${Math.round((topTwo / total) * 100)}% of ${total.toLocaleString("en-GB")} approvals in 12 months.`}
       next="reconcile"
       aside={
-        !proposal && (
+        proposal ? (
+          <>
+            <a
+              href={WORKFLOW_PACK_PATH}
+              target="_blank"
+              rel="noopener"
+              className="inline-flex h-11 items-center gap-2 rounded-lg border border-line-strong bg-surface px-4 text-[15px] font-medium hover:bg-surface-2"
+            >
+              <FileText size={17} aria-hidden />
+              Open decision pack
+            </a>
+            <Button
+              variant="primary"
+              disabled={sent || !packItem?.allowed.ask || send.isPending}
+              onClick={() => send.mutate()}
+            >
+              <Send size={17} aria-hidden />
+              {sent ? "Sent to the customer" : "Send pack to customer"}
+            </Button>
+          </>
+        ) : (
           <Button variant="primary" onClick={() => setProposal(true)}>
             View proposal
           </Button>
@@ -132,25 +152,6 @@ export function WorkflowsScreen() {
                 ))}
               </ul>
               <p className="mt-3 text-[15px] font-medium">{pack.decision_needed}</p>
-              <div className="mt-3 flex flex-wrap items-center gap-3">
-                <a
-                  href={WORKFLOW_PACK_PATH}
-                  target="_blank"
-                  rel="noopener"
-                  className="inline-flex h-11 items-center gap-2 rounded-lg border border-line-strong px-4 text-[15px] font-medium hover:bg-surface-2"
-                >
-                  <FileText size={17} aria-hidden />
-                  Open decision pack
-                </a>
-                <Button
-                  variant="primary"
-                  disabled={sent || !packItem?.allowed.ask || send.isPending}
-                  onClick={() => send.mutate()}
-                >
-                  <Send size={17} aria-hidden />
-                  {sent ? "Sent to the customer" : "Send pack to customer"}
-                </Button>
-              </div>
             </Panel>
             <Panel title="Test cases">
               <table className="w-full text-[15px]">

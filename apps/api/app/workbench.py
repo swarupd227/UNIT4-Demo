@@ -225,6 +225,7 @@ def generate_pack(db: Tx, role: PersonaRole) -> dict[str, Any]:
     ).scalar_one()
     storage = get_storage()
     storage.put(f"packs/{pack_id}/signoff_pack.pdf", built["pdf"])
+    storage.put(f"packs/{pack_id}/signoff_pack.html", built["html"])
     storage.put(f"packs/{pack_id}/signoff_pack.zip", built["zip"])
     return _signoff_state(db)
 
@@ -252,14 +253,18 @@ def sign_pack(db: Tx, role: PersonaRole) -> dict[str, Any]:
 
 @router.get("/signoff/{pack_id}/{file_name}")
 def download_pack(pack_id: int, file_name: str) -> Response:
-    media = {"signoff_pack.pdf": "application/pdf", "signoff_pack.zip": "application/zip"}.get(file_name)
+    media = {
+        "signoff_pack.pdf": "application/pdf",
+        "signoff_pack.html": "text/html; charset=utf-8",
+        "signoff_pack.zip": "application/zip",
+    }.get(file_name)
     if media is None:
         raise HTTPException(status_code=404, detail="Unknown file")
     try:
         content = get_storage().get(f"packs/{pack_id}/{file_name}")
     except FileNotFoundError as error:
         raise HTTPException(status_code=404, detail="Pack not found") from error
-    disposition = "inline" if file_name.endswith(".pdf") else "attachment"
+    disposition = "attachment" if file_name.endswith(".zip") else "inline"
     return Response(
         content, media_type=media, headers={"Content-Disposition": f"{disposition}; filename={file_name}"}
     )
@@ -288,7 +293,19 @@ SCENE_ANSWERS = {
     "RP-112": "Keep it",
     "WF-006": "Retire it",
     "CC-037": "The finance systems lead can explain it",
+    "WF-001": "Adopt the three workflows",
 }
+
+
+@router.post("/workspace/answer-open")
+def answer_open_questions(db: Tx) -> dict[str, int]:
+    """Lets the presenter clear the customer's questions without losing the run so far."""
+    questions = _rows(db, "SELECT item_id, options FROM studio.customer_question WHERE status = 'open'")
+    for question in questions:
+        options = question["options"] or ["Agreed"]
+        text_answer = SCENE_ANSWERS.get(question["item_id"], options[0])
+        answer(question["item_id"], AnswerQuestion(answer=text_answer), db, CUSTOMER)
+    return {"answered": len(questions)}
 
 
 @router.post("/workspace/prepare/{scene}")
@@ -302,8 +319,7 @@ def prepare_scene(scene: int, db: Tx) -> dict[str, str]:
             text("SELECT conflict FROM studio.agent_signal WHERE item_id = 'CC-014'")
         ).scalar_one()
         ask("CC-014", AskCustomer(question=conflict["question"], options=conflict["options"]), db, CONSULTANT)
-        for item_id, text_answer in SCENE_ANSWERS.items():
-            answer(item_id, AnswerQuestion(answer=text_answer), db, CUSTOMER)
+        answer_open_questions(db)
         run_checks(db)
     if scene == 8:
         generate_pack(db, CONSULTANT)

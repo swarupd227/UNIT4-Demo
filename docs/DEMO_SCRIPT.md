@@ -33,16 +33,16 @@ The console shows these same notes.
 | Scene | Time | Show | Say |
 |---|---|---|---|
 | 0 Set the scene | 1 | Customer card | Ardleigh wants to reach ERPx with fewer customisations. The app labels this as a sandbox, so say it aloud: everything is synthetic, with no payroll or HR data. The ERPx target is simulated, and the agent results marked Prepared analysis are written by hand, not generated live |
-| 1 Load the estate | 2 | Load the estate, then the estate map | J2X output arrives first, because this builds on it. J2X explains what exists. We start from there. Time by stage is to be baselined |
-| 2 Decisions | 4 | Retire filter, RP-112, then press A on a retirement | Routine items are seeded as earlier work, and the app shows them as accepted in an earlier session. The audit pack looks unused, and the system refused to retire it. A retirement waits for the customer |
-| 3 Custom code | 4 | CC-014: plain English, hidden rule, conflict, spec, tests | Direct database writes cannot move to Unit4 cloud. 10% in code, 15% in policy: the customer decides. The extension spec is illustrative until Unit4 confirms it |
+| 1 Load the estate | 2 | Load estate, then the estate map | J2X output arrives first, because this builds on it. J2X explains what exists. We start from there. Time by stage is to be baselined |
+| 2 Decisions | 4 | Retire filter, RP-112, press A on a retirement, then Ctrl+K, CC-003, A | Routine items are seeded as earlier work, and the app shows them as accepted in an earlier session. The audit pack looks unused, and the system refused to retire it. A retirement waits for the customer |
+| 3 Custom code | 4 | CC-014: summary, embedded rule, conflict, Run live, spec, tests | Direct database writes cannot move to Unit4 cloud. 10% in code, 15% in policy: the customer decides. The extension spec is illustrative until Unit4 confirms it |
 | 4 Reports | 3 | Reduction, rebuild, fix the list | Rebuilt faithfully, totals match to the penny. Fixed, the difference is exactly the omitted partners' WIP |
 | 5 Workflows | 2 | Usage, proposal, send pack | Two variants handle 94% of approvals. Controls are the customer's call |
 | 6 Reconcile | 4 | Run, R2, R4, R6, then threshold and run again | Plain code, no language model. Open R2 and show the proven cause. Ask the customer, switch to Jordan, choose, switch back, run again. Run once more to show the identical result |
-| 7 Sign-off pack | 1 | Generate, switch to Jordan, sign | This accepts a trial migration with listed exceptions. It is not cutover. Undecided items remain, and those marked as accepted in earlier sessions are seeded history |
+| 7 Sign-off pack | 1 | Answer customer questions in the console, generate, switch to Jordan, sign | This accepts a trial migration with listed exceptions. It is not cutover. Undecided items remain, and those marked as accepted in earlier sessions are seeded history |
 | 8 Results | 1 | Scorecard | Ten of ten on synthetic data, against an answer key, which the screen calls known issues and expected results. We quote no percentage saving, because Unit4 has shared no baseline |
 
-Scene 7 needs the four seeded customer questions answered first, plus the threshold. The fastest way is to switch to Jordan on the Sign-off screen and clear them there, or use **Prepare scene 7** beforehand. Allow for this, because it is not in the 1-minute budget.
+Scene 7 needs five customer questions answered first: the four seeded ones plus the workflow pack. Press **Answer customer questions** in the console, which keeps the run so far, or switch to Jordan and answer one or two aloud. Answering all five by hand does not fit the 1-minute budget.
 
 **Live agents.** `.env` must hold `ANTHROPIC_API_KEY`, and the button shows only for Robin. On the Code screen, press **Run live** on the explanation panel as the visible AI moment, or on the workflow proposal. A run can take a minute, so talk through it. The badge changes to AI analysis only when a model wrote the result. If a run fails, the cached result stays and a message says so. **Reset** restores the cached results.
 
@@ -67,4 +67,4 @@ Optional if a scene runs short, each about 20 seconds:
 - No time savings or accuracy figures that apply to real customers.
 - The agent does not decide. Every decision needs a consultant, and every retirement needs the customer.
 - No cutover readiness. Parallel runs and cutover need Unit4 and customer approval.
-- Agent output is not live. It is authored in the agents' format until a model is connected.
+- Prepared analysis is written by hand. Only a result marked AI analysis came from a model, and a person still reviews it.

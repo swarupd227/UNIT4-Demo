@@ -164,10 +164,11 @@ h2 { font-size: 14pt; margin: 18pt 0 6pt; border-bottom: 1pt solid #cfc7bb; padd
 table { width: 100%; border-collapse: collapse; font-size: 9pt; }
 th { text-align: left; border-bottom: 1pt solid #1e1a16; padding: 3pt 4pt; }
 td { border-bottom: .5pt solid #e4ded5; padding: 3pt 4pt; vertical-align: top; }
+@media screen { body { max-width: 760px; margin: 28px auto; padding: 0 28px; } }
 """
 
 
-def _render_pdf(data: dict[str, Any], summary: dict[str, Any], audit_head: str) -> bytes:
+def _render_html(data: dict[str, Any], summary: dict[str, Any], audit_head: str) -> str:
     case = data["case"]
     run = data["run"]
     checks = _table(
@@ -199,7 +200,7 @@ def _render_pdf(data: dict[str, Any], summary: dict[str, Any], audit_head: str) 
     decisions = _table(
         ["Outcome", "Items"], [[key.replace("_", " ").capitalize(), n] for key, n in sorted(counts.items())]
     )
-    document = f"""
+    return f"""
     <html><head><meta charset="utf-8"><style>{CSS}</style></head><body>
     <h1>Customer sign-off pack</h1>
     <p class="lead">{html.escape(case.customer)} · {html.escape(case.label)} · CR to ERPx</p>
@@ -233,7 +234,6 @@ def _render_pdf(data: dict[str, Any], summary: dict[str, Any], audit_head: str) 
     <p>The audit trail is hash-chained. The chain head when this pack was generated:<br>{audit_head}</p>
     </body></html>
     """
-    return HTML(string=document).write_pdf()
 
 
 def workflow_pack_html(customer: str, pack: dict[str, Any], usage: dict[str, int]) -> str:
@@ -346,7 +346,8 @@ def build_pack(db: Connection, run_id: int) -> dict[str, Any]:
             ["seq", "at", "actor", "role", "action", "item_id", "hash"], [tuple(row) for row in data["audit"]]
         ),
     }
-    files["signoff_pack.pdf"] = _render_pdf(data, summary, audit_head)
+    document = _render_html(data, summary, audit_head)
+    files["signoff_pack.pdf"] = HTML(string=document).write_pdf()
 
     manifest = {
         "scope": SCOPE,
@@ -362,6 +363,7 @@ def build_pack(db: Connection, run_id: int) -> dict[str, Any]:
         bundle.writestr("manifest.json", manifest_bytes)
     return {
         "pdf": files["signoff_pack.pdf"],
+        "html": document.encode(),
         "zip": archive.getvalue(),
         "manifest": manifest,
         "manifest_hash": _sha256(manifest_bytes),

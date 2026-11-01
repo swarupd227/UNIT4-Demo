@@ -18,7 +18,7 @@ export const SCENES: Scene[] = [
     notes: [
       "Introduce Ardleigh and its goal: reach ERPx with fewer customisations.",
       "Say plainly that everything is synthetic, with no payroll or HR data.",
-      "Say that the ERPx target is simulated and the agent results are authored.",
+      "Say that the ERPx target is simulated, and that Prepared analysis is written by hand.",
     ],
   },
   {
@@ -28,7 +28,7 @@ export const SCENES: Scene[] = [
     minutes: 2,
     protected: false,
     notes: [
-      "Press Load the estate. J2X output arrives first, because this builds on it.",
+      "Press Load estate. J2X output arrives first, because this builds on it.",
       "Point at the estate map: J2X explains, and this work starts after that.",
       "Time by stage is to be baselined. We assume no baseline.",
     ],
@@ -43,7 +43,7 @@ export const SCENES: Scene[] = [
       "Routine items are seeded as earlier work, and the app says so.",
       "On the Retire filter, open RP-112, the Year-end audit pack.",
       "It looks unused, and the system refused to retire it. Show the evidence.",
-      "Press A on a retirement: it waits for the customer. Nothing moves alone.",
+      "Press A on a retirement: it waits for the customer. Then Ctrl+K, CC-003, and A: Robin alone can accept it, so the count moves to 83.",
     ],
   },
   {
@@ -53,7 +53,7 @@ export const SCENES: Scene[] = [
     minutes: 4,
     protected: true,
     notes: [
-      "Read the plain English first, then select a hidden rule to find its line.",
+      "Read the summary first, then select an embedded rule to find its line. Press Run live here.",
       "Show the conflict: 10% in code, 15% in policy. The customer decides.",
       "Show the INT-09 dependency, then the extension spec and tests.",
       "Direct database writes cannot move to Unit4 cloud.",
@@ -106,7 +106,7 @@ export const SCENES: Scene[] = [
     notes: [
       "This accepts a trial migration with listed exceptions. It is not cutover.",
       "Say that undecided items remain, and name the seeded history.",
-      "Generate the pack, switch to Jordan, sign.",
+      "Press Answer customer questions in the console, generate the pack, switch to Jordan, sign.",
     ],
   },
   {
