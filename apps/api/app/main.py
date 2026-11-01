@@ -1,3 +1,4 @@
+import os
 from typing import Annotated
 
 from fastapi import Depends, FastAPI, HTTPException
@@ -9,6 +10,12 @@ from app.db import get_connection
 from app.decisions import router as decisions_router
 from app.validation import router as validation_router
 from app.workbench import router as workbench_router
+
+# Must run before the app is created, so that its requests are traced.
+if os.getenv("APPLICATIONINSIGHTS_CONNECTION_STRING"):
+    from azure.monitor.opentelemetry import configure_azure_monitor
+
+    configure_azure_monitor()
 
 app = FastAPI(title="Migration Studio API")
 app.include_router(decisions_router)

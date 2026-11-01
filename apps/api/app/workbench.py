@@ -8,9 +8,8 @@ from fastapi import APIRouter, HTTPException, Response
 from pydantic import BaseModel, Field
 from sqlalchemy import Connection, text
 
-from app.config import get_settings
 from app.decisions import AnswerQuestion, AskCustomer, PersonaRole, Tx, answer, ask
-from app.storage import LocalStorage
+from app.storage import get_storage
 from engines.decision import audit
 from engines.decision.policy import CONSULTANT, CUSTOMER, PERSONAS
 from engines.decision.seed import seed_decisions
@@ -141,10 +140,6 @@ def workflows(db: Tx) -> dict[str, Any]:
     }
 
 
-def _storage() -> LocalStorage:
-    return LocalStorage(get_settings().storage_root)
-
-
 def _latest_pack(db: Connection) -> dict[str, Any] | None:
     row = (
         db.execute(text("SELECT * FROM studio.signoff_pack ORDER BY pack_id DESC LIMIT 1")).mappings().first()
@@ -209,7 +204,7 @@ def generate_pack(db: Tx, role: PersonaRole) -> dict[str, Any]:
             "summary": json.dumps(built["summary"]),
         },
     ).scalar_one()
-    storage = _storage()
+    storage = get_storage()
     storage.put(f"packs/{pack_id}/signoff_pack.pdf", built["pdf"])
     storage.put(f"packs/{pack_id}/signoff_pack.zip", built["zip"])
     return _signoff_state(db)
@@ -242,7 +237,7 @@ def download_pack(pack_id: int, file_name: str) -> Response:
     if media is None:
         raise HTTPException(status_code=404, detail="Unknown file")
     try:
-        content = _storage().get(f"packs/{pack_id}/{file_name}")
+        content = get_storage().get(f"packs/{pack_id}/{file_name}")
     except FileNotFoundError as error:
         raise HTTPException(status_code=404, detail="Pack not found") from error
     disposition = "inline" if file_name.endswith(".pdf") else "attachment"

@@ -19,6 +19,7 @@ services:
     build:
       context: .
       dockerfile: apps/api/Dockerfile
+      target: dev
     environment:
       STUDIO_DATABASE_URL: postgresql+psycopg://studio:studio@db:5432/studio
       STUDIO_LLM_MODE: ${STUDIO_LLM_MODE:-replay}

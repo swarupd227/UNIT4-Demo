@@ -10,6 +10,10 @@ class Settings(BaseSettings):
     database_url: str = "postgresql+psycopg://studio:studio@db:5432/studio"
     llm_mode: Literal["replay", "live"] = "replay"
     storage_root: str = "/workspace/storage"
+    # Blob Storage replaces the local folder when either of these is set.
+    blob_account_url: str = ""
+    blob_connection_string: str = ""  # The local emulator only. Azure signs in with managed identity.
+    blob_container: str = "studio"
 
 
 @lru_cache

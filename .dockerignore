@@ -1,0 +1,14 @@
+.git
+.github
+.claude
+**/node_modules
+**/__pycache__
+**/.pytest_cache
+**/.mypy_cache
+**/.ruff_cache
+apps/web
+data/generated
+docs
+infra
+storage
+.env

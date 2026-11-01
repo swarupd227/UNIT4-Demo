@@ -13,6 +13,10 @@
     "test:api": "docker compose run --rm api pytest",
     "lint:api": "docker compose run --rm api sh -c \"ruff check /workspace/apps/api /workspace/data /workspace/engines && mypy app\"",
     "test:web": "docker compose run --rm --no-deps web sh -c \"npm install --no-audit --no-fund && npm test\"",
-    "lint:web": "docker compose run --rm --no-deps web sh -c \"npm install --no-audit --no-fund && npm run lint && npm run typecheck\""
+    "lint:web": "docker compose run --rm --no-deps web sh -c \"npm install --no-audit --no-fund && npm run lint && npm run typecheck\"",
+    "sim": "docker compose -f docker-compose.azure.yml up --build -d --wait db blob api web && docker compose -f docker-compose.azure.yml run --rm --build seed",
+    "sim:e2e": "docker compose -f docker-compose.azure.yml run --rm e2e",
+    "sim:stop": "docker compose -f docker-compose.azure.yml down -v",
+    "package:azure": "tar --exclude=node_modules --exclude=dist --exclude=e2e-results --exclude=__pycache__ --exclude=.mypy_cache --exclude=.pytest_cache --exclude=.ruff_cache --exclude=data/generated -czf migration-studio-source.tar.gz .dockerignore apps data engines infra"
   }
 }

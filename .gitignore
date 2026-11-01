@@ -12,3 +12,4 @@ storage/
 *.log
 e2e-results/
 apps/web/public/fallback/
+migration-studio-source.tar.gz

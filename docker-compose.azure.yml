@@ -1,0 +1,81 @@
+# The Azure images and layout on this machine: production containers, Blob Storage through the
+# Azurite emulator, and no route to the API except through the web container. Sign-in is the one
+# part that needs Azure. This is a separate project, so it never touches the local demo's data.
+name: unit4-azure-sim
+
+x-api: &api
+  build:
+    context: .
+    dockerfile: apps/api/Dockerfile
+    target: production
+  environment: &api-env
+    STUDIO_DATABASE_URL: postgresql+psycopg://studio:studio@db:5432/studio
+    STUDIO_LLM_MODE: replay
+    STUDIO_BLOB_CONNECTION_STRING: DefaultEndpointsProtocol=http;AccountName=devstoreaccount1;AccountKey=Eby8vdM02xNOcqFlqUwJPLlmEtlCDXJ1OUzFT50uSRZ6IFsuFq2UVErCz4I6tq/K1SZFPTOtr/KBHBeksoGMGw==;BlobEndpoint=http://blob:10000/devstoreaccount1;
+
+services:
+  db:
+    image: pgvector/pgvector:pg16
+    environment:
+      POSTGRES_USER: studio
+      POSTGRES_PASSWORD: studio
+      POSTGRES_DB: studio
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U studio -d studio"]
+      interval: 3s
+      timeout: 3s
+      retries: 20
+
+  blob:
+    image: mcr.microsoft.com/azure-storage/azurite:3.33.0
+    command: azurite-blob --blobHost 0.0.0.0 --skipApiVersionCheck
+
+  api:
+    <<: *api
+    depends_on:
+      db:
+        condition: service_healthy
+      blob:
+        condition: service_started
+    healthcheck:
+      test: ["CMD-SHELL", "python -c \"import urllib.request as u; u.urlopen('http://localhost:8000/readyz')\""]
+      interval: 5s
+      timeout: 3s
+      retries: 20
+
+  web:
+    build:
+      context: apps/web
+    environment:
+      API_UPSTREAM: http://api:8000
+    ports:
+      - "5185:8080"
+    depends_on:
+      api:
+        condition: service_healthy
+
+  # Stands in for the Container Apps seed job.
+  seed:
+    <<: *api
+    profiles: ["tools"]
+    command: python -m data.generator.main --load
+    depends_on:
+      api:
+        condition: service_healthy
+
+  e2e:
+    profiles: ["tools"]
+    image: mcr.microsoft.com/playwright:v1.49.1-noble
+    working_dir: /workspace/apps/web
+    environment:
+      E2E_BASE_URL: http://web:8080
+    volumes:
+      - .:/workspace
+      - e2e_node_modules:/workspace/apps/web/node_modules
+    command: sh -c "npm install --no-audit --no-fund --silent && npx playwright test"
+    depends_on:
+      web:
+        condition: service_started
+
+volumes:
+  e2e_node_modules:

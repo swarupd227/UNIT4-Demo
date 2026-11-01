@@ -60,4 +60,10 @@ If a hand-authored agent result is reviewed against a changed input, record that
 docker compose run --rm api python -m engines.agents.stamp
 ```
 
-See [docs/DEVELOPMENT_PLAN.md](docs/DEVELOPMENT_PLAN.md) for the plan and spec decisions.
+To run the production images with the Azure layout on this machine, at http://localhost:5185:
+
+```bash
+npm run sim
+```
+
+See [docs/DEVELOPMENT_PLAN.md](docs/DEVELOPMENT_PLAN.md) for the plan and spec decisions, and [docs/AZURE_DEPLOYMENT.md](docs/AZURE_DEPLOYMENT.md) to deploy.
