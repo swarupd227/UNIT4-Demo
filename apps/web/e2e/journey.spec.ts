@@ -60,6 +60,7 @@ test("scene 3 explains CC-014", async ({ page, request }) => {
   await page.getByRole("button", { name: /Write-downs above 10%/ }).hover();
   await expect(page.getByText("private const decimal Limit").locator("xpath=ancestor::div[1]")).toBeVisible();
   await expect(page.getByText("INT-09 also writes zz_rate_override")).toBeVisible();
+  await expect(page.getByText("Grounded in the ontology:")).toBeVisible();
   await page.getByRole("tab", { name: "Extension spec" }).click();
   await expect(page.getByText("Write-down approval", { exact: false }).first()).toBeVisible();
   await page.waitForTimeout(1000);

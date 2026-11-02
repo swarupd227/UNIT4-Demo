@@ -10,6 +10,7 @@ import { Panel, Screen, useDecision } from "../ui/layout";
 import { AiBadge, Button, Skeleton, SourceBadge, StatusLabel } from "../ui/primitives";
 import { AskDialog } from "./decisions/DecisionDialogs";
 import { LiveAgentButton } from "./LiveAgentButton";
+import { OntologyChips } from "./OntologyChips";
 import { useDecisionActions } from "./decisions/useDecisionActions";
 
 const ITEMS = ["CC-014", "CC-041", "CC-037"];
@@ -19,6 +20,7 @@ type Citation = { text: string; find: string; line: number };
 type Explanation = {
   plain_english: string;
   purpose_known: boolean;
+  ontology_concepts: string[];
   steps: Citation[];
   hidden_rules: Citation[];
   cloud_blockers: Citation[];
@@ -185,6 +187,7 @@ export function CodeScreen() {
             <div className="min-w-0">
               <h2 className="text-[20px] font-semibold">{item.name}</h2>
               <p className="text-[16px] leading-6 text-ink-2">{explanation.plain_english}</p>
+              <OntologyChips ids={explanation.ontology_concepts} />
             </div>
             <div className="flex shrink-0 items-center gap-3">
               <StatusLabel status={item.status} />

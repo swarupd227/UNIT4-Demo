@@ -22,6 +22,7 @@ class CodeExplanation(Strict):
     steps: list[Citation]
     hidden_rules: list[Citation]
     cloud_blockers: list[Citation]
+    ontology_concepts: list[str] = Field(description="IDs of the ontology concepts this analysis relied on.")
 
 
 class RuleCard(Strict):
@@ -108,3 +109,4 @@ class WorkflowPack(Strict):
     control_impact: list[str]
     tests: list[WorkflowTest]
     decision_needed: str
+    ontology_concepts: list[str] = Field(description="IDs of the ontology concepts this analysis relied on.")

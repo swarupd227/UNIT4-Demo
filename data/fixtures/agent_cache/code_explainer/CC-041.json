@@ -1,5 +1,5 @@
 {
-  "input_hash": "06811a3ab4915b8a44a2e59eae7c014e9a366d55a064dada658b49e149db159a",
+  "input_hash": "bf2e380193acc31a9e3066c255efed7bb2b75d8b0138b7a7a2da7e76aab947dc",
   "source": "hand_authored",
   "model": null,
   "duration_ms": null,
@@ -22,6 +22,9 @@
         "text": "Direct update of the timesheet table.",
         "find": "UPDATE timesheet_line"
       }
+    ],
+    "ontology_concepts": [
+      "direct_database_write"
     ]
   }
 }

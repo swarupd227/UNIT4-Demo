@@ -18,6 +18,7 @@ from engines.agents.schemas import (
     TestCases,
     WorkflowPack,
 )
+from engines.ontology.ontology import grounding_for
 
 CACHE_DIR: Path = FIXTURES / "agent_cache"
 PROMPT_VERSION = "1"
@@ -60,7 +61,11 @@ def _payload(db: Connection, spec: AgentSpec, subject: str) -> dict[str, Any]:
                 ORDER BY entity_code
             """)
         ).mappings()
-        return {"workflows": [dict(row) for row in rows], "legal_entities": [dict(row) for row in entities]}
+        material = {
+            "workflows": [dict(row) for row in rows],
+            "legal_entities": [dict(row) for row in entities],
+        }
+        return {**material, "ontology": grounding_for(json.dumps(material, default=str))}
     row = (
         db.execute(
             text("SELECT name, definition, source_text FROM studio.estate_item WHERE item_id = :item_id"),
@@ -74,6 +79,7 @@ def _payload(db: Connection, spec: AgentSpec, subject: str) -> dict[str, Any]:
         payload["billing_policy"] = db.execute(
             text("SELECT content FROM studio.reference_document WHERE document_key = 'billing_policy'")
         ).scalar_one()
+    payload["ontology"] = grounding_for(json.dumps(payload, default=str))
     return payload
 
 
@@ -110,6 +116,11 @@ def _resolve_citations(value: Any, lines: list[str], where: str) -> Any:
 def checked_content(spec: AgentSpec, request: AgentRequest, result: AgentResult) -> Any:
     """Every result passes the same checks, whoever produced it."""
     content = spec.schema.model_validate(result.output).model_dump()
+    given = {concept["id"] for concept in request.payload.get("ontology", [])}
+    if unknown := set(content.get("ontology_concepts", [])) - given:
+        raise ValueError(
+            f"{spec.agent} on {request.subject}: concepts not in its grounding: {sorted(unknown)}"
+        )
     source_text = request.payload.get("source_text") or ""
     return _resolve_citations(content, source_text.splitlines(), f"{spec.agent} on {request.subject}")
 

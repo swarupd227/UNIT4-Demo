@@ -1,0 +1,147 @@
+# The CR to ERPx migration ontology: the business concepts, their meaning and how they relate.
+# Agents are grounded in it and the decision rules read its protected purposes.
+# Terms are plain and general until the Unit4 functional specialist reviews them.
+version: "1.0"
+concepts:
+  - id: billing_line
+    label: Billing line
+    meaning: One charge to a client on a project, carrying a billable value.
+    synonyms: [billing line, billing_line]
+    relations:
+      - {type: belongs_to, target: project}
+      - {type: valued_at, target: billable_value}
+  - id: billable_value
+    label: Billable value
+    meaning: What a billing line is worth to the client before any adjustment.
+    synonyms: [billable value, billable_value]
+    relations:
+      - {type: priced_by, target: client_rate}
+  - id: billing_adjustment
+    label: Billing adjustment
+    meaning: A change to the value of a billing line, either a write-up or a write-down.
+    synonyms: [billing adjustment, billing adjustments, adjustment, adjust_type]
+    relations:
+      - {type: changes, target: billable_value}
+      - {type: must_use, target: supported_api}
+  - id: write_down
+    label: Write-down
+    meaning: A reduction in billable value. Large ones need the engagement partner's approval.
+    synonyms: [write-down, write-downs, writedown]
+    relations:
+      - {type: is_a, target: billing_adjustment}
+      - {type: governed_by, target: approval_rule}
+  - id: write_up
+    label: Write-up
+    meaning: An increase in billable value on a billing line.
+    synonyms: [write-up, write-ups, writeup]
+    relations:
+      - {type: is_a, target: billing_adjustment}
+  - id: client_rate
+    label: Client rate
+    meaning: A price agreed with a client that overrides the standard rate.
+    synonyms: [client rate, client rates, rate override, override rate, zz_rate_override]
+    relations:
+      - {type: fed_by, target: integration}
+  - id: approval_rule
+    label: Approval rule
+    meaning: A business rule stating who must approve what, and above which threshold.
+    synonyms: [approval rule, threshold, prior approval]
+    relations:
+      - {type: approved_by, target: engagement_partner}
+  - id: engagement_partner
+    label: Engagement partner
+    meaning: The partner accountable for a client engagement.
+    synonyms: [engagement partner, partner approval]
+    relations:
+      - {type: is_a, target: partner}
+  - id: partner
+    label: Partner
+    meaning: A senior person who owns clients and is measured on their work in progress.
+    synonyms: [partner, partners, partner_code]
+    relations:
+      - {type: owns, target: work_in_progress}
+  - id: project
+    label: Project
+    meaning: A piece of client work that collects time, cost and billing.
+    synonyms: [project, projects, project_id]
+    relations:
+      - {type: holds, target: work_in_progress}
+  - id: work_in_progress
+    label: Work in progress
+    meaning: Time and cost recorded on a project and not yet billed. A closed project may not hold it.
+    synonyms: [work in progress, wip]
+    relations:
+      - {type: reported_by, target: report}
+  - id: report
+    label: Report
+    meaning: A way of presenting figures to people. A rebuilt report must give the same totals.
+    synonyms: [report, reports, enquiry, report layout]
+    relations:
+      - {type: proven_by, target: report_parity}
+  - id: report_parity
+    label: Report parity
+    meaning: Proof that a rebuilt report gives the same total as the original for the same period.
+    synonyms: [parity]
+  - id: approval_workflow
+    label: Approval workflow
+    meaning: The route a purchase or expense takes through its approvers. Changing one changes a control.
+    synonyms: [approval workflow, approval workflows, workflow, approval_steps, enforced_rule]
+    relations:
+      - {type: enforces, target: approval_rule}
+      - {type: used_by, target: legal_entity}
+  - id: budget_holder
+    label: Budget holder
+    meaning: The person accountable for the budget a purchase is charged to.
+    synonyms: [budget holder, budget_holder]
+    relations:
+      - {type: approves_in, target: approval_workflow}
+  - id: legal_entity
+    label: Legal entity
+    meaning: A company in the customer's group, with its own accounts.
+    synonyms: [legal entity, legal entities, entity_code, used_by_entities]
+  - id: dormant_entity
+    label: Dormant entity
+    meaning: A legal entity that has stopped trading, so no live control depends on what only it uses.
+    synonyms: [dormant, dormant_since]
+    relations:
+      - {type: is_a, target: legal_entity}
+  - id: integration
+    label: Integration
+    meaning: A connection that moves data between the ERP and another system.
+    synonyms: [integration, integrations, INT-09]
+  - id: direct_database_write
+    label: Direct database write
+    meaning: Changing tables without a supported route. It is not allowed in Unit4 cloud.
+    synonyms: [UPDATE, INSERT INTO, direct write, direct database]
+    relations:
+      - {type: replaced_by, target: extension}
+  - id: extension
+    label: Extension
+    meaning: A supported way to add behaviour that standard ERPx does not cover.
+    synonyms: [extension]
+    relations:
+      - {type: must_use, target: supported_api}
+  - id: supported_api
+    label: Supported API
+    meaning: The only route by which changes may reach ERPx.
+    synonyms: [supported api, api call, api calls]
+  - id: year_end_close
+    label: Year-end close
+    meaning: A protected purpose. Work done at year-end can look unused for the rest of the year.
+    synonyms: [year-end, year end]
+    protected_pattern: year-end
+  - id: audit_evidence
+    label: Audit evidence
+    meaning: A protected purpose. Material that external auditors rely on.
+    synonyms: [audit, auditors]
+    protected_pattern: \baudit
+  - id: statutory_reporting
+    label: Statutory reporting
+    meaning: A protected purpose. Reporting that the law requires.
+    synonyms: [statutory]
+    protected_pattern: statutory
+  - id: tax_reporting
+    label: Tax reporting
+    meaning: A protected purpose. Records needed for tax.
+    synonyms: [tax]
+    protected_pattern: \btax\b

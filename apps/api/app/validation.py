@@ -11,6 +11,8 @@ from engines.agents.gateway import ClaudeGateway, LiveAgentError, LLMGateway
 from engines.agents.pipeline import request_for, run_live
 from engines.decision import audit
 from engines.decision.policy import CONSULTANT, PERSONAS
+from engines.ontology.ontology import concepts
+from engines.ontology.ontology import version as ontology_version
 from engines.scoring.score import score
 from engines.validation.runner import run_checks
 
@@ -121,6 +123,17 @@ def _live_gateway() -> LLMGateway:
 
 def _live_available() -> bool:
     return bool(os.getenv("ANTHROPIC_API_KEY"))
+
+
+@router.get("/ontology")
+def ontology() -> dict[str, Any]:
+    return {
+        "version": ontology_version(),
+        "concepts": {
+            concept_id: {"label": concept["label"], "meaning": concept["meaning"]}
+            for concept_id, concept in concepts().items()
+        },
+    }
 
 
 @router.get("/agents/status")

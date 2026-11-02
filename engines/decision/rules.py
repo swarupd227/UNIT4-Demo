@@ -10,11 +10,13 @@ from dataclasses import dataclass, field
 from datetime import date
 from typing import Any
 
+from engines.ontology.ontology import protected_patterns
+
 ENGINE_VERSION = "decision-rules-1"
 REPORTING_DATE = date(2026, 10, 31)
 LOW_USE_MAX_EVENTS = 2
 PRODUCT_GAP_MIN_PRECEDENTS = 5
-PROTECTED_WORDS = re.compile(r"year-end|\baudit|statutory|\btax\b", re.IGNORECASE)
+PROTECTED_WORDS = re.compile("|".join(protected_patterns()), re.IGNORECASE)
 
 RETIRE = "retire"
 STANDARD = "replace_standard"
@@ -170,8 +172,8 @@ def propose(facts: ItemFacts) -> Proposal:
                 {
                     "kind": "keyword",
                     "label": f'Protected word "{word}" found',
-                    "detail": "Items with a legal, audit, tax or year-end purpose are never retired "
-                    "automatically.",
+                    "detail": "The ontology marks this as a protected purpose. Items with a legal, audit, "
+                    "tax or year-end purpose are never retired automatically.",
                 }
             )
             return Proposal(

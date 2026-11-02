@@ -62,6 +62,7 @@ export type WorkflowPack = {
   control_impact: string[];
   tests: { id: string; description: string; expected: string }[];
   decision_needed: string;
+  ontology_concepts: string[];
 };
 
 export type CheckResult = {
@@ -187,6 +188,8 @@ export const workbench = {
   generatePack: (role: Role) => post<SignoffState>("/api/signoff/generate", role),
   signPack: (role: Role) => post<SignoffState>("/api/signoff/sign", role),
   scorecard: (role: Role) => request<Scorecard>("/api/scorecard", role),
+  ontology: (role: Role) =>
+    request<{ version: string; concepts: Record<string, { label: string; meaning: string }> }>("/api/ontology", role),
   agentStatus: (role: Role) => request<{ live: boolean; model: string }>("/api/agents/status", role),
   runAgent: (agent: string, subject: string, role: Role) =>
     post<{ duration_ms: number; model: string }>(`/api/agents/${agent}/${subject}/run`, role),

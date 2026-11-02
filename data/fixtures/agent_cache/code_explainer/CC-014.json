@@ -1,5 +1,5 @@
 {
-  "input_hash": "814817fd79a44046a033f91c2885536060e5ff28b87a024806ed4da58320b852",
+  "input_hash": "9d86ab179b13dc912d8d09ff2b0a6f592455b23a68765bc5508bfba3e60cf1b1",
   "source": "hand_authored",
   "model": null,
   "duration_ms": null,
@@ -55,6 +55,15 @@
         "text": "Direct update of a custom queue table.",
         "find": "UPDATE zz_billing_adjust_queue SET processed = 1"
       }
+    ],
+    "ontology_concepts": [
+      "write_down",
+      "billing_line",
+      "billable_value",
+      "client_rate",
+      "approval_rule",
+      "partner",
+      "direct_database_write"
     ]
   }
 }

@@ -10,6 +10,7 @@ import { useDecision, Panel, Screen } from "../ui/layout";
 import { AiBadge, Button, CodeBadge, Skeleton } from "../ui/primitives";
 import { useRefresh } from "./decisions/useDecisionActions";
 import { LiveAgentButton } from "./LiveAgentButton";
+import { OntologyChips } from "./OntologyChips";
 
 const PACK_ITEM = "WF-001";
 const PACK_OPTIONS = ["Adopt the three workflows", "Keep the nine workflows"];
@@ -152,6 +153,7 @@ export function WorkflowsScreen() {
                 ))}
               </ul>
               <p className="mt-3 text-[15px] font-medium">{pack.decision_needed}</p>
+              <OntologyChips ids={pack.ontology_concepts} />
             </Panel>
             <Panel title="Test cases">
               <table className="w-full text-[15px]">

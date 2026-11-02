@@ -15,7 +15,11 @@ configuration, APIs and extension tooling. ERPx extension options and API names 
 describe an API call by what it does, not by an invented name.
 
 Wherever the output asks for `find`, copy an exact substring of one line of the source, so that it
-can be matched by a plain text search. It must not span lines."""
+can be matched by a plain text search. It must not span lines.
+
+The material includes `ontology`: the migration concepts that apply here, with their meaning and
+how they relate. Reason in those terms, and use their meanings over any guess of your own. Where
+the output asks for `ontology_concepts`, list the IDs you relied on, using only IDs in the material."""
 
 TASKS = {
     "code_explainer": """\

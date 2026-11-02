@@ -1,5 +1,5 @@
 {
-  "input_hash": "381635130c158461ac912181dcf03a093f01ecdc0814d1bd69e1d66bbfa67556",
+  "input_hash": "91fb9d2a81b60efc81882ab57d97146c1f1f03f713bdd8a56a0d4c1766939f7e",
   "source": "hand_authored",
   "model": null,
   "duration_ms": null,
@@ -26,6 +26,7 @@
         "text": "Calls a service that is not defined anywhere in the estate.",
         "find": "Svc.Call(\"U7\""
       }
-    ]
+    ],
+    "ontology_concepts": []
   }
 }

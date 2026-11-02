@@ -46,6 +46,8 @@ Scene 7 needs five customer questions answered first: the four seeded ones plus 
 
 **Live agents.** `.env` must hold `ANTHROPIC_API_KEY`, and the button shows only for Robin. On the Code screen, press **Run live** on the explanation panel as the visible AI moment, or on the workflow proposal. A run can take a minute, so talk through it. The badge changes to AI analysis only when a model wrote the result. If a run fails, the cached result stays and a message says so. **Reset** restores the cached results.
 
+**What does what.** The ontology is the shared meaning: agents are grounded in it, and the decision rules read its protected purposes. AI agents read code and draft. Decision rules are plain code, not a trained model. Reconciliation is plain code. People decide. The ontology has 25 concepts in plain terms, pending the specialist's review, so do not present it as a full CR and ERPx model.
+
 Optional if a scene runs short, each about 20 seconds:
 
 - **Code:** open the Skeleton tab. It is a starting point for review, and the API names need Unit4 to confirm them. The Ava note below the panels is an idea only.
