@@ -4,11 +4,13 @@ import io
 import json
 import zipfile
 from collections.abc import Iterator
+from typing import get_args
 
 import pytest
 from fastapi.testclient import TestClient
 from weasyprint import HTML
 
+from app.decisions import Tx
 from app.main import app
 from engines.decision.memory import next_proposal
 from engines.signoff.pack import workflow_pack_html
@@ -282,3 +284,12 @@ def test_the_pack_has_a_page_to_show_on_screen(client: TestClient) -> None:
     assert page.status_code == 200
     assert page.headers["content-type"].startswith("text/html")
     assert "Customer sign-off pack" in page.text
+
+
+def test_a_change_is_saved_before_the_response_is_sent(client: TestClient) -> None:
+    dependency = get_args(Tx)[1]
+    assert dependency.scope == "function"
+    client.post("/api/workspace/answer-open")
+    state = client.get("/api/signoff").json()
+    assert state["open_questions"] == []
+    assert state["conditions"][0]["detail"] == "None open"

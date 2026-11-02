@@ -32,7 +32,8 @@ def get_transaction():
         yield connection
 
 
-Tx = Annotated[Connection, Depends(get_transaction)]
+# Commits before the response is sent, so a screen that refreshes straight away reads the saved state.
+Tx = Annotated[Connection, Depends(get_transaction, scope="function")]
 PersonaRole = Annotated[str, Depends(get_role)]
 
 ROW_SQL = """
