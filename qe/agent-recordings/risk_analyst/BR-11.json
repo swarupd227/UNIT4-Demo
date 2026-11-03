@@ -1,0 +1,83 @@
+{
+  "input_hash": "d0ba2b15a193f6ebf2a2670bdc1b817f634443eaf8c00632317a4e16a575d61b",
+  "source": "live_model",
+  "model": "claude-opus-5-5",
+  "duration_ms": 13299,
+  "output": {
+    "headline": "Fixed-price milestones billed twice, too early, or missed at period end",
+    "what_keeps_breaking": [
+      {
+        "point": "A milestone is billed more than once: it was not marked as billed after finalising, so the next month's proposal billed it again.",
+        "defects": [
+          "BILL-1029"
+        ]
+      },
+      {
+        "point": "A milestone is also billed twice when two open proposals for the same project each pick it up and both are finalised.",
+        "defects": [
+          "BILL-1131"
+        ]
+      },
+      {
+        "point": "Milestones not yet complete were billed once their planned date had passed, a behaviour carried over from 4.0.",
+        "defects": [
+          "BILL-1074"
+        ]
+      },
+      {
+        "point": "Mark complete stamped the system date rather than the business date, so a milestone completed during a late period run fell after the period end and was left out.",
+        "defects": [
+          "BILL-1069"
+        ]
+      },
+      {
+        "point": "The Projects list showed logged hours as unbilled on fixed-price projects, although those projects bill milestones, not hours.",
+        "defects": [
+          "BILL-1153"
+        ]
+      }
+    ],
+    "why_it_escapes": "Only one automated test exists for BR-11 (only completed milestones are billed), and the material does not show whether it covers the planned-date case; none of the fixes added an automated test, with four only updating a manual case and BILL-1153 adding nothing. Repeat billing across runs, concurrent proposals, business-date handling and the Projects list are therefore untested end to end.",
+    "proposed_tests": [
+      {
+        "title": "Milestone billed in one month is not billed again the next",
+        "scenario": "On P-1080, bill the completed milestone Solution design in January and finalise, then create the February proposal; expect no milestone line for Solution design, and the milestone records the January invoice.",
+        "defects": [
+          "BILL-1029"
+        ]
+      },
+      {
+        "title": "Second open proposal for the same project is refused",
+        "scenario": "Create a December proposal for P-1080 with a completed milestone, then try to create another before finalising the first; expect refusal with 'Project P-1080 already has an open proposal. Finalise or delete it first.' and the milestone on one proposal only.",
+        "defects": [
+          "BILL-1131"
+        ]
+      },
+      {
+        "title": "Incomplete milestone past its planned date is not billed",
+        "scenario": "On P-1080, leave a milestone planned for 15 June incomplete and create the June proposal; expect no line for that milestone.",
+        "defects": [
+          "BILL-1074"
+        ]
+      },
+      {
+        "title": "Milestone completed during a late run uses the business date",
+        "scenario": "With the business date set to 31 May and the system date 3 June, mark a P-1080 milestone complete and create the May proposal; expect completion dated 31 May and the milestone billed on the May proposal.",
+        "defects": [
+          "BILL-1069"
+        ]
+      },
+      {
+        "title": "Fixed-price projects show zero unbilled hours on the Projects list",
+        "scenario": "Log hours against fixed-price P-1080 and open Projects; expect 0.00 unbilled hours for P-1080, while a time-based project with logged hours still shows them.",
+        "defects": [
+          "BILL-1153"
+        ]
+      }
+    ],
+    "ontology_concepts": [
+      "project",
+      "work_in_progress"
+    ]
+  }
+}

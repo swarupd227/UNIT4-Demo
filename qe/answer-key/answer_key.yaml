@@ -76,6 +76,9 @@ planted:
   T10:
     what: Services/PercentCompleteBilling.cs and BillingHelper.PercentCompleteAmount are not reachable from any page
     expected: Listed as dead code; no test proposed
+    # Everything the reachability check must list: the planted path, and two date helpers left
+    # behind when the period labels moved into the pages.
+    unreachable: [PercentCompleteBilling, BillingHelper.PercentCompleteAmount, BillingHelper.PeriodLabel, BillingHelper.FiscalPeriod]
 
 # Expected results the validator must reach on its own, from documents and cases only.
 expected_results:

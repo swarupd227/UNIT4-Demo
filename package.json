@@ -21,6 +21,7 @@
     "qe:stop": "docker compose -f docker-compose.qe.yml down",
     "qe:lab": "docker compose -f docker-compose.qe.yml run --rm lab",
     "qe:verify": "docker compose -f docker-compose.qe.yml run --rm --no-deps qe-api sh -c \"cd /workspace && python -m qe.tools.verify --lab\"",
-    "qe:test:api": "docker compose -f docker-compose.qe.yml run --rm qe-api pytest"
+    "qe:test:api": "docker compose -f docker-compose.qe.yml run --rm qe-api pytest",
+    "qe:record": "docker compose -f docker-compose.qe.yml exec -w /workspace qe-api python -m qe.engines.agents.record"
   }
 }

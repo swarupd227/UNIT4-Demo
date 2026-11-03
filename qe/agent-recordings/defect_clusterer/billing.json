@@ -1,0 +1,490 @@
+{
+  "input_hash": "ffe7d8d1a5f7fb6927981b0504a9f290ecdd3a2eae0efe1c260719cb31275e39",
+  "source": "live_model",
+  "model": "claude-opus-5-5",
+  "duration_ms": 41310,
+  "output": {
+    "defects": [
+      {
+        "defect_id": "BILL-1001",
+        "rule": "BR-12"
+      },
+      {
+        "defect_id": "BILL-1003",
+        "rule": "BR-03"
+      },
+      {
+        "defect_id": "BILL-1004",
+        "rule": "BR-10"
+      },
+      {
+        "defect_id": "BILL-1006",
+        "rule": null
+      },
+      {
+        "defect_id": "BILL-1007",
+        "rule": "BR-01"
+      },
+      {
+        "defect_id": "BILL-1009",
+        "rule": "BR-09"
+      },
+      {
+        "defect_id": "BILL-1010",
+        "rule": "BR-08"
+      },
+      {
+        "defect_id": "BILL-1012",
+        "rule": "BR-13"
+      },
+      {
+        "defect_id": "BILL-1013",
+        "rule": "BR-03"
+      },
+      {
+        "defect_id": "BILL-1015",
+        "rule": null
+      },
+      {
+        "defect_id": "BILL-1018",
+        "rule": "BR-06"
+      },
+      {
+        "defect_id": "BILL-1020",
+        "rule": "BR-02"
+      },
+      {
+        "defect_id": "BILL-1021",
+        "rule": "BR-03"
+      },
+      {
+        "defect_id": "BILL-1023",
+        "rule": "BR-01"
+      },
+      {
+        "defect_id": "BILL-1026",
+        "rule": "BR-05"
+      },
+      {
+        "defect_id": "BILL-1027",
+        "rule": "BR-17"
+      },
+      {
+        "defect_id": "BILL-1029",
+        "rule": "BR-11"
+      },
+      {
+        "defect_id": "BILL-1030",
+        "rule": null
+      },
+      {
+        "defect_id": "BILL-1032",
+        "rule": "BR-09"
+      },
+      {
+        "defect_id": "BILL-1033",
+        "rule": "BR-10"
+      },
+      {
+        "defect_id": "BILL-1035",
+        "rule": "BR-08"
+      },
+      {
+        "defect_id": "BILL-1038",
+        "rule": "BR-01"
+      },
+      {
+        "defect_id": "BILL-1039",
+        "rule": null
+      },
+      {
+        "defect_id": "BILL-1041",
+        "rule": "BR-15"
+      },
+      {
+        "defect_id": "BILL-1042",
+        "rule": "BR-10"
+      },
+      {
+        "defect_id": "BILL-1044",
+        "rule": null
+      },
+      {
+        "defect_id": "BILL-1046",
+        "rule": "BR-04"
+      },
+      {
+        "defect_id": "BILL-1047",
+        "rule": "BR-03"
+      },
+      {
+        "defect_id": "BILL-1049",
+        "rule": "BR-15"
+      },
+      {
+        "defect_id": "BILL-1050",
+        "rule": "BR-18"
+      },
+      {
+        "defect_id": "BILL-1052",
+        "rule": "BR-08"
+      },
+      {
+        "defect_id": "BILL-1053",
+        "rule": null
+      },
+      {
+        "defect_id": "BILL-1055",
+        "rule": "BR-12"
+      },
+      {
+        "defect_id": "BILL-1056",
+        "rule": "BR-16"
+      },
+      {
+        "defect_id": "BILL-1058",
+        "rule": "BR-17"
+      },
+      {
+        "defect_id": "BILL-1059",
+        "rule": "BR-15"
+      },
+      {
+        "defect_id": "BILL-1061",
+        "rule": "BR-14"
+      },
+      {
+        "defect_id": "BILL-1062",
+        "rule": null
+      },
+      {
+        "defect_id": "BILL-1063",
+        "rule": "BR-04"
+      },
+      {
+        "defect_id": "BILL-1064",
+        "rule": "BR-12"
+      },
+      {
+        "defect_id": "BILL-1066",
+        "rule": "BR-10"
+      },
+      {
+        "defect_id": "BILL-1068",
+        "rule": "BR-14"
+      },
+      {
+        "defect_id": "BILL-1069",
+        "rule": "BR-11"
+      },
+      {
+        "defect_id": "BILL-1071",
+        "rule": "BR-08"
+      },
+      {
+        "defect_id": "BILL-1073",
+        "rule": "BR-08"
+      },
+      {
+        "defect_id": "BILL-1074",
+        "rule": "BR-11"
+      },
+      {
+        "defect_id": "BILL-1076",
+        "rule": "BR-13"
+      },
+      {
+        "defect_id": "BILL-1077",
+        "rule": "BR-16"
+      },
+      {
+        "defect_id": "BILL-1079",
+        "rule": "BR-09"
+      },
+      {
+        "defect_id": "BILL-1080",
+        "rule": "BR-03"
+      },
+      {
+        "defect_id": "BILL-1082",
+        "rule": null
+      },
+      {
+        "defect_id": "BILL-1084",
+        "rule": "BR-09"
+      },
+      {
+        "defect_id": "BILL-1085",
+        "rule": "BR-05"
+      },
+      {
+        "defect_id": "BILL-1087",
+        "rule": "BR-07"
+      },
+      {
+        "defect_id": "BILL-1088",
+        "rule": "BR-04"
+      },
+      {
+        "defect_id": "BILL-1090",
+        "rule": "BR-03"
+      },
+      {
+        "defect_id": "BILL-1092",
+        "rule": "BR-08"
+      },
+      {
+        "defect_id": "BILL-1093",
+        "rule": "BR-19"
+      },
+      {
+        "defect_id": "BILL-1095",
+        "rule": "BR-19"
+      },
+      {
+        "defect_id": "BILL-1098",
+        "rule": "BR-13"
+      },
+      {
+        "defect_id": "BILL-1100",
+        "rule": "BR-01"
+      },
+      {
+        "defect_id": "BILL-1102",
+        "rule": "BR-03"
+      },
+      {
+        "defect_id": "BILL-1103",
+        "rule": "BR-20"
+      },
+      {
+        "defect_id": "BILL-1105",
+        "rule": "BR-02"
+      },
+      {
+        "defect_id": "BILL-1107",
+        "rule": "BR-08"
+      },
+      {
+        "defect_id": "BILL-1108",
+        "rule": "BR-15"
+      },
+      {
+        "defect_id": "BILL-1110",
+        "rule": "BR-19"
+      },
+      {
+        "defect_id": "BILL-1112",
+        "rule": null
+      },
+      {
+        "defect_id": "BILL-1113",
+        "rule": "BR-15"
+      },
+      {
+        "defect_id": "BILL-1115",
+        "rule": "BR-13"
+      },
+      {
+        "defect_id": "BILL-1116",
+        "rule": "BR-19"
+      },
+      {
+        "defect_id": "BILL-1119",
+        "rule": "BR-08"
+      },
+      {
+        "defect_id": "BILL-1121",
+        "rule": "BR-04"
+      },
+      {
+        "defect_id": "BILL-1123",
+        "rule": "BR-18"
+      },
+      {
+        "defect_id": "BILL-1125",
+        "rule": "BR-08"
+      },
+      {
+        "defect_id": "BILL-1131",
+        "rule": "BR-11"
+      },
+      {
+        "defect_id": "BILL-1133",
+        "rule": "BR-15"
+      },
+      {
+        "defect_id": "BILL-1135",
+        "rule": "BR-06"
+      },
+      {
+        "defect_id": "BILL-1136",
+        "rule": null
+      },
+      {
+        "defect_id": "BILL-1140",
+        "rule": "BR-17"
+      },
+      {
+        "defect_id": "BILL-1141",
+        "rule": "BR-14"
+      },
+      {
+        "defect_id": "BILL-1143",
+        "rule": "BR-15"
+      },
+      {
+        "defect_id": "BILL-1146",
+        "rule": "BR-13"
+      },
+      {
+        "defect_id": "BILL-1151",
+        "rule": "BR-08"
+      },
+      {
+        "defect_id": "BILL-1153",
+        "rule": "BR-11"
+      },
+      {
+        "defect_id": "BILL-1156",
+        "rule": "BR-03"
+      },
+      {
+        "defect_id": "BILL-1159",
+        "rule": "BR-07"
+      },
+      {
+        "defect_id": "BILL-1161",
+        "rule": "BR-07"
+      },
+      {
+        "defect_id": "BILL-1162",
+        "rule": "BR-07"
+      },
+      {
+        "defect_id": "BILL-1164",
+        "rule": "BR-07"
+      },
+      {
+        "defect_id": "BILL-1167",
+        "rule": "BR-07"
+      },
+      {
+        "defect_id": "BILL-1169",
+        "rule": "BR-07"
+      },
+      {
+        "defect_id": "BILL-1171",
+        "rule": "BR-07"
+      },
+      {
+        "defect_id": "BILL-1177",
+        "rule": null
+      },
+      {
+        "defect_id": "BILL-1180",
+        "rule": "BR-03"
+      },
+      {
+        "defect_id": "BILL-1183",
+        "rule": "BR-08"
+      },
+      {
+        "defect_id": "BILL-1185",
+        "rule": "BR-07"
+      },
+      {
+        "defect_id": "BILL-1187",
+        "rule": "BR-04"
+      },
+      {
+        "defect_id": "BILL-1189",
+        "rule": "BR-07"
+      },
+      {
+        "defect_id": "BILL-1191",
+        "rule": "BR-06"
+      },
+      {
+        "defect_id": "BILL-1193",
+        "rule": null
+      },
+      {
+        "defect_id": "BILL-1195",
+        "rule": null
+      },
+      {
+        "defect_id": "BILL-1197",
+        "rule": "BR-15"
+      },
+      {
+        "defect_id": "BILL-1199",
+        "rule": "BR-08"
+      },
+      {
+        "defect_id": "BILL-1201",
+        "rule": null
+      },
+      {
+        "defect_id": "BILL-1203",
+        "rule": "BR-04"
+      },
+      {
+        "defect_id": "BILL-1205",
+        "rule": "BR-03"
+      },
+      {
+        "defect_id": "BILL-1207",
+        "rule": null
+      },
+      {
+        "defect_id": "BILL-1209",
+        "rule": null
+      },
+      {
+        "defect_id": "BILL-1212",
+        "rule": null
+      },
+      {
+        "defect_id": "BILL-1214",
+        "rule": "BR-08"
+      },
+      {
+        "defect_id": "BILL-1216",
+        "rule": null
+      },
+      {
+        "defect_id": "BILL-1219",
+        "rule": "BR-04"
+      },
+      {
+        "defect_id": "BILL-1222",
+        "rule": null
+      },
+      {
+        "defect_id": "BILL-1225",
+        "rule": null
+      },
+      {
+        "defect_id": "BILL-1228",
+        "rule": "BR-15"
+      },
+      {
+        "defect_id": "BILL-1231",
+        "rule": null
+      },
+      {
+        "defect_id": "BILL-1235",
+        "rule": "BR-07"
+      },
+      {
+        "defect_id": "BILL-1238",
+        "rule": "BR-15"
+      },
+      {
+        "defect_id": "BILL-1240",
+        "rule": "BR-05"
+      }
+    ]
+  }
+}

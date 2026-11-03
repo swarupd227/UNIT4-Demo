@@ -1,0 +1,210 @@
+{
+  "input_hash": "d2b76e27855aca067be404a1b7eacef31387816fd9de2a3d4610a5b33c8bd9c3",
+  "source": "live_model",
+  "model": "claude-opus-5-5",
+  "duration_ms": 23663,
+  "output": {
+    "cases": [
+      {
+        "case_id": "48201",
+        "rule": "BR-01",
+        "reason": "Checks that only approved, billable time up to the period end appears on the proposal."
+      },
+      {
+        "case_id": "48202",
+        "rule": "BR-01",
+        "reason": "Checks that time dated after the period end is left off the proposal."
+      },
+      {
+        "case_id": "48203",
+        "rule": "BR-02",
+        "reason": "Checks the agreed rate, then the project rate card, then the standard rate."
+      },
+      {
+        "case_id": "48204",
+        "rule": "BR-03",
+        "reason": "Checks reverse charge for an EU business customer with a VAT number."
+      },
+      {
+        "case_id": "48205",
+        "rule": "BR-03",
+        "reason": "Checks that Finnish VAT applies when an EU customer has no VAT number."
+      },
+      {
+        "case_id": "48206",
+        "rule": "BR-05",
+        "reason": "Checks that a customer on billing hold blocks proposal creation."
+      },
+      {
+        "case_id": "48207",
+        "rule": "BR-04",
+        "reason": "Tests multi-currency rounding, though its expected result of rounding once on the total conflicts with the rule."
+      },
+      {
+        "case_id": "48208",
+        "rule": "BR-12",
+        "reason": "Checks that an expense is billed at cost plus the project markup."
+      },
+      {
+        "case_id": "48209",
+        "rule": "BR-06",
+        "reason": "Checks that a write-up is refused without a reason and saved with one."
+      },
+      {
+        "case_id": "48210",
+        "rule": "BR-01",
+        "reason": "Checks that draft, submitted and non-billable entries stay unbilled after a proposal."
+      },
+      {
+        "case_id": "48211",
+        "rule": "BR-02",
+        "reason": "Checks that the project rate card applies when there is no agreed rate."
+      },
+      {
+        "case_id": "48212",
+        "rule": "BR-04",
+        "reason": "Checks that JPY lines are rounded per line to zero decimal places."
+      },
+      {
+        "case_id": "48213",
+        "rule": "BR-05",
+        "reason": "Checks that a project on hold blocks proposal creation."
+      },
+      {
+        "case_id": "48214",
+        "rule": "BR-07",
+        "reason": "Checks that a write-down needs a reason and is recorded against the line."
+      },
+      {
+        "case_id": "48215",
+        "rule": "BR-11",
+        "reason": "Checks that a fixed-price project bills only a milestone completed by the period end."
+      },
+      {
+        "case_id": "48216",
+        "rule": "BR-16",
+        "reason": "Checks that the agreement discount applies to time lines but not to expenses."
+      },
+      {
+        "case_id": "48217",
+        "rule": "BR-13",
+        "reason": "Checks that a final invoice cannot be edited."
+      },
+      {
+        "case_id": "48218",
+        "rule": "BR-14",
+        "reason": "Checks that a proposal under 50 EUR is deferred and its entries stay unbilled."
+      },
+      {
+        "case_id": "48219",
+        "rule": "BR-04",
+        "reason": "Checks per-line USD rounding half away from zero, with tax worked out on the rounded line."
+      },
+      {
+        "case_id": "48220",
+        "rule": "BR-06",
+        "reason": "Checks that a write-up can be removed before finalisation."
+      },
+      {
+        "case_id": "48221",
+        "rule": "BR-16",
+        "reason": "Checks that the agreement discount is not taken off milestones."
+      },
+      {
+        "case_id": "48222",
+        "rule": "BR-15",
+        "reason": "Checks that finalisation is blocked when no exchange rate exists on or before the invoice date."
+      },
+      {
+        "case_id": "48223",
+        "rule": "BR-18",
+        "reason": "Checks that 2.1 hours is rounded up to 2.25."
+      },
+      {
+        "case_id": "48224",
+        "rule": "BR-14",
+        "reason": "Checks the closing-project exception to the minimum amount."
+      },
+      {
+        "case_id": "48225",
+        "rule": "BR-15",
+        "reason": "Checks that the rate effective on or before the invoice date is used."
+      },
+      {
+        "case_id": "48226",
+        "rule": "BR-17",
+        "reason": "Checks that finalisation is blocked without a valid purchase order number."
+      },
+      {
+        "case_id": "48227",
+        "rule": "BR-19",
+        "reason": "Checks that the not-to-exceed limit holds back an entry and the banner says how many."
+      },
+      {
+        "case_id": "48228",
+        "rule": null,
+        "reason": "Per-line credit caps and positive-amount checks are not covered by BR-08, which limits only the invoice total."
+      },
+      {
+        "case_id": "48229",
+        "rule": "BR-12",
+        "reason": "Checks that the hotel expense is billed at cost plus 12% markup."
+      },
+      {
+        "case_id": "48230",
+        "rule": "BR-03",
+        "reason": "Checks that a non-EU customer gets the project tax code with no reverse charge wording."
+      },
+      {
+        "case_id": "48231",
+        "rule": "BR-09",
+        "reason": "Checks that an invoice number is assigned only at finalisation."
+      },
+      {
+        "case_id": "48232",
+        "rule": "BR-09",
+        "reason": "Checks that deleting a proposal leaves no gap in the invoice sequence."
+      },
+      {
+        "case_id": "48233",
+        "rule": "BR-10",
+        "reason": "Checks that the due date follows 45-day customer payment terms."
+      },
+      {
+        "case_id": "48234",
+        "rule": "BR-10",
+        "reason": "Checks the 30-day default due date when the customer has no payment terms."
+      },
+      {
+        "case_id": "48235",
+        "rule": "BR-17",
+        "reason": "Checks that an invoice for a PO-required customer finalises once a purchase order number is entered."
+      },
+      {
+        "case_id": "48236",
+        "rule": "BR-11",
+        "reason": "Checks that a completed milestone is billed only once."
+      },
+      {
+        "case_id": "48237",
+        "rule": "BR-19",
+        "reason": "Checks that nothing more is billed once the not-to-exceed limit is reached."
+      },
+      {
+        "case_id": "48238",
+        "rule": "BR-08",
+        "reason": "Checks that total credits cannot exceed the invoice total."
+      },
+      {
+        "case_id": "48239",
+        "rule": "BR-09",
+        "reason": "Checks that credit notes use their own CN sequence."
+      },
+      {
+        "case_id": "48240",
+        "rule": "BR-20",
+        "reason": "Checks that a credit note keeps the original 24% tax rate."
+      }
+    ]
+  }
+}

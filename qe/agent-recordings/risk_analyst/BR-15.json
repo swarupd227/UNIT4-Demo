@@ -1,0 +1,102 @@
+{
+  "input_hash": "c6439c67f50d8c0005658289d0d9c523aea6fcb33ee1229c3d9187ea255ee9b7",
+  "source": "live_model",
+  "model": "claude-opus-5-5",
+  "duration_ms": 18834,
+  "output": {
+    "headline": "Exchange rate lookup and finalise keep using the wrong or no rate",
+    "what_keeps_breaking": [
+      {
+        "point": "When no rate exists, the system has twice gone ahead silently at 1.0, first on proposals and then on finalise, invoicing a SEK customer 1,500 SEK instead of 17,000 SEK.",
+        "defects": [
+          "BILL-1041",
+          "BILL-1113"
+        ]
+      },
+      {
+        "point": "The rate lookup has picked a rate from the wrong date, either the newest rate regardless of its effective date or the rate for the finalise business date rather than the invoice date.",
+        "defects": [
+          "BILL-1049",
+          "BILL-1108"
+        ]
+      },
+      {
+        "point": "Finalise stored the new rate but did not recalculate the lines, so the amounts stayed in EUR.",
+        "defects": [
+          "BILL-1143"
+        ]
+      },
+      {
+        "point": "Correcting a rate for the same effective date created a second rate, and invoices could pick either one.",
+        "defects": [
+          "BILL-1059"
+        ]
+      },
+      {
+        "point": "The rate entry page accepted bad input, including a missing date, a zero rate and a EUR to EUR rate, and it lost the selected currency after saving.",
+        "defects": [
+          "BILL-1133",
+          "BILL-1197",
+          "BILL-1228",
+          "BILL-1238"
+        ]
+      }
+    ],
+    "why_it_escapes": "There are no automated tests at all, and every fix was covered only by an updated manual case or by nothing, so each defect was found by users. The failures depend on timing (rates entered late, finalising across a month end), which casual manual checks with rates already in place do not exercise.",
+    "proposed_tests": [
+      {
+        "title": "Finalise is refused when no rate exists on or before the invoice date",
+        "scenario": "Given a SEK customer, no SEK rate on or before the invoice date and a proposal for 1,500 EUR of work, the proposal shows the 'rate-missing' banner and 'Missing' in the rate field, and finalising is refused with 'No exchange rate from EUR to SEK on or before ...'. The invoice stays unfinalised and is never issued at 1.0.",
+        "defects": [
+          "BILL-1041",
+          "BILL-1113"
+        ]
+      },
+      {
+        "title": "A rate effective after the invoice date is ignored",
+        "scenario": "Given GBP rates effective 1 March and 1 April (illustrative values 0.85 and 0.86), the April rate entered on 26 March, a March proposal for a GBP customer uses the 1 March rate (0.85), not the April one.",
+        "defects": [
+          "BILL-1049"
+        ]
+      },
+      {
+        "title": "Finalising after a month end uses the rate for the invoice date",
+        "scenario": "Given a proposal dated 30 September and the October rate entered before finalising on 2 October (business date), the finalised invoice carries the September rate.",
+        "defects": [
+          "BILL-1108"
+        ]
+      },
+      {
+        "title": "Finalise recalculates lines at the stored rate",
+        "scenario": "Given a GBP proposal created before the month's rate exists, then the rate is entered (for example 0.85) and the invoice is finalised, every line amount equals the EUR amount multiplied by 0.85 and none remains in EUR.",
+        "defects": [
+          "BILL-1143"
+        ]
+      },
+      {
+        "title": "Re-saving a rate for the same date replaces it",
+        "scenario": "Save SEK 11.40 effective 2024-04-01, then save 11.45 for the same date: the SEK history shows exactly one rate for that date, 11.45, and an invoice dated in April 2024 uses 11.45.",
+        "defects": [
+          "BILL-1059"
+        ]
+      },
+      {
+        "title": "Rate entry rejects invalid input",
+        "scenario": "On Exchange rates, saving a rate with an empty date shows 'Enter the date the rate is effective from.', saving 0 for SEK shows 'Enter a rate greater than zero.', and EUR does not appear in the currency list. No rate is saved in any of these cases.",
+        "defects": [
+          "BILL-1133",
+          "BILL-1197",
+          "BILL-1228"
+        ]
+      },
+      {
+        "title": "Rate page stays on the chosen currency after saving",
+        "scenario": "Choose SEK on Exchange rates and save a valid dated rate: the page shows 'Rate saved.' and the SEK history, not GBP.",
+        "defects": [
+          "BILL-1238"
+        ]
+      }
+    ],
+    "ontology_concepts": []
+  }
+}

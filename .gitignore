@@ -22,3 +22,4 @@ qe/history/repo/
 qe/lab/results/*
 !qe/lab/results/baseline-20.jsonl
 !qe/lab/results/fault-check.jsonl
+*.tsbuildinfo

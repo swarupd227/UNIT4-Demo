@@ -1,0 +1,111 @@
+{
+  "input_hash": "8e941b76391e31e397aa7414f3c0f9ebe16cf777d2166a8cdadf6a26b35d13a9",
+  "source": "live_model",
+  "model": "claude-opus-5-5",
+  "duration_ms": 35808,
+  "output": {
+    "rules": [
+      {
+        "title": "Write-downs over 10% need approval",
+        "statement": "When a proposal's write-downs together exceed 10% of its value before adjustments, it goes to Awaiting approval and cannot be finalised until a billing manager approves it. Any later adjustment that leaves write-downs above 10% clears the approval and needs approval again; one that brings them back to 10% or below returns the proposal to Proposal without approval.",
+        "related_rule": "BR-07",
+        "citations": [
+          {
+            "file": "Billing.Web/Services/AdjustmentService.cs",
+            "find": "private const decimal WD_LIMIT = 0.10m;"
+          },
+          {
+            "file": "Billing.Web/Services/AdjustmentService.cs",
+            "find": "var writeDowns = invoice.Lines.Where(l => l.Adjustment < 0).Sum(l => -l.Adjustment);"
+          },
+          {
+            "file": "Billing.Web/Services/AdjustmentService.cs",
+            "find": "if (before > 0 && writeDowns / before > WD_LIMIT)"
+          },
+          {
+            "file": "Billing.Web/Services/AdjustmentService.cs",
+            "find": "invoice.Status = InvoiceStatus.PendingApproval;"
+          },
+          {
+            "file": "Billing.Web/Services/AdjustmentService.cs",
+            "find": "invoice.ApprovedBy = null;"
+          },
+          {
+            "file": "Billing.Web/Services/AdjustmentService.cs",
+            "find": "else if (invoice.Status == InvoiceStatus.PendingApproval)"
+          },
+          {
+            "file": "Billing.Web/Services/InvoiceService.cs",
+            "find": "if (invoice.Status == InvoiceStatus.PendingApproval)"
+          },
+          {
+            "file": "Billing.Web/Services/InvoiceService.cs",
+            "find": "throw new BillingException(\"Write-downs on this proposal are waiting for a billing manager's approval.\");"
+          },
+          {
+            "file": "Billing.Web/Pages/Proposals/Edit.cshtml.cs",
+            "find": "? \"Adjustment saved. The proposal now needs a billing manager's approval.\""
+          }
+        ],
+        "why_hidden": "BR-07 says only that write-downs are recorded with a reason. Help page 19 lists the reason, the zero floor and open proposals as the only rules. Page 14 gives the proposal status as Proposal or Deferred only. The finalise checks on page 22 and the troubleshooting messages on page 27 omit the approval message. Case 48214 tests only a small write-down. No automated test covers write-downs. The ontology says large write-downs need the engagement partner's approval, but the code requires a billing manager. The material does not settle which is intended.",
+        "search_phrases": [
+          "billing manager's approval",
+          "Awaiting approval",
+          "waiting for a billing manager",
+          "write-downs awaiting approval"
+        ],
+        "proposed_test": "On a P-1001 proposal (1,950.00 EUR), write line 1 down by -200 with a reason and check that the status becomes Awaiting approval and that Finalise invoice is refused with the approval message, then write it down by -50 and check that the status returns to Proposal.",
+        "ontology_concepts": [
+          "write_down",
+          "billing_adjustment",
+          "approval_rule",
+          "billable_value"
+        ]
+      },
+      {
+        "title": "Only billing managers approve; rejection removes write-downs",
+        "statement": "Only a user with the Billing manager role can approve or reject write-downs that are awaiting approval. Rejecting resets every write-down on the proposal to zero, not just the ones that crossed the threshold, and returns the proposal to Proposal status.",
+        "related_rule": "BR-07",
+        "citations": [
+          {
+            "file": "Billing.Web/Infrastructure/Infrastructure.cs",
+            "find": "public bool IsBillingManager => Role == \"Billing manager\";"
+          },
+          {
+            "file": "Billing.Web/Services/ApprovalService.cs",
+            "find": "throw new BillingException(\"Only a billing manager can approve write-downs.\");"
+          },
+          {
+            "file": "Billing.Web/Services/ApprovalService.cs",
+            "find": "throw new BillingException(\"Only a billing manager can reject write-downs.\");"
+          },
+          {
+            "file": "Billing.Web/Services/ApprovalService.cs",
+            "find": "foreach (var line in invoice.Lines.Where(l => l.Adjustment < 0))"
+          },
+          {
+            "file": "Billing.Web/Services/ApprovalService.cs",
+            "find": "line.Adjustment = 0;"
+          },
+          {
+            "file": "Billing.Web/Pages/Approvals/Index.cshtml.cs",
+            "find": "TempData[\"Message\"] = \"Write-downs rejected and removed.\";"
+          }
+        ],
+        "why_hidden": "No register rule mentions approving or rejecting write-downs. Help page 3 describes the menu without the Approvals item. Page 0 says billing managers look after customer settings, holds and exchange rates, and does not mention approvals. No help page, manual case or automated test describes the approve or reject actions, who may perform them, or that rejection wipes every write-down on the proposal. The ontology names the engagement partner as approver, which conflicts with the billing manager role in the code. The material does not settle which is intended.",
+        "search_phrases": [
+          "Only a billing manager",
+          "approve write-downs",
+          "Write-downs rejected",
+          "rejected and removed"
+        ],
+        "proposed_test": "With a proposal awaiting approval, try Approve as Anna Virtanen (Billing clerk) and expect a refusal, then Reject as Mikko Laine (Billing manager) and check that every negative adjustment on the proposal is cleared and the status is Proposal.",
+        "ontology_concepts": [
+          "write_down",
+          "approval_rule",
+          "billing_adjustment"
+        ]
+      }
+    ]
+  }
+}

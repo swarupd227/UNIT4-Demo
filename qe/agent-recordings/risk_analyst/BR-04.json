@@ -1,0 +1,97 @@
+{
+  "input_hash": "4ee7532e47b8f3774fd67a9d84e329ae2df48105b06322ddcbc2083d1c972fe2",
+  "source": "live_model",
+  "model": "claude-opus-5-5",
+  "duration_ms": 30641,
+  "output": {
+    "headline": "Multi-currency rounding keeps going a cent or decimal place wrong",
+    "what_keeps_breaking": [
+      {
+        "point": "Midpoint amounts were rounded to even instead of half away from zero: 1,234.565 SEK printed as 1,234.56.",
+        "defects": [
+          "BILL-1046"
+        ]
+      },
+      {
+        "point": "Conversion went through double and lost precision, leaving large SEK lines a cent out.",
+        "defects": [
+          "BILL-1063"
+        ]
+      },
+      {
+        "point": "Credit note amounts were truncated rather than rounded like invoice lines, so a full credit of 99.995 left 0.01 open.",
+        "defects": [
+          "BILL-1088"
+        ]
+      },
+      {
+        "point": "Lines were converted without rounding and only the total was rounded, so the printed lines did not add up to the subtotal and the customer's AP rejected the invoice.",
+        "defects": [
+          "BILL-1121"
+        ]
+      },
+      {
+        "point": "Every currency was given two decimal places, so JPY, then KRW and ISK, invoices showed decimals; the fix is a hand-kept list of zero-decimal currencies, and the material does not say whether any other currencies are billed.",
+        "defects": [
+          "BILL-1187",
+          "BILL-1219"
+        ]
+      },
+      {
+        "point": "VAT was worked out on the unrounded converted amount instead of the rounded line, putting some lines 0.01 SEK out, which touches tax records.",
+        "defects": [
+          "BILL-1203"
+        ]
+      }
+    ],
+    "why_it_escapes": "There are no automated tests for this rule; each fix recorded only a manual case update or nothing, so one-cent and decimal-place regressions in the shared RoundingHelper were seen only when customers' AP systems or banks rejected invoices.",
+    "proposed_tests": [
+      {
+        "title": "Midpoint line amounts round half away from zero",
+        "scenario": "Create a SEK proposal with lines converting to 1,234.565 SEK and 1,234.575 SEK; expect printed lines of 1,234.57 and 1,234.58.",
+        "defects": [
+          "BILL-1046"
+        ]
+      },
+      {
+        "title": "Large conversion is exact in decimal",
+        "scenario": "Create a Nordvik (SEK) proposal with a line of 12,345.67 EUR at rate 11.4523; expect the repro's 141,385.32 SEK, though exact decimal multiplication gives 141,386.32, so engineers should confirm the expected figure before encoding it.",
+        "defects": [
+          "BILL-1063"
+        ]
+      },
+      {
+        "title": "Full credit of a converted line clears the invoice",
+        "scenario": "On a GBP invoice with a line of 99.995 GBP equivalent, raise a full credit note; expect a credit line of -100.00 and 0.00 left open on the invoice.",
+        "defects": [
+          "BILL-1088"
+        ]
+      },
+      {
+        "title": "Printed lines add up to the subtotal",
+        "scenario": "Create a Nordvik (SEK) proposal with 14 time lines of 1.00 EUR at rate 11.4523; expect each line printed as 11.45 SEK and a subtotal of 160.30 SEK (not 160.33), equal to the sum of the printed lines.",
+        "defects": [
+          "BILL-1121"
+        ]
+      },
+      {
+        "title": "Zero-decimal currencies print whole units",
+        "scenario": "Create proposals for Kaito Systems (JPY), Hanseo Logistics (KRW) and Fjord Data ehf (ISK) with a line converting to 152,340.47; expect 152,340 with no decimals on lines, tax and totals in each currency, and two decimals for a SEK control proposal.",
+        "defects": [
+          "BILL-1187",
+          "BILL-1219"
+        ]
+      },
+      {
+        "title": "VAT is worked out on the rounded line",
+        "scenario": "Create a SEK proposal with a line of 1.00 EUR at rate 10.015 and VAT at 25.5%; expect line 10.02 SEK, VAT 2.56 SEK (not 2.55) and a total of 12.58 SEK.",
+        "defects": [
+          "BILL-1203"
+        ]
+      }
+    ],
+    "ontology_concepts": [
+      "tax_reporting"
+    ]
+  }
+}

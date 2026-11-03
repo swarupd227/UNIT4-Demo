@@ -1,0 +1,150 @@
+{
+  "input_hash": "e5abfd03e7947f61e9a5052b35ff2ff4d4138cfd2f87e3cbec4ebd20e478be0e",
+  "source": "live_model",
+  "model": "claude-opus-5-5",
+  "duration_ms": 21404,
+  "output": {
+    "headline": "Write-down approval workflow keeps breaking wherever the new status reaches",
+    "what_keeps_breaking": [
+      {
+        "point": "Basic limits on a write-down were missing: a line could be written below zero.",
+        "defects": [
+          "BILL-1087"
+        ]
+      },
+      {
+        "point": "The approval threshold was not enforced at first, so a 40% write-down was finalised without review.",
+        "defects": [
+          "BILL-1159"
+        ]
+      },
+      {
+        "point": "Status transitions around approval are wrong: proposals stay Awaiting approval after the write-down is removed, and an earlier approval survives a further write-down over the limit.",
+        "defects": [
+          "BILL-1161",
+          "BILL-1189"
+        ]
+      },
+      {
+        "point": "Approve and Reject were not restricted to the billing manager role, so a project manager approved her own write-down.",
+        "defects": [
+          "BILL-1162"
+        ]
+      },
+      {
+        "point": "Rejecting write-downs cleared the lines but left the written-down total in place.",
+        "defects": [
+          "BILL-1185"
+        ]
+      },
+      {
+        "point": "Other code paths did not know about the PendingApproval status: the open-proposal check let a second proposal be created, and the status label showed the raw enum name.",
+        "defects": [
+          "BILL-1169",
+          "BILL-1167"
+        ]
+      },
+      {
+        "point": "The approver and clerk saw wrong or missing information: the approvals list showed 0.00 with no reasons, and the clerk got no message that approval was needed.",
+        "defects": [
+          "BILL-1164",
+          "BILL-1171"
+        ]
+      },
+      {
+        "point": "The audit log recorded every change as 'Adjustment' rather than Write-up or Write-down, which weakens audit evidence.",
+        "defects": [
+          "BILL-1235"
+        ]
+      }
+    ],
+    "why_it_escapes": "There are no automated tests for this rule, and every fix added either a manual case or nothing, so the PendingApproval status introduced by BILL-1159 was never exercised end to end across finalise, approvals, proposal creation, labels and audit. The material also conflicts on the approver: the code requires a billing manager, while the ontology says large write-downs need the engagement partner, and the rule statement BR-07 does not state a threshold or approver at all; the material does not settle which is correct.",
+    "proposed_tests": [
+      {
+        "title": "Write-down larger than the line is refused",
+        "scenario": "On a proposal line of 500.00, write down by 600.00 with a reason. Expected: refused with 'A write-down cannot take a line below zero.' and the line stays at 500.00.",
+        "defects": [
+          "BILL-1087"
+        ]
+      },
+      {
+        "title": "Write-down over 10% blocks finalisation",
+        "scenario": "On a 12,000 EUR proposal for P-1001, write lines down by 4,800 EUR with a reason, then Finalise. Expected: status Awaiting approval and Finalise refused with the billing manager approval message.",
+        "defects": [
+          "BILL-1159"
+        ]
+      },
+      {
+        "title": "Removing the write-down releases the approval",
+        "scenario": "On a 10,000.00 proposal, write a line down by 2,000.00 (20%), then set the adjustment back to 0. Expected: status returns to Proposal and Finalise succeeds.",
+        "defects": [
+          "BILL-1161"
+        ]
+      },
+      {
+        "title": "Project manager cannot approve or reject",
+        "scenario": "As Sofia Berg (project manager), open Approvals and approve, then reject, her own 20% write-down. Expected: both refused with 'Only a billing manager can approve write-downs.' / '...reject write-downs.' and status stays Awaiting approval.",
+        "defects": [
+          "BILL-1162"
+        ]
+      },
+      {
+        "title": "Approvals list shows amounts and reasons",
+        "scenario": "With one 10,000.00 proposal written down by 2,000.00 with reason 'Overrun', open Approvals as a billing manager. Expected: amount before 10,000.00, written down 2,000.00 and the reason 'Overrun' shown.",
+        "defects": [
+          "BILL-1164"
+        ]
+      },
+      {
+        "title": "Awaiting approval status is labelled readably",
+        "scenario": "Open a proposal written down by 20%. Expected: status shown as 'Awaiting approval', not 'PendingApproval'.",
+        "defects": [
+          "BILL-1167"
+        ]
+      },
+      {
+        "title": "No second proposal while one awaits approval",
+        "scenario": "With a P-1001 proposal Awaiting approval, try to create another proposal for P-1001. Expected: refused and no second proposal exists.",
+        "defects": [
+          "BILL-1169"
+        ]
+      },
+      {
+        "title": "Clerk is told approval is needed",
+        "scenario": "Write a 10,000.00 proposal down by 2,000.00 (20%). Expected: message 'Adjustment saved. The proposal now needs a billing manager's approval.'",
+        "defects": [
+          "BILL-1171"
+        ]
+      },
+      {
+        "title": "Reject restores lines and totals",
+        "scenario": "On a 10,000.00 proposal written down by 2,000.00, a billing manager rejects the write-downs. Expected: no adjustment on the lines, total back to 10,000.00 and status Proposal.",
+        "defects": [
+          "BILL-1185"
+        ]
+      },
+      {
+        "title": "Further write-down clears an earlier approval",
+        "scenario": "A billing manager approves a 15% write-down on a 10,000.00 proposal; the clerk then writes another line down so the total is 30%. Expected: status Awaiting approval again, approval cleared and Finalise refused.",
+        "defects": [
+          "BILL-1189"
+        ]
+      },
+      {
+        "title": "Audit log distinguishes write-ups and write-downs",
+        "scenario": "Write one line down by 100.00 and another up by 50.00, then open the audit log. Expected: entries with action 'Write-down' and 'Write-up' respectively, not 'Adjustment'.",
+        "defects": [
+          "BILL-1235"
+        ]
+      }
+    ],
+    "ontology_concepts": [
+      "write_down",
+      "write_up",
+      "billing_adjustment",
+      "billable_value",
+      "approval_rule",
+      "audit_evidence"
+    ]
+  }
+}

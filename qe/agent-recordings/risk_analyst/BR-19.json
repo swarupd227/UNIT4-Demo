@@ -1,0 +1,71 @@
+{
+  "input_hash": "2d48a13a982e1ddf9e4d8b1eea9faba982cf417f002b3d6aac370445fa2f9bed",
+  "source": "live_model",
+  "model": "claude-opus-5-5",
+  "duration_ms": 15018,
+  "output": {
+    "headline": "Not-to-exceed limit miscounted, bypassed by expenses, and held entries went unreported",
+    "what_keeps_breaking": [
+      {
+        "point": "Billed to date was calculated wrongly: open and deferred proposals were counted and final credit notes were not subtracted, so the limit was reached too early.",
+        "defects": [
+          "BILL-1093"
+        ]
+      },
+      {
+        "point": "The limit check covered only time, so expenses were billed over the not-to-exceed limit.",
+        "defects": [
+          "BILL-1110"
+        ]
+      },
+      {
+        "point": "The time loop stopped at the first entry over the limit, holding back later entries that would have fitted.",
+        "defects": [
+          "BILL-1116"
+        ]
+      },
+      {
+        "point": "Held-back entries were silently left off the proposal, with no message saying how many, which the rule requires.",
+        "defects": [
+          "BILL-1095"
+        ]
+      }
+    ],
+    "why_it_escapes": "There are no automated tests for this rule, and every fix recorded only 'manual case updated'. Those manual cases are not in the material, so their coverage of credit notes, expenses, entry order and the held-back message cannot be confirmed.",
+    "proposed_tests": [
+      {
+        "title": "Billed to date counts final invoices less final credit notes only",
+        "scenario": "P-1030 has a not-to-exceed limit of 40,000 EUR, 32,000 EUR in final invoices, a 4,000 EUR final credit note, and an open and a deferred proposal; create a proposal with 6,000 EUR of time. Expected: all 6,000 EUR is billed (28,000 + 6,000 is under 40,000) and no held-back banner is shown.",
+        "defects": [
+          "BILL-1093"
+        ]
+      },
+      {
+        "title": "Expense that would exceed the limit is held back",
+        "scenario": "P-1030 is 100 EUR under its limit, with an approved 400 EUR expense; create a proposal. Expected: the expense is not on the proposal, billed to date stays within the limit, and the status reason reports 1 entry held back.",
+        "defects": [
+          "BILL-1110",
+          "BILL-1095"
+        ]
+      },
+      {
+        "title": "Only the entry over the limit is held back; later entries that fit are billed",
+        "scenario": "P-1030 has 900 EUR left under its limit, with time entries of 2 h, 8 h and 1 h in that order at an assumed 100 EUR/h with no discount (the material does not give the rate); create a proposal. Expected: the 2 h and 1 h entries (300 EUR) are billed, and the 8 h entry is held back.",
+        "defects": [
+          "BILL-1116"
+        ]
+      },
+      {
+        "title": "Proposal shows how many entries the limit held back",
+        "scenario": "Using the 900 EUR headroom with 2 h, 8 h and 1 h entries at an assumed 100 EUR/h, open the proposal edit page. Expected: the #status-reason warning banner reads '1 entry was held back: the not-to-exceed limit of ... is reached.' with the project's limit in base currency (the exact money format is not settled by the material).",
+        "defects": [
+          "BILL-1095"
+        ]
+      }
+    ],
+    "ontology_concepts": [
+      "project",
+      "work_in_progress"
+    ]
+  }
+}

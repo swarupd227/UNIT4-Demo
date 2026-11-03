@@ -13,7 +13,8 @@ Use case 2. The plan is in [docs/USE_CASE_2_PLAN.md](../docs/USE_CASE_2_PLAN.md)
 | `faults` | 34 seeded faults, each tagged to a rule |
 | `lab` | The test lab image: every build of the module plus Playwright, and the run harness |
 | `answer-key` | What the right answers are, written before any agent runs |
-| `engines` | Shared Python: estate reader, agent gateway, audit trail, ontology |
+| `engines` | Shared Python: estate reader, coverage, defect history, dead code, the context analysis, agent gateway, audit trail, ontology |
+| `agent-recordings` | Recorded results of the context agents, replayed by the workbench. Each holds the hash of its input and prompt |
 | `tools/verify.py` | Checks the estate against the answer key |
 
 ## Commands
@@ -41,6 +42,12 @@ docker run --rm -v "$PWD:/repo" -w /repo python:3.13 sh -c "pip install -q pyyam
 ```
 
 Rebuilds the history repository and the defect export. Run it after any change to the module, its tests or its help pages, because the history ends at today's files.
+
+```bash
+npm run qe:record
+```
+
+Records the context agents (case and defect mapping, the hidden-rule finder, risk cards) with Claude. It calls the model only where a recording is missing or its input or prompt has changed, and saves a result only after it passes the same checks as in the app. Needs `ANTHROPIC_API_KEY` in `.env`. Restart `qe-api` afterwards so the workbench replays the new recordings.
 
 ```bash
 npm run qe:verify
