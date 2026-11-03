@@ -1,0 +1,46 @@
+@page
+@model Kestrel.Billing.Pages.Admin.ExchangeRatesModel
+@{
+    ViewData["Title"] = "Exchange rates";
+}
+<h1>Exchange rates</h1>
+<p>Rates from EUR. An invoice uses the latest rate whose effective date is on or before the invoice date.</p>
+<partial name="_Error" model="Model.Error" />
+<form method="post" class="form inline" id="rate-form">
+    <div class="field">
+        <label for="Currency">Currency</label>
+        <select id="Currency" name="Currency">
+            @foreach (var c in Model.Currencies)
+            {
+                <option value="@c" selected="@(c == Model.Currency)">@c</option>
+            }
+        </select>
+    </div>
+    <div class="field">
+        <label for="EffectiveDate">Effective from</label>
+        <input id="EffectiveDate" name="EffectiveDate" type="date" />
+    </div>
+    <div class="field">
+        <label for="Rate">Rate</label>
+        <input id="Rate" name="Rate" size="10" />
+    </div>
+    <button type="submit">Save rate</button>
+</form>
+<form method="get" class="filter">
+    <label for="show">Show</label>
+    <select id="show" name="currency" onchange="this.form.submit()">
+        @foreach (var c in Model.Currencies)
+        {
+            <option value="@c" selected="@(c == Model.Currency)">@c</option>
+        }
+    </select>
+</form>
+<table class="grid" id="rates">
+    <thead><tr><th>Currency</th><th>Effective from</th><th class="num">Rate</th></tr></thead>
+    <tbody>
+    @foreach (var r in Model.History)
+    {
+        <tr><td>@r.ToCurrency</td><td>@r.EffectiveDate.ToString("yyyy-MM-dd")</td><td class="num">@r.Rate.ToString("0.0000####")</td></tr>
+    }
+    </tbody>
+</table>

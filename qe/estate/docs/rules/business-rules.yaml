@@ -1,0 +1,118 @@
+# Project Billing: business rule register.
+# Owned by the billing product owner. Critical rules are the ones finance signs off before a release.
+# Last reviewed: March 2025.
+rules:
+  - id: BR-01
+    title: Billable time
+    critical: true
+    statement: >-
+      A proposal includes time entries that are approved, marked billable, not yet billed and dated
+      on or before the period end. Draft, submitted, rejected and non-billable entries are left out.
+  - id: BR-02
+    title: Hourly rates
+    critical: true
+    statement: >-
+      Each time entry is priced at the rate agreed with the customer for the employee's role. Where
+      there is none, the project's rate card applies, and otherwise the role's standard rate.
+  - id: BR-03
+    title: VAT on invoice lines
+    critical: true
+    statement: >-
+      Each line carries the project's tax code. Business customers in another EU country with a VAT
+      number are reverse charged: no VAT, and the reverse charge wording on the invoice.
+  - id: BR-04
+    title: Multi-currency rounding
+    critical: true
+    statement: >-
+      Lines are converted to the customer's currency and rounded one by one to that currency's
+      decimal places, half away from zero. Tax is worked out on the rounded line. The invoice total
+      is the sum of the rounded lines and their tax.
+  - id: BR-05
+    title: Billing holds
+    critical: true
+    statement: >-
+      No proposal can be created for a customer or a project that is on billing hold.
+  - id: BR-06
+    title: Write-ups
+    critical: false
+    statement: >-
+      A proposal line can be written up before finalisation. A write-up needs a reason.
+  - id: BR-07
+    title: Write-downs
+    critical: true
+    statement: >-
+      A proposal line can be written down before finalisation. Write-downs are recorded against the
+      line with a reason.
+  - id: BR-08
+    title: Credit note limit
+    critical: true
+    statement: >-
+      A credit note refers to one final invoice and cannot take the credited total, including tax,
+      above that invoice's total.
+  - id: BR-09
+    title: Invoice numbering
+    critical: true
+    statement: >-
+      Numbers are given when a document is finalised, never to proposals, so the sequence has no
+      gaps. Invoices (INV-) and credit notes (CN-) have separate sequences.
+  - id: BR-10
+    title: Payment terms
+    critical: false
+    statement: >-
+      The due date is the invoice date plus the customer's payment terms in days, or 30 days when
+      the customer has none.
+  - id: BR-11
+    title: Fixed-price milestones
+    critical: true
+    statement: >-
+      Fixed-price projects bill milestones, not hours. A milestone is billed once, and only after it
+      is marked complete on or before the period end.
+  - id: BR-12
+    title: Expense markup
+    critical: false
+    statement: >-
+      Approved expenses are billed at cost plus the project's expense markup percentage.
+  - id: BR-13
+    title: Final invoices are locked
+    critical: true
+    statement: >-
+      A final invoice cannot be changed or deleted. Corrections are made with a credit note.
+  - id: BR-14
+    title: Minimum invoice amount
+    critical: false
+    statement: >-
+      A proposal worth less than 50.00 EUR before tax is deferred and its entries stay unbilled,
+      unless the project is closing.
+  - id: BR-15
+    title: Exchange rate date
+    critical: true
+    statement: >-
+      An invoice uses the latest exchange rate effective on or before its invoice date. If there is
+      none, the invoice cannot be finalised.
+  - id: BR-16
+    title: Agreement discount
+    critical: false
+    statement: >-
+      A customer's agreement discount is taken off time lines only, not expenses or milestones.
+  - id: BR-17
+    title: Purchase order numbers
+    critical: false
+    statement: >-
+      For customers that require one, an invoice cannot be finalised without a purchase order number.
+  - id: BR-18
+    title: Quarter-hour billing
+    critical: false
+    statement: >-
+      Hours are billed in quarter hours, rounded up per time entry.
+  - id: BR-19
+    title: Not-to-exceed limit
+    critical: true
+    statement: >-
+      Billing on a project with a not-to-exceed limit cannot go above it, counting what has been
+      billed already. Entries that would go over are held back, and the proposal says how many.
+  - id: BR-20
+    title: Credit note tax
+    critical: false
+    statement: >-
+      A credit note line charges the tax rate of the invoice line it credits, even if the rate has
+      changed since.

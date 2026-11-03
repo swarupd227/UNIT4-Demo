@@ -1,0 +1,290 @@
+# Seeded faults for the fault check. Each fault is a small change to the billing module's source,
+# tagged to the business rule it breaks. A test "catches" a fault when it fails on the faulted build
+# and passes on the baseline. Several faults put back a bug fixed in the defect history.
+#
+# file: path under qe/estate/src. find must occur exactly once in the file.
+faults:
+  - id: F01a
+    rule: BR-01
+    description: Draft and submitted time is billed as well as approved time
+    file: Billing.Web/Services/ProposalService.cs
+    find: "&& t.Status == EntryStatus.Approved"
+    replace: "&& t.Status != EntryStatus.Rejected"
+  - id: F01b
+    rule: BR-01
+    description: Time on the period end date is left out
+    file: Billing.Web/Services/ProposalService.cs
+    find: "&& t.Date <= periodEnd)"
+    replace: "&& t.Date < periodEnd)"
+
+  - id: F02a
+    rule: BR-02
+    description: The project rate card wins over the rate agreed with the customer
+    file: Billing.Web/Helpers/BillingHelper.cs
+    find: |
+      var agreed = customer.Rates.FirstOrDefault(r => r.RoleCode == roleCode);
+              if (agreed != null)
+              {
+                  return agreed.Rate;
+              }
+
+              var card = project.Rates.FirstOrDefault(r => r.RoleCode == roleCode);
+              if (card != null)
+              {
+                  return card.Rate;
+              }
+    replace: |
+      var card = project.Rates.FirstOrDefault(r => r.RoleCode == roleCode);
+              if (card != null)
+              {
+                  return card.Rate;
+              }
+
+              var agreed = customer.Rates.FirstOrDefault(r => r.RoleCode == roleCode);
+              if (agreed != null)
+              {
+                  return agreed.Rate;
+              }
+  - id: F02b
+    rule: BR-02
+    description: Roles without an agreed or card rate are billed at zero
+    file: Billing.Web/Helpers/BillingHelper.cs
+    find: "return role.DefaultRate;"
+    replace: "return 0m;"
+
+  - id: F03a
+    rule: BR-03
+    description: Reverse charge is applied to domestic customers instead of other EU countries
+    file: Billing.Web/Helpers/BillingHelper.cs
+    find: "return IsEu(customer.CountryCode) && customer.CountryCode != company.CountryCode;"
+    replace: "return IsEu(customer.CountryCode) && customer.CountryCode == company.CountryCode;"
+  - id: F03b
+    rule: BR-03
+    description: Reverse charge no longer needs a VAT number
+    file: Billing.Web/Helpers/BillingHelper.cs
+    find: |
+      if (string.IsNullOrWhiteSpace(customer.VatNumber))
+              {
+                  return false;
+              }
+    replace: ""
+
+  - id: F04a
+    rule: BR-04
+    defect: BILL-1046
+    description: Banker's rounding put back (midpoints round to even)
+    file: Billing.Web/Helpers/RoundingHelper.cs
+    find: "MidpointRounding.AwayFromZero"
+    replace: "MidpointRounding.ToEven"
+  - id: F04b
+    rule: BR-04
+    defect: BILL-1121
+    description: Lines are no longer rounded one by one, so only the total is rounded
+    file: Billing.Web/Helpers/RoundingHelper.cs
+    find: "return RoundMoney(sourceAmount * rate, currency);"
+    replace: "return sourceAmount * rate;"
+  - id: F04c
+    rule: BR-04
+    defect: BILL-1187
+    description: Yen invoices get two decimal places again
+    file: Billing.Web/Helpers/RoundingHelper.cs
+    find: |
+      case "JPY":
+    replace: ""
+  - id: F04d
+    rule: BR-04
+    defect: BILL-1203
+    description: Tax is worked out on the unrounded converted amount again
+    file: Billing.Web/Helpers/RoundingHelper.cs
+    find: "var lineAmount = Convert(sourceAmount, rate, currency);"
+    replace: "var lineAmount = sourceAmount * rate;"
+
+  - id: F05a
+    rule: BR-05
+    description: A customer hold only stops billing when the project is on hold too
+    file: Billing.Web/Services/ProposalService.cs
+    find: "if (customer.IsOnHold)"
+    replace: "if (customer.IsOnHold && project.IsOnHold)"
+  - id: F05b
+    rule: BR-05
+    description: A project hold only stops billing on closing projects
+    file: Billing.Web/Services/ProposalService.cs
+    find: "if (project.IsOnHold)"
+    replace: "if (project.IsOnHold && project.Status == ProjectStatus.Closing)"
+
+  - id: F06
+    rule: BR-06
+    description: Write-ups no longer need a reason
+    file: Billing.Web/Services/AdjustmentService.cs
+    find: "if (adjustment != 0 && string.IsNullOrWhiteSpace(reason))"
+    replace: "if (adjustment < 0 && string.IsNullOrWhiteSpace(reason))"
+
+  - id: F07a
+    rule: BR-07
+    description: Write-down approval threshold flipped from 10% to 20%
+    file: Billing.Web/Services/AdjustmentService.cs
+    find: "private const decimal WD_LIMIT = 0.10m;"
+    replace: "private const decimal WD_LIMIT = 0.20m;"
+  - id: F07b
+    rule: BR-07
+    description: Finalise no longer waits for write-down approval
+    file: Billing.Web/Services/InvoiceService.cs
+    find: |
+      if (invoice.Status == InvoiceStatus.PendingApproval)
+              {
+                  throw new BillingException("Write-downs on this proposal are waiting for a billing manager's approval.");
+              }
+    replace: ""
+
+  - id: F08a
+    rule: BR-08
+    description: Earlier credit notes are not counted against the invoice
+    file: Billing.Web/Services/CreditNoteService.cs
+    find: "return original.Total - _invoices.CreditedSoFar(original.Id);"
+    replace: "return original.Total;"
+  - id: F08b
+    rule: BR-08
+    description: The credit limit is worked out before tax instead of on the invoice total
+    file: Billing.Web/Services/CreditNoteService.cs
+    find: "return original.Total - _invoices.CreditedSoFar(original.Id);"
+    replace: "return original.Subtotal - _invoices.CreditedSoFar(original.Id);"
+
+  - id: F09a
+    rule: BR-09
+    description: The invoice number is taken when the proposal is created, leaving gaps
+    file: Billing.Web/Services/ProposalService.cs
+    find: |
+      var rate = _rates.GetRate(company.BaseCurrency, customer.Currency, invoiceDate);
+    replace: |
+      invoice.Number = "INV-" + (company.NextInvoiceNumber++).ToString("000000");
+              var rate = _rates.GetRate(company.BaseCurrency, customer.Currency, invoiceDate);
+  - id: F09b
+    rule: BR-09
+    description: Credit notes take numbers from the invoice sequence
+    file: Billing.Web/Services/CreditNoteService.cs
+    find: "note.Number = _numbering.Next(InvoiceKind.CreditNote);"
+    replace: "note.Number = _numbering.Next(InvoiceKind.Invoice);"
+
+  - id: F10
+    rule: BR-10
+    description: Every customer gets 30 days whatever their terms
+    file: Billing.Web/Helpers/BillingHelper.cs
+    find: "var days = customer.PaymentTermsDays > 0 ? customer.PaymentTermsDays : DefaultPaymentTerms;"
+    replace: "var days = DefaultPaymentTerms;"
+
+  - id: F11a
+    rule: BR-11
+    description: Milestones are billed before they are complete
+    file: Billing.Web/Services/ProposalService.cs
+    find: |
+      if (!m.IsComplete)
+                      {
+                          continue;
+                      }
+    replace: ""
+  - id: F11b
+    rule: BR-11
+    description: A milestone that was billed already is billed again
+    file: Billing.Web/Services/ProposalService.cs
+    find: |
+      if (m.BilledInvoiceId != null)
+                      {
+                          continue;
+                      }
+    replace: ""
+  - id: F11c
+    rule: BR-11
+    description: Time is billed on fixed-price projects as well as milestones
+    file: Billing.Web/Services/ProposalService.cs
+    find: "if (project.BillingType == BillingType.TimeAndMaterials)"
+    replace: "if (project.BillingType == BillingType.TimeAndMaterials || project.BillingType == BillingType.FixedPrice)"
+
+  - id: F12
+    rule: BR-12
+    description: Expenses are billed at cost without the project markup
+    file: Billing.Web/Helpers/BillingHelper.cs
+    find: "return cost + cost * markupPercent / 100m;"
+    replace: "return cost;"
+
+  - id: F13
+    rule: BR-13
+    description: Final invoices can be edited
+    file: Billing.Web/Services/InvoiceService.cs
+    find: "return invoice.Status == InvoiceStatus.Final || invoice.Status == InvoiceStatus.Cancelled;"
+    replace: "return invoice.Status == InvoiceStatus.Cancelled;"
+
+  - id: F14
+    rule: BR-14
+    description: Minimum invoice amount lowered from 50 to 5 EUR
+    file: Billing.Web/Helpers/BillingHelper.cs
+    find: "public const decimal MinimumInvoiceAmount = 50m;"
+    replace: "public const decimal MinimumInvoiceAmount = 5m;"
+
+  - id: F15a
+    rule: BR-15
+    description: The newest exchange rate is used even when it starts after the invoice date
+    file: Billing.Web/Services/ExchangeRateService.cs
+    find: |
+      .Where(r => r.EffectiveDate <= onDate)
+    replace: ""
+  - id: F15b
+    rule: BR-15
+    description: Finalise uses the rate on the business date instead of the invoice date
+    file: Billing.Web/Services/InvoiceService.cs
+    find: "var rate = _rates.GetRate(company.BaseCurrency, invoice.Currency, invoice.InvoiceDate);"
+    replace: "var rate = _rates.GetRate(company.BaseCurrency, invoice.Currency, _clock.Today);"
+
+  - id: F16
+    rule: BR-16
+    description: The agreement discount is also taken off expenses
+    file: Billing.Web/Helpers/BillingHelper.cs
+    find: "if (kind != LineKind.Time || discountPercent <= 0)"
+    replace: "if (discountPercent <= 0)"
+
+  - id: F17
+    rule: BR-17
+    description: A missing purchase order number no longer stops finalisation
+    file: Billing.Web/Services/InvoiceService.cs
+    find: "if (customer.PoRequired && !BillingHelper.IsValidPoNumber(invoice.PoNumber))"
+    replace: "if (customer.PoRequired && invoice.PoNumber == \"\")"
+
+  - id: F18
+    rule: BR-18
+    description: Time is billed as recorded instead of in quarter hours
+    file: Billing.Web/Helpers/RoundingHelper.cs
+    find: "return Math.Ceiling(hours * 4m) / 4m;"
+    replace: "return hours;"
+
+  - id: F19a
+    rule: BR-19
+    description: Earlier invoices are not counted against the not-to-exceed limit
+    file: Billing.Web/Services/ProposalService.cs
+    find: ".Where(i => i.ProjectId == projectId && i.Status == InvoiceStatus.Final)"
+    replace: ".Where(i => i.ProjectId == projectId && i.Status == InvoiceStatus.Proposal)"
+  - id: F19b
+    rule: BR-19
+    description: Once one entry is held back, every later entry is held back too
+    file: Billing.Web/Services/ProposalService.cs
+    find: |
+      if (project.NotToExceed.HasValue && billedToDate + running + net > project.NotToExceed.Value)
+                      {
+                          held++;
+                          continue;
+                      }
+    replace: |
+      if (project.NotToExceed.HasValue && billedToDate + running + net > project.NotToExceed.Value)
+                      {
+                          held++;
+                          break;
+                      }
+
+  - id: F20
+    rule: BR-20
+    description: Credit notes charge today's tax rate instead of the rate on the original line
+    file: Billing.Web/Services/CreditNoteService.cs
+    find: |
+      TaxRate = line.TaxRate,
+                      TaxAmount = RoundingHelper.CreditAmount(credit * line.TaxRate / 100m, original.Currency),
+    replace: |
+      TaxRate = _db.TaxCodes.Find(line.TaxCode)?.Rate ?? line.TaxRate,
+                      TaxAmount = RoundingHelper.CreditAmount(credit * (_db.TaxCodes.Find(line.TaxCode)?.Rate ?? line.TaxRate) / 100m, original.Currency),

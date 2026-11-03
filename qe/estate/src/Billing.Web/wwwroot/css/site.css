@@ -1,0 +1,53 @@
+/* Project Billing. House style from the 2023 finance systems refresh. */
+* { box-sizing: border-box; }
+body { margin: 0; font: 14px/1.45 "Segoe UI", Tahoma, Arial, sans-serif; color: #1d2733; background: #eef1f4; }
+a { color: #0b5cad; }
+h1 { font-size: 22px; margin: 0 0 14px; font-weight: 600; }
+h1 small { font-size: 14px; color: #6a7684; font-weight: 400; }
+h2 { font-size: 16px; margin: 24px 0 8px; }
+.topbar { display: flex; align-items: center; gap: 24px; background: #1f3a56; color: #fff; padding: 10px 20px; }
+.brand { font-weight: 600; font-size: 16px; }
+.brand span { font-weight: 400; color: #b9cbe0; margin-left: 6px; }
+.sysdate { margin-left: auto; color: #b9cbe0; }
+.sysdate strong { color: #fff; }
+.user-switch label { margin-right: 6px; color: #b9cbe0; }
+.user-switch select { padding: 3px 6px; }
+.menu { display: flex; gap: 2px; background: #2c4f73; padding: 0 14px; }
+.menu a { color: #e6eef7; text-decoration: none; padding: 9px 12px; }
+.menu a:hover { background: #3a6390; }
+.content { padding: 20px; max-width: 1400px; }
+.footer { padding: 14px 20px; color: #7d8894; font-size: 12px; }
+.lead { color: #4b5866; }
+.tiles { display: flex; gap: 12px; flex-wrap: wrap; }
+.tile { background: #fff; border: 1px solid #d3dae1; padding: 14px 18px; min-width: 170px; text-decoration: none; color: #1d2733; display: flex; flex-direction: column; }
+.tile-value { font-size: 26px; font-weight: 600; color: #1f3a56; }
+.grid { border-collapse: collapse; width: 100%; background: #fff; margin: 8px 0 16px; }
+.grid th, .grid td { border: 1px solid #d3dae1; padding: 5px 8px; text-align: left; vertical-align: top; }
+.grid th { background: #e3e8ee; font-weight: 600; }
+.grid .num { text-align: right; white-space: nowrap; }
+.grid tfoot td { font-weight: 600; background: #f6f8fa; }
+.grid tr.total td { font-size: 15px; }
+.reason { color: #6a7684; font-size: 12px; }
+.facts { display: grid; grid-template-columns: 200px 1fr; gap: 4px 12px; background: #fff; border: 1px solid #d3dae1; padding: 10px 14px; max-width: 760px; }
+.facts dt { color: #5c6875; }
+.facts dd { margin: 0; }
+.form { background: #fff; border: 1px solid #d3dae1; padding: 14px; margin: 10px 0; max-width: 760px; }
+.form.inline { display: flex; align-items: flex-end; gap: 14px; flex-wrap: wrap; max-width: none; }
+form.inline { display: inline-block; }
+.field { margin-bottom: 10px; }
+.field label { display: block; color: #4b5866; margin-bottom: 3px; }
+.field.check { display: flex; gap: 6px; align-items: center; }
+.field.check label { display: inline; margin: 0; }
+input, select { font: inherit; padding: 4px 6px; border: 1px solid #aab4bf; }
+button, .button { font: inherit; padding: 5px 12px; border: 1px solid #8a97a5; background: #f4f6f8; cursor: pointer; text-decoration: none; color: #1d2733; display: inline-block; }
+button.primary, .button.primary { background: #1f6fc0; border-color: #1a5ea3; color: #fff; }
+button.danger { background: #fff; border-color: #b33a3a; color: #b33a3a; }
+.actions { display: flex; gap: 10px; margin-top: 10px; }
+.message { background: #e3f3e6; border: 1px solid #9dcfa6; padding: 8px 12px; margin-bottom: 12px; }
+.error { background: #fbe6e6; border: 1px solid #e2a1a1; color: #8a1f1f; padding: 8px 12px; margin-bottom: 12px; }
+.banner { padding: 8px 12px; margin-bottom: 12px; border: 1px solid; }
+.banner.locked { background: #eef2f7; border-color: #a9b9cc; }
+.banner.warning { background: #fff6e0; border-color: #e5c66b; }
+.note { background: #fff; border-left: 3px solid #1f6fc0; padding: 6px 10px; }
+.filter { margin: 8px 0; display: flex; gap: 8px; align-items: center; }
+.muted { color: #6a7684; }

@@ -1,0 +1,49 @@
+@page "{id:int}"
+@model Kestrel.Billing.Pages.Customers.EditModel
+@{
+    ViewData["Title"] = Model.Customer.Name;
+}
+<h1>@Model.Customer.Name <small>@Model.Customer.Code</small></h1>
+<partial name="_Error" model="Model.Error" />
+<form method="post" class="form" id="customer-form">
+    <div class="field">
+        <label for="PaymentTermsDays">Payment terms (days)</label>
+        <input id="PaymentTermsDays" name="PaymentTermsDays" type="number" min="0" max="120" value="@Model.Customer.PaymentTermsDays" />
+    </div>
+    <div class="field">
+        <label for="DiscountPercent">Agreement discount (%)</label>
+        <input id="DiscountPercent" name="DiscountPercent" value="@Model.Customer.DiscountPercent.ToString("0.##", System.Globalization.CultureInfo.InvariantCulture)" />
+    </div>
+    <div class="field check">
+        <input id="PoRequired" name="PoRequired" type="checkbox" value="true" checked="@Model.Customer.PoRequired" />
+        <label for="PoRequired">Purchase order number required on invoices</label>
+    </div>
+    <div class="field check">
+        <input id="IsOnHold" name="IsOnHold" type="checkbox" value="true" checked="@Model.Customer.IsOnHold" />
+        <label for="IsOnHold">Billing hold</label>
+    </div>
+    <div class="field">
+        <label for="HoldReason">Hold reason</label>
+        <input id="HoldReason" name="HoldReason" value="@Model.Customer.HoldReason" />
+    </div>
+    <dl class="facts">
+        <dt>Currency</dt><dd>@Model.Customer.Currency</dd>
+        <dt>Country</dt><dd>@Model.Customer.CountryCode</dd>
+        <dt>VAT number</dt><dd>@(Model.Customer.VatNumber ?? "None")</dd>
+    </dl>
+    <button type="submit" class="primary">Save</button>
+    <a href="/Customers">Back</a>
+</form>
+@if (Model.Customer.Rates.Count > 0)
+{
+    <h2>Agreed rates</h2>
+    <table class="grid">
+        <thead><tr><th>Role</th><th class="num">Rate (EUR)</th></tr></thead>
+        <tbody>
+        @foreach (var r in Model.Customer.Rates.OrderBy(r => r.RoleCode))
+        {
+            <tr><td>@r.RoleCode</td><td class="num">@r.Rate.ToString("0.00")</td></tr>
+        }
+        </tbody>
+    </table>
+}

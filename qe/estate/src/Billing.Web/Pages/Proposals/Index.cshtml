@@ -1,0 +1,30 @@
+@page
+@model Kestrel.Billing.Pages.Proposals.IndexModel
+@{
+    ViewData["Title"] = "Proposals";
+}
+<h1>Invoice proposals</h1>
+<p><a class="button primary" href="/Proposals/Create" id="new-proposal">New proposal</a></p>
+<table class="grid" id="proposals">
+    <thead>
+    <tr><th>Proposal</th><th>Project</th><th>Customer</th><th>Period end</th><th>Status</th><th class="num">Total</th><th>Created by</th></tr>
+    </thead>
+    <tbody>
+    @foreach (var i in Model.Proposals)
+    {
+        <tr>
+            <td><a href="/Proposals/Edit/@i.Id">P@(i.Id.ToString("00000"))</a></td>
+            <td>@i.Project.Code</td>
+            <td>@i.Customer.Name</td>
+            <td>@i.PeriodEnd.ToString("yyyy-MM-dd")</td>
+            <td>@BillingHelper.StatusLabel(i.Status)</td>
+            <td class="num">@BillingHelper.FormatMoney(i.Total, i.Currency)</td>
+            <td>@i.CreatedBy</td>
+        </tr>
+    }
+    </tbody>
+</table>
+@if (Model.Proposals.Count == 0)
+{
+    <p>No open proposals.</p>
+}

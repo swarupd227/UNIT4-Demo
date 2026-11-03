@@ -13,3 +13,12 @@ storage/
 e2e-results/
 demo-video/
 deliverables/
+
+# Test Assurance Studio
+qe/estate/src/**/bin/
+qe/estate/src/**/obj/
+qe/estate/tests/e2e/test-results/
+qe/history/repo/
+qe/lab/results/*
+!qe/lab/results/baseline-20.jsonl
+!qe/lab/results/fault-check.jsonl

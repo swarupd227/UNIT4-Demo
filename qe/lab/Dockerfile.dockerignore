@@ -1,0 +1,9 @@
+*
+!qe/estate/src
+!qe/estate/tests/e2e/package.json
+!qe/faults
+!qe/lab/build_variants.py
+!qe/lab/run.mjs
+**/bin
+**/obj
+**/node_modules

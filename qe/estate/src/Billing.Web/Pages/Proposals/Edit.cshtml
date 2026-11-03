@@ -1,0 +1,110 @@
+@page "{id:int}"
+@model Kestrel.Billing.Pages.Proposals.EditModel
+@{
+    var i = Model.Invoice;
+    var locked = Model.Locked;
+    ViewData["Title"] = "Proposal P" + i.Id.ToString("00000");
+}
+<h1>Invoice proposal P@(i.Id.ToString("00000"))</h1>
+<partial name="_Error" model="Model.Error" />
+@if (locked)
+{
+    <div class="banner locked" id="locked-banner">This invoice is final. Changes are made with a credit note.
+        <a href="/Invoices/Details/@i.Id">Open invoice @i.Number</a></div>
+}
+@if (!string.IsNullOrEmpty(i.StatusReason))
+{
+    <div class="banner warning" id="status-reason">@i.StatusReason</div>
+}
+@if (i.ExchangeRate == null)
+{
+    <div class="banner warning" id="rate-missing">No exchange rate to @i.Currency for @i.InvoiceDate.ToString("d MMM yyyy") yet. Amounts are shown in EUR until the rate is entered.</div>
+}
+<dl class="facts">
+    <dt>Status</dt><dd id="proposal-status">@BillingHelper.StatusLabel(i.Status)</dd>
+    <dt>Invoice number</dt><dd id="proposal-number">@(i.Number ?? "Assigned when finalised")</dd>
+    <dt>Project</dt><dd id="proposal-project">@i.Project.Code @i.Project.Name</dd>
+    <dt>Customer</dt><dd id="proposal-customer">@i.Customer.Name</dd>
+    <dt>Period end</dt><dd>@i.PeriodEnd.ToString("yyyy-MM-dd")</dd>
+    <dt>Invoice date</dt><dd id="proposal-invoice-date">@i.InvoiceDate.ToString("yyyy-MM-dd")</dd>
+    <dt>Currency</dt><dd id="proposal-currency">@i.Currency</dd>
+    <dt>Exchange rate</dt><dd id="proposal-rate">@(i.ExchangeRate?.ToString("0.0000####") ?? "Missing")</dd>
+    @if (i.ApprovedBy != null)
+    {
+        <dt>Write-downs approved by</dt><dd id="approved-by">@i.ApprovedBy</dd>
+    }
+</dl>
+@if (!string.IsNullOrEmpty(i.Notes))
+{
+    <p class="note" id="invoice-note">@i.Notes</p>
+}
+
+@if (!locked)
+{
+    <form method="post" asp-page-handler="Po" class="form inline" id="po-form">
+        <div class="field">
+            <label for="PoNumber">Purchase order</label>
+            <input id="PoNumber" name="PoNumber" value="@i.PoNumber" />
+        </div>
+        <button type="submit">Save PO</button>
+    </form>
+}
+
+<table class="grid" id="proposal-lines">
+    <thead>
+    <tr>
+        <th>#</th><th>Type</th><th>Description</th><th class="num">Qty</th><th class="num">Unit price (EUR)</th>
+        <th class="num">Discount</th><th class="num">Adjustment (EUR)</th><th class="num">Amount (@i.Currency)</th>
+        <th>Tax</th><th class="num">Tax amount</th>@if (!locked){<th></th>}
+    </tr>
+    </thead>
+    <tbody>
+    @foreach (var l in i.Lines.OrderBy(l => l.Sequence))
+    {
+        <tr data-line="@l.Sequence">
+            <td>@l.Sequence</td>
+            <td class="line-kind">@BillingHelper.LineKindLabel(l.Kind)</td>
+            <td class="line-description">@l.Description
+                @if (!string.IsNullOrEmpty(l.AdjustmentReason))
+                {
+                    <div class="reason">@l.AdjustmentReason</div>
+                }
+            </td>
+            <td class="num line-quantity">@l.Quantity.ToString("0.00")</td>
+            <td class="num line-unit-price">@l.UnitPrice.ToString("#,##0.00")</td>
+            <td class="num line-discount">@(l.DiscountPercent == 0 ? "" : l.DiscountPercent.ToString("0.##") + "%")</td>
+            <td class="num line-adjustment">@(l.Adjustment == 0 ? "" : l.Adjustment.ToString("+#,##0.00;-#,##0.00"))</td>
+            <td class="num line-amount">@BillingHelper.FormatAmount(l.Amount, i.Currency)</td>
+            <td class="line-tax-code">@l.TaxCode @(l.TaxRate == 0 ? "" : l.TaxRate.ToString("0.##") + "%")</td>
+            <td class="num line-tax">@BillingHelper.FormatAmount(l.TaxAmount, i.Currency)</td>
+            @if (!locked)
+            {
+                <td>
+                    <form method="post" asp-page-handler="Adjust" asp-route-lineId="@l.Id" class="adjust">
+                        <input name="Adjustment" aria-label="Adjustment for line @l.Sequence" placeholder="+/- EUR" size="8" />
+                        <input name="Reason" aria-label="Reason for line @l.Sequence" placeholder="Reason" size="18" />
+                        <button type="submit">Adjust</button>
+                    </form>
+                </td>
+            }
+        </tr>
+    }
+    </tbody>
+    <tfoot>
+    <tr><td colspan="7">Subtotal</td><td class="num" id="proposal-subtotal">@BillingHelper.FormatAmount(i.Subtotal, i.Currency)</td><td></td><td></td></tr>
+    <tr><td colspan="7">Tax</td><td class="num" id="proposal-tax">@BillingHelper.FormatAmount(i.TaxTotal, i.Currency)</td><td></td><td></td></tr>
+    <tr class="total"><td colspan="7">Total</td><td class="num" id="proposal-total">@BillingHelper.FormatMoney(i.Total, i.Currency)</td><td></td><td></td></tr>
+    </tfoot>
+</table>
+
+@if (!locked)
+{
+    <div class="actions">
+        <form method="post" asp-page-handler="Finalise">
+            <button type="submit" class="primary" id="finalise">Finalise invoice</button>
+        </form>
+        <form method="post" asp-page-handler="Delete" onsubmit="return confirm('Delete this proposal? Its entries go back to unbilled.');">
+            <button type="submit" class="danger" id="delete-proposal">Delete proposal</button>
+        </form>
+    </div>
+}

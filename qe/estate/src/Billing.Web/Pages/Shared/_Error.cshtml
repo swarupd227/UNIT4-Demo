@@ -1,0 +1,5 @@
+@model string?
+@if (!string.IsNullOrEmpty(Model))
+{
+    <div class="error" role="alert" id="error-message">@Model</div>
+}

@@ -1,0 +1,3859 @@
+# Project Billing history: commits from the TFS import in October 2023 to today, and the bugs they fix.
+# Each change pair turns `before` into `after`; `after` is text in the code at that commit.
+# qe/history/build_history.py rebuilds the repository and the defect export from this file.
+authors:
+  mikael:
+    name: Mikael Strand
+    email: mikael.strand@kestrel.fi
+  priya:
+    name: Priya Nair
+    email: priya.nair@kestrel.fi
+  jonas:
+    name: Jonas Berg
+    email: jonas.berg@kestrel.fi
+  tuomas:
+    name: Tuomas Aalto
+    email: tuomas.aalto@kestrel.fi
+  elif:
+    name: Elif Kaya
+    email: elif.kaya@kestrel.fi
+commits:
+- date: '2023-10-16T16:05:00+03:00'
+  author: mikael
+  message: |-
+    Import Project Billing 4.0 from TFS
+
+    Source from the TFS collection FinanceSystems/ProjectBilling, branch Release/4.0, changeset 18842.
+    History before this point stays in TFS.
+  initial: true
+- date: '2023-11-07T11:08:00+02:00'
+  author: mikael
+  message: BILL-1001 Expense markup is a percentage, not a fraction
+  defect: BILL-1001
+  changes:
+  - file: src/Billing.Web/Helpers/BillingHelper.cs
+    before: '        return cost + cost * markupPercent;'
+    after: '        return cost + cost * markupPercent / 100m;'
+- date: '2023-11-08T12:58:00+02:00'
+  author: tuomas
+  message: BILL-1003 Reverse charge only for other EU countries
+  defect: BILL-1003
+  changes:
+  - file: src/Billing.Web/Helpers/BillingHelper.cs
+    before: '        return IsEu(customer.CountryCode);'
+    after: '        return IsEu(customer.CountryCode) && customer.CountryCode != company.CountryCode;'
+- date: '2023-11-14T12:41:00+02:00'
+  author: tuomas
+  message: BILL-1004 Fix due date off by one
+  defect: BILL-1004
+  changes:
+  - file: src/Billing.Web/Helpers/BillingHelper.cs
+    before: '        return invoiceDate.AddDays(customer.PaymentTermsDays - 1);'
+    after: '        return invoiceDate.AddDays(customer.PaymentTermsDays);'
+- date: '2023-11-17T11:29:00+02:00'
+  author: jonas
+  message: BILL-1006 Thousand separators in money amounts
+  defect: BILL-1006
+  changes:
+  - file: src/Billing.Web/Helpers/BillingHelper.cs
+    before: '        return amount.ToString(places == 0 ? "0" : "0.00", Money) + " " + currency;'
+    after: '        return amount.ToString(places == 0 ? "#,##0" : "#,##0.00", Money) + " " + currency;'
+  - file: src/Billing.Web/Helpers/BillingHelper.cs
+    before: '        return amount.ToString(places == 0 ? "0" : "0.00", Money);'
+    after: '        return amount.ToString(places == 0 ? "#,##0" : "#,##0.00", Money);'
+- date: '2023-11-21T14:38:00+02:00'
+  author: mikael
+  message: BILL-1007 Leave non-billable time out of proposals
+  defect: BILL-1007
+  changes:
+  - file: src/Billing.Web/Services/ProposalService.cs
+    before: ''
+    after: |2
+                                  && t.Billable
+- date: '2023-11-24T13:00:00+02:00'
+  author: mikael
+  message: BILL-1009 Pad credit note numbers to six digits
+  defect: BILL-1009
+  changes:
+  - file: src/Billing.Web/Services/NumberingService.cs
+    before: number = "CN-" + company.NextCreditNoteNumber;
+    after: number = "CN-" + company.NextCreditNoteNumber.ToString("000000");
+- date: '2023-11-29T11:37:00+02:00'
+  author: mikael
+  message: BILL-1010 Credit migrated invoices that have no exchange rate
+  defect: BILL-1010
+  changes:
+  - file: src/Billing.Web/Services/CreditNoteService.cs
+    before: '                SourceAmount = amount / original.ExchangeRate!.Value,'
+    after: |2-
+                      SourceAmount = original.ExchangeRate.HasValue && original.ExchangeRate.Value != 0
+                          ? amount / original.ExchangeRate.Value
+                          : amount,
+- date: '2023-12-04T15:34:00+02:00'
+  author: mikael
+  message: BILL-1012 Do not delete final invoices
+  defect: BILL-1012
+  changes:
+  - file: src/Billing.Web/Services/ProposalService.cs
+    before: ''
+    after: |2
+              if (invoice.Status == InvoiceStatus.Final)
+              {
+                  throw new BillingException("A final invoice cannot be deleted. Raise a credit note instead.");
+              }
+- date: '2023-12-11T11:36:00+02:00'
+  author: tuomas
+  message: BILL-1013 Remove GB from the EU country list
+  defect: BILL-1013
+  changes:
+  - file: src/Billing.Web/Helpers/BillingHelper.cs
+    before: '        "AT", "BE", "BG", "CY", "CZ", "DE", "DK", "EE", "ES", "FI", "FR", "GB", "GR", "HR", "HU", "IE",'
+    after: '        "AT", "BE", "BG", "CY", "CZ", "DE", "DK", "EE", "ES", "FI", "FR", "GR", "HR", "HU", "IE",'
+- date: '2023-12-13T11:38:00+02:00'
+  author: jonas
+  message: BILL-1015 No brackets when a time entry has no comment
+  defect: BILL-1015
+  changes:
+  - file: src/Billing.Web/Services/ProposalService.cs
+    before: '                    Description = e.Date.ToString("yyyy-MM-dd") + " " + e.Employee.Name + " - " + e.ActivityCode + " (" + e.Comment + ")",'
+    after: |2-
+                          Description = e.Date.ToString("yyyy-MM-dd") + " " + e.Employee.Name + " - " + e.ActivityCode +
+                                        (string.IsNullOrWhiteSpace(e.Comment) ? "" : " (" + e.Comment + ")"),
+- date: '2023-12-20T11:09:00+02:00'
+  author: tuomas
+  message: BILL-1018 Work out line tax on the adjusted amount
+  defect: BILL-1018
+  changes:
+  - file: src/Billing.Web/Services/ProposalService.cs
+    before: |2-
+                  line.Amount = RoundingHelper.Convert(line.SourceAmount + line.Adjustment, rate, invoice.Currency);
+                  line.TaxAmount = RoundingHelper.LineTax(line.SourceAmount, rate, line.TaxRate, invoice.Currency);
+    after: |2-
+                  var value = line.SourceAmount + line.Adjustment;
+                  line.Amount = RoundingHelper.Convert(value, rate, invoice.Currency);
+                  line.TaxAmount = RoundingHelper.LineTax(value, rate, line.TaxRate, invoice.Currency);
+- date: '2024-01-09T13:23:00+02:00'
+  author: mikael
+  message: BILL-1020 Agreed customer rate wins over the rate card
+  defect: BILL-1020
+  changes:
+  - file: src/Billing.Web/Helpers/BillingHelper.cs
+    before: '    /// The hourly rate for a role, from the project''s rate card or the customer agreement.'
+    after: '    /// The hourly rate for a role. A rate agreed with the customer wins over the project''s rate card.'
+  - file: src/Billing.Web/Helpers/BillingHelper.cs
+    before: |2-
+              var card = project.Rates.FirstOrDefault(r => r.RoleCode == roleCode);
+              if (card != null)
+              {
+                  return card.Rate;
+              }
+
+              var agreed = customer.Rates.FirstOrDefault(r => r.RoleCode == roleCode);
+              if (agreed != null)
+              {
+                  return agreed.Rate;
+              }
+    after: |2-
+              var agreed = customer.Rates.FirstOrDefault(r => r.RoleCode == roleCode);
+              if (agreed != null)
+              {
+                  return agreed.Rate;
+              }
+
+              var card = project.Rates.FirstOrDefault(r => r.RoleCode == roleCode);
+              if (card != null)
+              {
+                  return card.Rate;
+              }
+- date: '2024-01-12T11:15:00+02:00'
+  author: tuomas
+  message: BILL-1021 No reverse charge for consumers
+  defect: BILL-1021
+  changes:
+  - file: src/Billing.Web/Helpers/BillingHelper.cs
+    before: ''
+    after: |2
+              if (!customer.IsBusiness)
+              {
+                  return false;
+              }
+- date: '2024-01-15T15:40:00+02:00'
+  author: mikael
+  message: Release 4.1.0
+  changes:
+  - file: src/Billing.Web/Pages/Shared/_Layout.cshtml
+    before: Project Billing 4.0.0 &middot;
+    after: Project Billing 4.1.0 &middot;
+- date: '2024-01-17T16:34:00+02:00'
+  author: mikael
+  message: BILL-1023 Bill approved time only
+  defect: BILL-1023
+  changes:
+  - file: src/Billing.Web/Services/ProposalService.cs
+    before: '                            && t.Status != EntryStatus.Rejected'
+    after: '                            && t.Status == EntryStatus.Approved'
+- date: '2024-01-22T11:50:00+02:00'
+  author: jonas
+  message: BILL-1026 Name the customer and reason in the hold message
+  defect: BILL-1026
+  changes:
+  - file: src/Billing.Web/Services/ProposalService.cs
+    before: '            throw new BillingException("Customer " + customer.Code + " is on billing hold.");'
+    after: '            throw new BillingException(("Billing hold: customer " + customer.Name + " is on hold. " + (customer.HoldReason ?? "")).Trim());'
+- date: '2024-01-25T15:21:00+02:00'
+  author: mikael
+  message: BILL-1027 Limit PO numbers to 30 characters
+  defect: BILL-1027
+  changes:
+  - file: src/Billing.Web/Helpers/BillingHelper.cs
+    before: '        return trimmed.Length >= 4;'
+    after: '        return trimmed.Length >= 4 && trimmed.Length <= 30;'
+- date: '2024-02-01T16:50:00+02:00'
+  author: mikael
+  message: BILL-1029 Mark milestones billed and skip them next run
+  defect: BILL-1029
+  changes:
+  - file: src/Billing.Web/Services/ProposalService.cs
+    before: ''
+    after: |2
+                      if (m.BilledInvoiceId != null)
+                      {
+                          continue;
+                      }
+  - file: src/Billing.Web/Services/InvoiceService.cs
+    before: ''
+    after: |2+
+              var milestoneIds = invoice.Lines.Where(l => l.Kind == LineKind.Milestone && l.SourceLineId != null)
+                  .Select(l => l.SourceLineId!.Value).ToList();
+              foreach (var m in _db.Milestones.Where(m => milestoneIds.Contains(m.Id)))
+              {
+                  m.BilledInvoiceId = invoice.Id;
+              }
+
+- date: '2024-02-02T16:53:00+02:00'
+  author: jonas
+  message: BILL-1030 Show the business date in the header
+  defect: BILL-1030
+  changes:
+  - file: src/Billing.Web/Pages/Shared/_Layout.cshtml
+    before: '@DateTime.Today.ToString("d MMM yyyy")'
+    after: '@Clock.Today.ToString("d MMM yyyy")'
+- date: '2024-02-07T14:24:00+02:00'
+  author: mikael
+  message: BILL-1032 Serialise number allocation
+  defect: BILL-1032
+  changes:
+  - file: src/Billing.Web/Services/NumberingService.cs
+    before: '    private readonly BillingContext _db;'
+    after: |2-
+          private static readonly object Gate = new();
+
+          private readonly BillingContext _db;
+  - file: src/Billing.Web/Services/NumberingService.cs
+    before: |2-
+              var company = _db.Companies.First();
+              string number;
+              if (kind == InvoiceKind.CreditNote)
+              {
+                  number = "CN-" + company.NextCreditNoteNumber.ToString("000000");
+                  company.NextCreditNoteNumber++;
+              }
+              else
+              {
+                  number = "INV-" + company.NextInvoiceNumber.ToString("000000");
+                  company.NextInvoiceNumber++;
+              }
+              _db.SaveChanges();
+              return number;
+    after: |2-
+              lock (Gate)
+              {
+                  var company = _db.Companies.First();
+                  _db.Entry(company).Reload();
+                  string number;
+                  if (kind == InvoiceKind.CreditNote)
+                  {
+                      number = "CN-" + company.NextCreditNoteNumber.ToString("000000");
+                      company.NextCreditNoteNumber++;
+                  }
+                  else
+                  {
+                      number = "INV-" + company.NextInvoiceNumber.ToString("000000");
+                      company.NextInvoiceNumber++;
+                  }
+                  _db.SaveChanges();
+                  return number;
+              }
+- date: '2024-02-09T11:38:00+02:00'
+  author: tuomas
+  message: BILL-1033 Due date from the invoice date
+  defect: BILL-1033
+  changes:
+  - file: src/Billing.Web/Services/InvoiceService.cs
+    before: '        invoice.DueDate = BillingHelper.DueDate(_clock.Today, customer);'
+    after: '        invoice.DueDate = BillingHelper.DueDate(invoice.InvoiceDate, customer);'
+- date: '2024-02-12T11:10:00+02:00'
+  author: jonas
+  message: Add invoice export for the finance spreadsheet
+  changes:
+  - file: src/Billing.Web/Helpers/BillingHelper.cs
+    before: |-
+      using System.Globalization;
+      using Kestrel.Billing.Data;
+    after: |-
+      using System.Globalization;
+      using System.Text;
+      using Kestrel.Billing.Data;
+  - file: src/Billing.Web/Helpers/BillingHelper.cs
+    before: ''
+    after: |2+
+          // ----- export ----------------------------------------------------------------------------
+
+          /// <summary>Semicolon separated export for the finance team's spreadsheet.</summary>
+          public static string ExportCsv(IEnumerable<Invoice> invoices)
+          {
+              var sb = new StringBuilder();
+              sb.AppendLine("Number;Kind;Customer;Project;Invoice date;Due date;Currency;Subtotal;Tax;Total;Status");
+              foreach (var i in invoices)
+              {
+                  sb.Append(i.Number ?? "").Append(';')
+                    .Append(i.Kind).Append(';')
+                    .Append(i.Customer?.Code).Append(';')
+                    .Append(i.Project?.Code).Append(';')
+                    .Append(i.InvoiceDate.ToString("yyyy-MM-dd")).Append(';')
+                    .Append(i.DueDate.Value.ToString("yyyy-MM-dd")).Append(';')
+                    .Append(i.Currency).Append(';')
+                    .Append(i.Subtotal.ToString(CultureInfo.InvariantCulture)).Append(';')
+                    .Append(i.TaxTotal.ToString(CultureInfo.InvariantCulture)).Append(';')
+                    .Append(i.Total.ToString(CultureInfo.InvariantCulture)).Append(';')
+                    .Append(StatusLabel(i.Status))
+                    .AppendLine();
+              }
+              return sb.ToString();
+          }
+
+  - file: src/Billing.Web/Pages/Invoices/Index.cshtml
+    before: ''
+    after: |2
+          <a href="/Invoices/Export?q=@Model.Q">Export</a>
+  added:
+  - src/Billing.Web/Pages/Invoices/Export.cshtml
+  - src/Billing.Web/Pages/Invoices/Export.cshtml.cs
+- date: '2024-02-14T14:31:00+02:00'
+  author: mikael
+  message: BILL-1035 Require a reason on credit notes
+  defect: BILL-1035
+  changes:
+  - file: src/Billing.Web/Services/CreditNoteService.cs
+    before: ''
+    after: |2
+              if (string.IsNullOrWhiteSpace(reason))
+              {
+                  throw new BillingException("Enter a reason for the credit note.");
+              }
+  - file: src/Billing.Web/Services/CreditNoteService.cs
+    before: '            Notes = "Credit for invoice " + original.Number + ". " + reason,'
+    after: '            Notes = "Credit for invoice " + original.Number + ". " + reason!.Trim(),'
+- date: '2024-02-29T11:23:00+02:00'
+  author: jonas
+  message: BILL-1038 Use the real last day of the month
+  defect: BILL-1038
+  changes:
+  - file: src/Billing.Web/Helpers/BillingHelper.cs
+    before: '        return new DateOnly(date.Year, date.Month, date.Month == 2 ? 28 : date.Month is 4 or 6 or 9 or 11 ? 30 : 31);'
+    after: '        return new DateOnly(date.Year, date.Month, DateTime.DaysInMonth(date.Year, date.Month));'
+- date: '2024-03-05T15:25:00+02:00'
+  author: jonas
+  message: BILL-1039 Default the invoice date to the period end
+  defect: BILL-1039
+  changes:
+  - file: src/Billing.Web/Pages/Proposals/Create.cshtml.cs
+    before: |2-
+              PeriodEnd = BillingHelper.EndOfMonth(_clock.Today);
+              InvoiceDate = _clock.Today;
+    after: |2-
+              PeriodEnd = BillingHelper.EndOfMonth(_clock.Today);
+              InvoiceDate = PeriodEnd;
+- date: '2024-03-06T14:26:00+02:00'
+  author: mikael
+  message: Use InvoiceService.IsLocked for the final-invoice checks
+  changes:
+  - file: src/Billing.Web/Services/AdjustmentService.cs
+    before: |2-
+              if (invoice.Status == InvoiceStatus.Final)
+              {
+                  throw new BillingException("This invoice is final. Changes are made with a credit note.");
+              }
+    after: |2-
+              if (InvoiceService.IsLocked(invoice))
+              {
+                  throw new BillingException("This invoice is final. Changes are made with a credit note.");
+              }
+  - file: src/Billing.Web/Pages/Proposals/Edit.cshtml.cs
+    before: '        Locked = Invoice.Status == InvoiceStatus.Final;'
+    after: '        Locked = InvoiceService.IsLocked(Invoice);'
+- date: '2024-03-08T13:03:00+02:00'
+  author: mikael
+  message: BILL-1041 Show a warning when the exchange rate is missing
+  defect: BILL-1041
+  changes:
+  - file: src/Billing.Web/Services/ProposalService.cs
+    before: '        var rate = _rates.GetRate(company.BaseCurrency, customer.Currency, invoiceDate) ?? 1m;'
+    after: '        var rate = _rates.GetRate(company.BaseCurrency, customer.Currency, invoiceDate);'
+  - file: src/Billing.Web/Pages/Proposals/Edit.cshtml
+    before: ''
+    after: |
+      @if (i.ExchangeRate == null)
+      {
+          <div class="banner warning" id="rate-missing">No exchange rate to @i.Currency for @i.InvoiceDate.ToString("d MMM yyyy") yet. Amounts are shown in EUR until the rate is entered.</div>
+      }
+  - file: src/Billing.Web/Pages/Proposals/Edit.cshtml
+    before: <dd id="proposal-rate">@i.ExchangeRate?.ToString("0.0000####")</dd>
+    after: <dd id="proposal-rate">@(i.ExchangeRate?.ToString("0.0000####") ?? "Missing")</dd>
+- date: '2024-03-12T11:37:00+02:00'
+  author: jonas
+  message: BILL-1042 Export documents without a due date
+  defect: BILL-1042
+  changes:
+  - file: src/Billing.Web/Helpers/BillingHelper.cs
+    before: '              .Append(i.DueDate.Value.ToString("yyyy-MM-dd")).Append('';'')'
+    after: '              .Append(i.DueDate?.ToString("yyyy-MM-dd")).Append('';'')'
+- date: '2024-03-14T14:06:00+02:00'
+  author: jonas
+  message: BILL-1044 Accept thousand separators in amounts
+  defect: BILL-1044
+  changes:
+  - file: src/Billing.Web/Helpers/BillingHelper.cs
+    before: '        var cleaned = text.Trim();'
+    after: '        var cleaned = text.Replace(" ", "").Replace(",", "");'
+- date: '2024-03-19T13:05:00+02:00'
+  author: tuomas
+  message: BILL-1046 Round half away from zero on invoice lines
+  defect: BILL-1046
+  changes:
+  - file: src/Billing.Web/Helpers/RoundingHelper.cs
+    before: '        return Math.Round(amount, MinorUnits(currency));'
+    after: '        return Math.Round(amount, MinorUnits(currency), MidpointRounding.AwayFromZero);'
+- date: '2024-03-22T14:18:00+02:00'
+  author: tuomas
+  message: BILL-1047 Full reverse charge wording on invoices
+  defect: BILL-1047
+  changes:
+  - file: src/Billing.Web/Services/TaxService.cs
+    before: '    public const string ReverseChargeNote = "Reverse charge.";'
+    after: '    public const string ReverseChargeNote = "Reverse charge: VAT to be accounted for by the recipient (Article 196, Directive 2006/112/EC).";'
+- date: '2024-03-27T15:54:00+02:00'
+  author: tuomas
+  message: BILL-1049 Ignore rates that start after the invoice date
+  defect: BILL-1049
+  changes:
+  - file: src/Billing.Web/Services/ExchangeRateService.cs
+    before: ''
+    after: |2
+                  .Where(r => r.EffectiveDate <= onDate)
+- date: '2024-04-02T16:06:00+03:00'
+  author: mikael
+  message: BILL-1050 Show billed quarter hours as the line quantity
+  defect: BILL-1050
+  changes:
+  - file: src/Billing.Web/Services/ProposalService.cs
+    before: '                    Quantity = e.Hours,'
+    after: '                    Quantity = hours,'
+- date: '2024-04-04T11:05:00+03:00'
+  author: mikael
+  message: BILL-1052 Date credit notes on the business date
+  defect: BILL-1052
+  changes:
+  - file: src/Billing.Web/Services/CreditNoteService.cs
+    before: '            InvoiceDate = original.InvoiceDate,'
+    after: '            InvoiceDate = _clock.Today,'
+- date: '2024-04-05T10:27:00+03:00'
+  author: jonas
+  message: BILL-1053 Only redirect to local pages after switching user
+  defect: BILL-1053
+  changes:
+  - file: src/Billing.Web/Pages/User/Switch.cshtml.cs
+    before: '        return Redirect(returnUrl ?? "/");'
+    after: '        return LocalRedirect(string.IsNullOrEmpty(returnUrl) || !Url.IsLocalUrl(returnUrl) ? "/" : returnUrl);'
+- date: '2024-04-08T15:20:00+03:00'
+  author: mikael
+  message: Release 4.2.0
+  changes:
+  - file: src/Billing.Web/Pages/Shared/_Layout.cshtml
+    before: Project Billing 4.1.0 &middot;
+    after: Project Billing 4.2.0 &middot;
+- date: '2024-04-12T14:22:00+03:00'
+  author: mikael
+  message: BILL-1055 Release expenses when deleting a proposal
+  defect: BILL-1055
+  changes:
+  - file: src/Billing.Web/Services/ProposalService.cs
+    before: ''
+    after: |2
+              foreach (var x in _db.Expenses.Where(x => x.InvoiceLineId != null && lineIds.Contains(x.InvoiceLineId.Value)))
+              {
+                  x.InvoiceLineId = null;
+              }
+- date: '2024-04-17T11:11:00+03:00'
+  author: jonas
+  message: BILL-1056 Validate the customer discount
+  defect: BILL-1056
+  changes:
+  - file: src/Billing.Web/Pages/Customers/Edit.cshtml.cs
+    before: ''
+    after: |2
+                  if (discount < 0 || discount > 50)
+                  {
+                      throw new BillingException("The discount must be between 0 and 50%.");
+                  }
+- date: '2024-04-23T12:25:00+03:00'
+  author: mikael
+  message: BILL-1058 Validate the PO number when finalising
+  defect: BILL-1058
+  changes:
+  - file: src/Billing.Web/Services/InvoiceService.cs
+    before: '        if (customer.PoRequired && string.IsNullOrEmpty(invoice.PoNumber))'
+    after: '        if (customer.PoRequired && !BillingHelper.IsValidPoNumber(invoice.PoNumber))'
+- date: '2024-04-26T16:02:00+03:00'
+  author: tuomas
+  message: BILL-1059 Replace the rate when saving the same date again
+  defect: BILL-1059
+  changes:
+  - file: src/Billing.Web/Services/ExchangeRateService.cs
+    before: |2-
+              _db.ExchangeRates.Add(new ExchangeRate
+              {
+                  FromCurrency = fromCurrency,
+                  ToCurrency = toCurrency,
+                  EffectiveDate = effective,
+                  Rate = rate,
+              });
+    after: |2-
+              var existing = _db.ExchangeRates.FirstOrDefault(r =>
+                  r.FromCurrency == fromCurrency && r.ToCurrency == toCurrency && r.EffectiveDate == effective);
+              if (existing != null)
+              {
+                  existing.Rate = rate;
+              }
+              else
+              {
+                  _db.ExchangeRates.Add(new ExchangeRate
+                  {
+                      FromCurrency = fromCurrency,
+                      ToCurrency = toCurrency,
+                      EffectiveDate = effective,
+                      Rate = rate,
+                  });
+              }
+- date: '2024-05-07T15:08:00+03:00'
+  author: mikael
+  message: BILL-1061 Do not defer small invoices on closing projects
+  defect: BILL-1061
+  changes:
+  - file: src/Billing.Web/Services/ProposalService.cs
+    before: |2-
+              // Small invoices cost more to process than they are worth, so they wait for the next run.
+              if (invoice.BaseSubtotal < BillingHelper.MinimumInvoiceAmount)
+    after: |2-
+              // Small invoices cost more to process than they are worth, so they wait for the next run,
+              // unless the project is closing and this is the last chance to bill.
+              if (invoice.BaseSubtotal < BillingHelper.MinimumInvoiceAmount && project.Status != ProjectStatus.Closing)
+- date: '2024-05-08T14:14:00+03:00'
+  author: jonas
+  message: BILL-1062 Keep amounts on one line
+  defect: BILL-1062
+  changes:
+  - file: src/Billing.Web/wwwroot/css/site.css
+    before: '.grid .num { text-align: right; }'
+    after: '.grid .num { text-align: right; white-space: nowrap; }'
+- date: '2024-05-14T14:18:00+03:00'
+  author: mikael
+  message: BILL-1063 Convert currency in decimal, not double
+  defect: BILL-1063
+  changes:
+  - file: src/Billing.Web/Helpers/RoundingHelper.cs
+    before: '        return (decimal)((double)sourceAmount * (double)rate);'
+    after: '        return sourceAmount * rate;'
+- date: '2024-05-17T16:19:00+03:00'
+  author: mikael
+  message: BILL-1064 Leave expenses after the period end out
+  defect: BILL-1064
+  changes:
+  - file: src/Billing.Web/Services/ProposalService.cs
+    before: '                        && x.InvoiceLineId == null)'
+    after: |2-
+                              && x.InvoiceLineId == null
+                              && x.Date <= periodEnd)
+- date: '2024-05-22T12:45:00+03:00'
+  author: tuomas
+  message: BILL-1066 Default payment terms of 30 days
+  defect: BILL-1066
+  changes:
+  - file: src/Billing.Web/Helpers/BillingHelper.cs
+    before: '        return invoiceDate.AddDays(customer.PaymentTermsDays);'
+    after: |2-
+              var days = customer.PaymentTermsDays > 0 ? customer.PaymentTermsDays : DefaultPaymentTerms;
+              return invoiceDate.AddDays(days);
+  - file: src/Billing.Web/Helpers/BillingHelper.cs
+    before: '    public const decimal MinimumInvoiceAmount = 50m;'
+    after: |2-
+          public const decimal MinimumInvoiceAmount = 50m;
+          public const int DefaultPaymentTerms = 30;
+- date: '2024-05-28T13:06:00+03:00'
+  author: mikael
+  message: BILL-1068 Do not finalise deferred proposals
+  defect: BILL-1068
+  changes:
+  - file: src/Billing.Web/Services/InvoiceService.cs
+    before: ''
+    after: |2
+              if (invoice.Status == InvoiceStatus.Deferred)
+              {
+                  throw new BillingException("A deferred proposal cannot be finalised. Its entries are billed in the next run.");
+              }
+- date: '2024-05-30T11:06:00+03:00'
+  author: jonas
+  message: BILL-1069 Use the business date when completing a milestone
+  defect: BILL-1069
+  changes:
+  - file: src/Billing.Web/Pages/Projects/Details.cshtml.cs
+    before: '        milestone.CompletedOn = DateOnly.FromDateTime(DateTime.Today);'
+    after: '        milestone.CompletedOn = _clock.Today;'
+- date: '2024-06-05T14:30:00+03:00'
+  author: mikael
+  message: BILL-1071 Reject negative credit amounts
+  defect: BILL-1071
+  changes:
+  - file: src/Billing.Web/Services/CreditNoteService.cs
+    before: ''
+    after: |2
+                  if (credit < 0)
+                  {
+                      throw new BillingException("Enter credit amounts as positive numbers.");
+                  }
+- date: '2024-06-12T14:30:00+03:00'
+  author: priya
+  message: |-
+    Add Playwright regression suite
+
+    Page objects for proposals, invoices, credit notes and customers, and specs for the main billing
+    flows. Runs against the seeded test environment (October 2026 period).
+  added:
+  - tests/e2e/package-lock.json
+  - tests/e2e/package.json
+  - tests/e2e/playwright.config.ts
+  - tests/e2e/tsconfig.json
+  - tests/e2e/fixtures/billing.ts
+  - tests/e2e/fixtures/testData.ts
+  - tests/e2e/pages/CreditNotePage.ts
+  - tests/e2e/pages/CustomerPage.ts
+  - tests/e2e/pages/InvoicePage.ts
+  - tests/e2e/pages/ProposalPage.ts
+  - tests/e2e/specs/invoicing/credit-notes.spec.ts
+  - tests/e2e/specs/invoicing/locked.spec.ts
+  - tests/e2e/specs/invoicing/numbering.spec.ts
+  - tests/e2e/specs/pricing/discount.spec.ts
+  - tests/e2e/specs/pricing/expenses.spec.ts
+  - tests/e2e/specs/pricing/proposal-totals.spec.ts
+  - tests/e2e/specs/pricing/rates.spec.ts
+  - tests/e2e/specs/pricing/tax.spec.ts
+  - tests/e2e/specs/proposals/holds.spec.ts
+  - tests/e2e/specs/proposals/milestones.spec.ts
+- date: '2024-06-19T14:51:00+03:00'
+  author: priya
+  message: BILL-1073 Count credit notes as positive when working out what is credited
+  defect: BILL-1073
+  changes:
+  - file: src/Billing.Web/Services/InvoiceService.cs
+    before: '            .Sum(c => c.Total);'
+    after: '            .Sum(c => Math.Abs(c.Total));'
+  - file: tests/e2e/specs/invoicing/credit-notes.spec.ts
+    before: ''
+    after: |2+
+        await expect(creditNote.remaining).toHaveText('1,857.40 EUR');
+
+- date: '2024-06-24T15:43:00+03:00'
+  author: mikael
+  message: BILL-1074 Bill completed milestones only
+  defect: BILL-1074
+  changes:
+  - file: src/Billing.Web/Services/ProposalService.cs
+    before: '                if (!m.IsComplete && m.PlannedDate > periodEnd)'
+    after: '                if (!m.IsComplete)'
+- date: '2024-06-26T13:50:00+03:00'
+  author: priya
+  message: BILL-1076 Hide proposal actions on final invoices
+  defect: BILL-1076
+  changes:
+  - file: src/Billing.Web/Pages/Proposals/Edit.cshtml
+    before: |-
+      <div class="actions">
+          <form method="post" asp-page-handler="Finalise">
+              <button type="submit" class="primary" id="finalise">Finalise invoice</button>
+          </form>
+          <form method="post" asp-page-handler="Delete" onsubmit="return confirm('Delete this proposal? Its entries go back to unbilled.');">
+              <button type="submit" class="danger" id="delete-proposal">Delete proposal</button>
+          </form>
+      </div>
+    after: |-
+      @if (!locked)
+      {
+          <div class="actions">
+              <form method="post" asp-page-handler="Finalise">
+                  <button type="submit" class="primary" id="finalise">Finalise invoice</button>
+              </form>
+              <form method="post" asp-page-handler="Delete" onsubmit="return confirm('Delete this proposal? Its entries go back to unbilled.');">
+                  <button type="submit" class="danger" id="delete-proposal">Delete proposal</button>
+              </form>
+          </div>
+      }
+  - file: tests/e2e/specs/invoicing/locked.spec.ts
+    before: ''
+    after: |2
+        await expect(page.locator('#finalise')).toHaveCount(0);
+- date: '2024-06-28T12:57:00+03:00'
+  author: tuomas
+  message: BILL-1077 Apply the agreement discount to time only
+  defect: BILL-1077
+  changes:
+  - file: src/Billing.Web/Helpers/BillingHelper.cs
+    before: '    /// <summary>Customer agreement discount.</summary>'
+    after: '    /// <summary>Customer agreement discount. Applies to time only, never to expenses or milestones.</summary>'
+  - file: src/Billing.Web/Helpers/BillingHelper.cs
+    before: '        if (discountPercent <= 0)'
+    after: '        if (kind != LineKind.Time || discountPercent <= 0)'
+  - file: tests/e2e/specs/pricing/discount.spec.ts
+    before: ''
+    after: |2
+        await expect(proposal.amountOf(3)).toHaveText('120.00');
+- date: '2024-07-01T15:10:00+03:00'
+  author: mikael
+  message: Release 4.3.0
+  changes:
+  - file: src/Billing.Web/Pages/Shared/_Layout.cshtml
+    before: Project Billing 4.2.0 &middot;
+    after: Project Billing 4.3.0 &middot;
+- date: '2024-07-03T11:54:00+03:00'
+  author: mikael
+  message: BILL-1079 Number credit notes from their own sequence
+  defect: BILL-1079
+  changes:
+  - file: src/Billing.Web/Services/CreditNoteService.cs
+    before: '        note.Number = _numbering.Next(InvoiceKind.Invoice);'
+    after: '        note.Number = _numbering.Next(InvoiceKind.CreditNote);'
+  - file: tests/e2e/specs/invoicing/numbering.spec.ts
+    before: async ({ proposal, invoice, page })
+    after: async ({ proposal, invoice, creditNote, page })
+  - file: tests/e2e/specs/invoicing/numbering.spec.ts
+    before: ''
+    after: |2
+
+        await invoice.startCreditNote();
+        await creditNote.credit({ 1: '100.00' }, 'Goodwill');
+        await invoice.waitUntilPosted();
+        await expect(invoice.number).toHaveText(/^CN-\d{6}$/);
+- date: '2024-07-05T16:53:00+03:00'
+  author: tuomas
+  message: BILL-1080 Reverse charge needs a VAT number
+  defect: BILL-1080
+  changes:
+  - file: src/Billing.Web/Helpers/BillingHelper.cs
+    before: ''
+    after: |2
+              if (string.IsNullOrWhiteSpace(customer.VatNumber))
+              {
+                  return false;
+              }
+  - file: tests/e2e/specs/pricing/tax.spec.ts
+    before: ''
+    after: |2
+
+        // Lumo is also in Germany but has no VAT number, so Finnish VAT applies.
+        await proposal.create(projects.lumo, PERIOD_END);
+        await expect(proposal.line(1).locator('.line-tax-code')).toHaveText('S 25.5%');
+        await expect(proposal.tax).toHaveText('91.80');
+- date: '2024-07-08T09:34:00+03:00'
+  author: priya
+  message: Reset the Halden discount at the end of the discount test
+  changes:
+  - file: tests/e2e/specs/pricing/discount.spec.ts
+    before: ''
+    after: |2
+
+        await customer.open(customers.halden);
+        await customer.setDiscount('0');
+- date: '2024-07-10T14:25:00+03:00'
+  author: jonas
+  message: BILL-1082 Line up proposal totals with the amount column
+  defect: BILL-1082
+  changes:
+  - file: src/Billing.Web/Pages/Proposals/Edit.cshtml
+    before: <tr><td colspan="6">Subtotal</td>
+    after: <tr><td colspan="7">Subtotal</td>
+  - file: src/Billing.Web/Pages/Proposals/Edit.cshtml
+    before: <tr><td colspan="6">Tax</td>
+    after: <tr><td colspan="7">Tax</td>
+  - file: src/Billing.Web/Pages/Proposals/Edit.cshtml
+    before: <tr class="total"><td colspan="6">Total</td>
+    after: <tr class="total"><td colspan="7">Total</td>
+- date: '2024-07-12T11:08:00+03:00'
+  author: mikael
+  message: BILL-1084 Give invoice numbers at finalisation only
+  defect: BILL-1084
+  changes:
+  - file: src/Billing.Web/Services/ProposalService.cs
+    before: |2-
+                  CreatedAt = _clock.Now,
+              };
+              invoice.Number = "INV-" + (company.NextInvoiceNumber++).ToString("000000");
+    after: |2-
+                  CreatedAt = _clock.Now,
+              };
+  - file: src/Billing.Web/Services/InvoiceService.cs
+    before: '        invoice.Number ??= _numbering.Next(InvoiceKind.Invoice);'
+    after: '        invoice.Number = _numbering.Next(InvoiceKind.Invoice);'
+  - file: src/Billing.Web/Pages/Proposals/Edit.cshtml
+    before: <dd id="proposal-number">@i.Number</dd>
+    after: <dd id="proposal-number">@(i.Number ?? "Assigned when finalised")</dd>
+  - file: tests/e2e/specs/invoicing/numbering.spec.ts
+    before: ''
+    after: |2
+        await expect(proposal.number).toHaveText('Assigned when finalised');
+- date: '2024-07-17T13:40:00+03:00'
+  author: mikael
+  message: BILL-1085 Stop proposals for projects on hold
+  defect: BILL-1085
+  changes:
+  - file: src/Billing.Web/Services/ProposalService.cs
+    before: ''
+    after: |2
+              if (project.IsOnHold)
+              {
+                  throw new BillingException(("Billing hold: project " + project.Code + " is on hold. " + (project.HoldReason ?? "")).Trim());
+              }
+  - file: tests/e2e/specs/proposals/holds.spec.ts
+    before: ''
+    after: |2
+
+        await proposal.create(projects.brightwaterStudy, PERIOD_END);
+        await expect(proposal.error).toContainText('Billing hold: project P-1011 is on hold.');
+- date: '2024-07-19T14:11:00+03:00'
+  author: mikael
+  message: BILL-1087 Stop write-downs below zero
+  defect: BILL-1087
+  changes:
+  - file: src/Billing.Web/Services/AdjustmentService.cs
+    before: ''
+    after: |2
+              if (adjustment < 0 && line.SourceAmount + adjustment < 0)
+              {
+                  throw new BillingException("A write-down cannot take a line below zero.");
+              }
+- date: '2024-07-23T11:02:00+03:00'
+  author: tuomas
+  message: BILL-1088 Round credit note amounts like invoice lines
+  defect: BILL-1088
+  changes:
+  - file: src/Billing.Web/Helpers/RoundingHelper.cs
+    before: '    /// <summary>Credit note lines are negative.</summary>'
+    after: '    /// <summary>Credit note lines are negative. They round the same way as invoice lines.</summary>'
+  - file: src/Billing.Web/Helpers/RoundingHelper.cs
+    before: '        return -Math.Truncate(Math.Abs(amount) * 100m) / 100m;'
+    after: '        return -RoundMoney(Math.Abs(amount), currency);'
+- date: '2024-07-31T12:13:00+03:00'
+  author: priya
+  message: BILL-1090 Put the tax note on the proposal
+  defect: BILL-1090
+  changes:
+  - file: src/Billing.Web/Services/ProposalService.cs
+    before: ''
+    after: |2
+              if (tax.Note != null)
+              {
+                  invoice.Notes = tax.Note;
+              }
+  - file: tests/e2e/specs/pricing/tax.spec.ts
+    before: ''
+    after: |2
+        await expect(proposal.note).toContainText('Reverse charge');
+- date: '2024-08-07T16:03:00+03:00'
+  author: mikael
+  message: BILL-1092 Count earlier credit notes against the invoice
+  defect: BILL-1092
+  changes:
+  - file: src/Billing.Web/Services/CreditNoteService.cs
+    before: '        return original.Total;'
+    after: '        return original.Total - _invoices.CreditedSoFar(original.Id);'
+  - file: tests/e2e/specs/invoicing/credit-notes.spec.ts
+    before: ''
+    after: |2
+        // Crediting both lines again would credit line 2 twice.
+        await creditNote.credit({ 1: '1480.00', 2: '900.00' }, 'Workshop cancelled');
+        await expect(creditNote.error).toContainText('is more than the 1,857.40 EUR still open on invoice INV-000291');
+
+        await creditNote.clear(2);
+  - file: tests/e2e/pages/CreditNotePage.ts
+    before: ''
+    after: |2+
+        get error(): Locator {
+          return this.page.locator('#error-message');
+        }
+
+  - file: tests/e2e/pages/CreditNotePage.ts
+    before: ''
+    after: |2
+
+        async clear(sequence: number) {
+          await this.page.getByLabel(`Credit for line ${sequence}`).fill('');
+        }
+- date: '2024-08-12T12:48:00+03:00'
+  author: mikael
+  message: BILL-1093 Count final invoices and credit notes against the limit
+  defect: BILL-1093
+  changes:
+  - file: src/Billing.Web/Services/ProposalService.cs
+    before: '                .Where(i => i.ProjectId == projectId && i.Kind == InvoiceKind.Invoice && i.Status != InvoiceStatus.Cancelled)'
+    after: '                .Where(i => i.ProjectId == projectId && i.Status == InvoiceStatus.Final)'
+  - file: src/Billing.Web/Services/ProposalService.cs
+    before: '                billedToDate += f.BaseSubtotal;'
+    after: |2-
+                      if (f.Kind == InvoiceKind.Invoice)
+                      {
+                          billedToDate += f.BaseSubtotal;
+                      }
+                      else
+                      {
+                          billedToDate -= Math.Abs(f.BaseSubtotal);
+                      }
+- date: '2024-08-15T13:47:00+03:00'
+  author: jonas
+  message: BILL-1095 Tell the user how many entries the limit held back
+  defect: BILL-1095
+  changes:
+  - file: src/Billing.Web/Services/ProposalService.cs
+    before: ''
+    after: |2+
+              if (held > 0)
+              {
+                  invoice.StatusReason = held + (held == 1 ? " entry was" : " entries were") + " held back: the not-to-exceed limit of " +
+                      BillingHelper.FormatMoney(project.NotToExceed!.Value, company.BaseCurrency) + " is reached.";
+              }
+
+  - file: src/Billing.Web/Pages/Proposals/Edit.cshtml
+    before: ''
+    after: |
+      @if (!string.IsNullOrEmpty(i.StatusReason))
+      {
+          <div class="banner warning" id="status-reason">@i.StatusReason</div>
+      }
+- date: '2024-08-23T14:57:00+03:00'
+  author: mikael
+  message: BILL-1098 Treat cancelled invoices as locked
+  defect: BILL-1098
+  changes:
+  - file: src/Billing.Web/Services/InvoiceService.cs
+    before: '        return invoice.Status == InvoiceStatus.Final;'
+    after: '        return invoice.Status == InvoiceStatus.Final || invoice.Status == InvoiceStatus.Cancelled;'
+- date: '2024-08-29T13:18:00+03:00'
+  author: priya
+  message: BILL-1100 Include time on the period end date
+  defect: BILL-1100
+  changes:
+  - file: src/Billing.Web/Services/ProposalService.cs
+    before: '                            && t.Date < periodEnd)'
+    after: '                            && t.Date <= periodEnd)'
+  - file: tests/e2e/specs/pricing/proposal-totals.spec.ts
+    before: ''
+    after: |2
+        await expect(proposal.line(3)).toContainText('2026-10-31');
+- date: '2024-09-04T11:58:00+03:00'
+  author: tuomas
+  message: BILL-1102 Show tax rates with decimals
+  defect: BILL-1102
+  changes:
+  - file: src/Billing.Web/Pages/Proposals/Edit.cshtml
+    before: l.TaxRate.ToString("0") + "%"
+    after: l.TaxRate.ToString("0.##") + "%"
+  - file: src/Billing.Web/Pages/Invoices/Details.cshtml
+    before: l.TaxRate.ToString("0") + "%"
+    after: l.TaxRate.ToString("0.##") + "%"
+  - file: src/Billing.Web/Pages/CreditNotes/Create.cshtml
+    before: l.TaxRate.ToString("0") + "%"
+    after: l.TaxRate.ToString("0.##") + "%"
+- date: '2024-09-06T12:14:00+03:00'
+  author: tuomas
+  message: BILL-1103 Credit tax at the rate on the original line
+  defect: BILL-1103
+  changes:
+  - file: src/Billing.Web/Services/CreditNoteService.cs
+    before: |2-
+                      TaxRate = _db.TaxCodes.Find(line.TaxCode)?.Rate ?? line.TaxRate,
+                      TaxAmount = RoundingHelper.CreditAmount(credit * (_db.TaxCodes.Find(line.TaxCode)?.Rate ?? line.TaxRate) / 100m, original.Currency),
+    after: |2-
+                      TaxRate = line.TaxRate,
+                      TaxAmount = RoundingHelper.CreditAmount(credit * line.TaxRate / 100m, original.Currency),
+- date: '2024-09-12T15:25:00+03:00'
+  author: mikael
+  message: BILL-1105 Fall back to the role's standard rate
+  defect: BILL-1105
+  changes:
+  - file: src/Billing.Web/Helpers/BillingHelper.cs
+    before: '    /// The hourly rate for a role. A rate agreed with the customer wins over the project''s rate card.'
+    after: |2-
+          /// The hourly rate for a role. A rate agreed with the customer wins over the project's rate card,
+          /// and the role's standard rate is used when neither has one.
+  - file: src/Billing.Web/Helpers/BillingHelper.cs
+    before: ''
+    after: |2+
+              var role = db.Roles.Find(roleCode);
+              if (role != null)
+              {
+                  return role.DefaultRate;
+              }
+
+  - file: tests/e2e/specs/pricing/rates.spec.ts
+    before: ''
+    after: |2
+        await expect(proposal.unitPriceOf(3)).toHaveText('85.00'); // junior: standard rate
+- date: '2024-09-18T13:23:00+03:00'
+  author: priya
+  message: BILL-1107 Link credit notes to the invoice they credit
+  defect: BILL-1107
+  changes:
+  - file: src/Billing.Web/Pages/Invoices/Details.cshtml.cs
+    before: ''
+    after: |2
+          public Invoice? Original { get; set; }
+  - file: src/Billing.Web/Pages/Invoices/Details.cshtml.cs
+    before: ''
+    after: |2
+              if (Invoice.OriginalInvoiceId != null)
+              {
+                  Original = _db.Invoices.AsNoTracking().FirstOrDefault(o => o.Id == Invoice.OriginalInvoiceId);
+              }
+  - file: src/Billing.Web/Pages/Invoices/Details.cshtml
+    before: ''
+    after: |2
+          @if (Model.Original != null)
+          {
+              <dt>Credits invoice</dt><dd id="original-invoice"><a href="/Invoices/Details/@Model.Original.Id">@Model.Original.Number</a></dd>
+          }
+  - file: tests/e2e/specs/invoicing/credit-notes.spec.ts
+    before: ''
+    after: |2
+        await expect(page.locator('#original-invoice')).toHaveText(invoices.lumoSeptember);
+- date: '2024-09-20T15:20:00+03:00'
+  author: tuomas
+  message: BILL-1108 Finalise with the rate for the invoice date
+  defect: BILL-1108
+  changes:
+  - file: src/Billing.Web/Services/InvoiceService.cs
+    before: '        var rate = _rates.GetRate(company.BaseCurrency, invoice.Currency, _clock.Today);'
+    after: '        var rate = _rates.GetRate(company.BaseCurrency, invoice.Currency, invoice.InvoiceDate);'
+- date: '2024-09-26T11:09:00+03:00'
+  author: mikael
+  message: BILL-1110 Check expenses against the not-to-exceed limit
+  defect: BILL-1110
+  changes:
+  - file: src/Billing.Web/Services/ProposalService.cs
+    before: ''
+    after: |2+
+                  if (project.NotToExceed.HasValue && billedToDate + running + amount > project.NotToExceed.Value)
+                  {
+                      held++;
+                      continue;
+                  }
+
+- date: '2024-10-02T13:49:00+03:00'
+  author: jonas
+  message: BILL-1112 Show the currency on the proposal total
+  defect: BILL-1112
+  changes:
+  - file: src/Billing.Web/Pages/Proposals/Edit.cshtml
+    before: id="proposal-total">@BillingHelper.FormatAmount(i.Total
+    after: id="proposal-total">@BillingHelper.FormatMoney(i.Total
+  - file: tests/e2e/specs/pricing/proposal-totals.spec.ts
+    before: ''
+    after: |2
+        await expect(proposal.total).toHaveText('2,447.25 EUR');
+- date: '2024-10-04T13:41:00+03:00'
+  author: mikael
+  message: BILL-1113 Do not finalise without an exchange rate
+  defect: BILL-1113
+  changes:
+  - file: src/Billing.Web/Services/InvoiceService.cs
+    before: ''
+    after: |2
+              if (rate == null)
+              {
+                  throw new BillingException("No exchange rate from " + company.BaseCurrency + " to " + invoice.Currency +
+                      " on or before " + invoice.InvoiceDate.ToString("d MMM yyyy") + ". Add the rate before finalising.");
+              }
+- date: '2024-10-07T15:35:00+03:00'
+  author: mikael
+  message: Release 4.4.0
+  changes:
+  - file: src/Billing.Web/Pages/Shared/_Layout.cshtml
+    before: Project Billing 4.3.0 &middot;
+    after: Project Billing 4.4.0 &middot;
+- date: '2024-10-10T13:17:00+03:00'
+  author: priya
+  message: BILL-1115 Hide adjustments on final invoices
+  defect: BILL-1115
+  changes:
+  - file: src/Billing.Web/Pages/Proposals/Edit.cshtml
+    before: <th class="num">Tax amount</th><th></th>
+    after: <th class="num">Tax amount</th>@if (!locked){<th></th>}
+  - file: src/Billing.Web/Pages/Proposals/Edit.cshtml
+    before: |2-
+                  <td>
+                      <form method="post" asp-page-handler="Adjust" asp-route-lineId="@l.Id" class="adjust">
+                          <input name="Adjustment" aria-label="Adjustment for line @l.Sequence" placeholder="+/- EUR" size="8" />
+                          <input name="Reason" aria-label="Reason for line @l.Sequence" placeholder="Reason" size="18" />
+                          <button type="submit">Adjust</button>
+                      </form>
+                  </td>
+    after: |2-
+                  @if (!locked)
+                  {
+                      <td>
+                          <form method="post" asp-page-handler="Adjust" asp-route-lineId="@l.Id" class="adjust">
+                              <input name="Adjustment" aria-label="Adjustment for line @l.Sequence" placeholder="+/- EUR" size="8" />
+                              <input name="Reason" aria-label="Reason for line @l.Sequence" placeholder="Reason" size="18" />
+                              <button type="submit">Adjust</button>
+                          </form>
+                      </td>
+                  }
+  - file: tests/e2e/specs/invoicing/locked.spec.ts
+    before: ''
+    after: |2
+        await expect(page.getByRole('button', { name: 'Adjust' })).toHaveCount(0);
+- date: '2024-10-15T13:02:00+03:00'
+  author: mikael
+  message: BILL-1116 Hold back only the entries that go over the limit
+  defect: BILL-1116
+  changes:
+  - file: src/Billing.Web/Services/ProposalService.cs
+    before: |2-
+                      if (project.NotToExceed.HasValue && billedToDate + running + net > project.NotToExceed.Value)
+                      {
+                          held++;
+                          break;
+                      }
+    after: |2-
+                      if (project.NotToExceed.HasValue && billedToDate + running + net > project.NotToExceed.Value)
+                      {
+                          held++;
+                          continue;
+                      }
+- date: '2024-10-30T16:51:00+02:00'
+  author: mikael
+  message: BILL-1119 Limit each credit line to the invoice line
+  defect: BILL-1119
+  changes:
+  - file: src/Billing.Web/Services/CreditNoteService.cs
+    before: ''
+    after: |2
+                  if (credit > line.Amount)
+                  {
+                      throw new BillingException("Line " + line.Sequence + " cannot be credited by more than its amount of " +
+                          BillingHelper.FormatMoney(line.Amount, original.Currency) + ".");
+                  }
+- date: '2024-11-05T13:09:00+02:00'
+  author: mikael
+  message: BILL-1121 Round each converted line, not the total
+  defect: BILL-1121
+  changes:
+  - file: src/Billing.Web/Helpers/RoundingHelper.cs
+    before: /// Money rounding for invoices. Every amount on an invoice goes through here.
+    after: |-
+      /// Money rounding for invoices. Every amount on an invoice goes through here.
+      /// Amounts are converted and rounded line by line, and totals are the sum of the rounded lines,
+      /// so that the printed lines always add up to the printed total.
+  - file: src/Billing.Web/Helpers/RoundingHelper.cs
+    before: '    /// <summary>Converts an amount from the company currency.</summary>'
+    after: '    /// <summary>Converts one line from the company currency and rounds it in the invoice currency.</summary>'
+  - file: src/Billing.Web/Helpers/RoundingHelper.cs
+    before: '        return sourceAmount * rate;'
+    after: '        return RoundMoney(sourceAmount * rate, currency);'
+  - file: src/Billing.Web/Helpers/RoundingHelper.cs
+    before: |2-
+          /// <summary>The invoice total is rounded once, after adding up the lines.</summary>
+          public static decimal SumLines(IEnumerable<decimal> roundedAmounts)
+          {
+              return Math.Round(roundedAmounts.Sum(), 2);
+    after: |2-
+          public static decimal SumLines(IEnumerable<decimal> roundedAmounts)
+          {
+              return roundedAmounts.Sum();
+- date: '2024-11-13T16:46:00+02:00'
+  author: mikael
+  message: BILL-1123 Round hours up to the next quarter
+  defect: BILL-1123
+  changes:
+  - file: src/Billing.Web/Services/ProposalService.cs
+    before: '                var hours = Math.Round(e.Hours * 4m, MidpointRounding.AwayFromZero) / 4m;'
+    after: '                var hours = RoundingHelper.RoundHours(e.Hours);'
+- date: '2024-11-20T15:04:00+02:00'
+  author: tuomas
+  message: BILL-1125 Check the credit including tax
+  defect: BILL-1125
+  changes:
+  - file: src/Billing.Web/Services/CreditNoteService.cs
+    before: '        if (Math.Abs(note.Subtotal) > remaining)'
+    after: '        if (Math.Abs(note.Total) > remaining)'
+- date: '2024-12-09T15:47:00+02:00'
+  author: mikael
+  message: BILL-1131 One open proposal per project
+  defect: BILL-1131
+  changes:
+  - file: src/Billing.Web/Services/ProposalService.cs
+    before: ''
+    after: |2+
+              var open = _db.Invoices.Any(i => i.ProjectId == projectId && i.Kind == InvoiceKind.Invoice &&
+                  i.Status == InvoiceStatus.Proposal);
+              if (open)
+              {
+                  throw new BillingException("Project " + project.Code + " already has an open proposal. Finalise or delete it first.");
+              }
+
+- date: '2024-12-12T12:07:00+02:00'
+  author: jonas
+  message: BILL-1133 Ask for the effective date on the rate page
+  defect: BILL-1133
+  changes:
+  - file: src/Billing.Web/Pages/Admin/ExchangeRates.cshtml.cs
+    before: ''
+    after: |2
+                  if (effectiveDate == null)
+                  {
+                      throw new BillingException("Enter the date the rate is effective from.");
+                  }
+- date: '2025-01-09T15:48:00+02:00'
+  author: mikael
+  message: BILL-1135 Write-ups need a reason too
+  defect: BILL-1135
+  changes:
+  - file: src/Billing.Web/Services/AdjustmentService.cs
+    before: |2-
+              if (adjustment < 0 && string.IsNullOrWhiteSpace(reason))
+              {
+                  throw new BillingException("Enter a reason for the write-down.");
+              }
+    after: |2-
+              if (adjustment != 0 && string.IsNullOrWhiteSpace(reason))
+              {
+                  throw new BillingException(adjustment > 0
+                      ? "Enter a reason for the write-up."
+                      : "Enter a reason for the write-down.");
+              }
+  - file: src/Billing.Web/Services/AdjustmentService.cs
+    before: '        line.AdjustmentReason = string.IsNullOrWhiteSpace(reason) ? null : reason.Trim();'
+    after: '        line.AdjustmentReason = adjustment == 0 ? null : reason!.Trim();'
+- date: '2025-01-13T14:14:00+02:00'
+  author: tuomas
+  message: BILL-1136 Cap percentage of completion at 100%
+  defect: BILL-1136
+  changes:
+  - file: src/Billing.Web/Helpers/BillingHelper.cs
+    before: '        var percent = costToDate / estimatedCost;'
+    after: '        var percent = Math.Min(1m, costToDate / estimatedCost);'
+- date: '2025-01-13T16:10:00+02:00'
+  author: mikael
+  message: Release 4.5.0
+  changes:
+  - file: src/Billing.Web/Pages/Shared/_Layout.cshtml
+    before: Project Billing 4.4.0 &middot;
+    after: Project Billing 4.5.0 &middot;
+- date: '2025-01-23T14:27:00+02:00'
+  author: mikael
+  message: BILL-1140 Store PO numbers in upper case
+  defect: BILL-1140
+  changes:
+  - file: src/Billing.Web/Helpers/BillingHelper.cs
+    before: '        return po.Trim();'
+    after: '        return (po ?? "").Trim().ToUpperInvariant();'
+- date: '2025-01-27T11:53:00+02:00'
+  author: mikael
+  message: BILL-1141 Include adjustments in the company-currency subtotal
+  defect: BILL-1141
+  changes:
+  - file: src/Billing.Web/Services/ProposalService.cs
+    before: '        invoice.BaseSubtotal = invoice.Lines.Sum(l => l.SourceAmount);'
+    after: '        invoice.BaseSubtotal = invoice.Lines.Sum(l => l.SourceAmount + l.Adjustment);'
+- date: '2025-02-05T12:23:00+02:00'
+  author: tuomas
+  message: BILL-1143 Recalculate lines when finalising
+  defect: BILL-1143
+  changes:
+  - file: src/Billing.Web/Services/InvoiceService.cs
+    before: |2
+              invoice.ExchangeRate = rate;
+    after: |2
+              invoice.ExchangeRate = rate;
+              ProposalService.Recalculate(invoice);
+- date: '2025-02-14T10:43:00+02:00'
+  author: jonas
+  message: Show agreed rates on the customer page
+  changes:
+  - file: src/Billing.Web/Pages/Customers/Edit.cshtml
+    before: </form>
+    after: |-
+      </form>
+      @if (Model.Customer.Rates.Count > 0)
+      {
+          <h2>Agreed rates</h2>
+          <table class="grid">
+              <thead><tr><th>Role</th><th class="num">Rate (EUR)</th></tr></thead>
+              <tbody>
+              @foreach (var r in Model.Customer.Rates.OrderBy(r => r.RoleCode))
+              {
+                  <tr><td>@r.RoleCode</td><td class="num">@r.Rate.ToString("0.00")</td></tr>
+              }
+              </tbody>
+          </table>
+      }
+  - file: src/Billing.Web/Pages/Customers/Edit.cshtml.cs
+    before: |2-
+          public IActionResult OnGet(int id)
+          {
+              Customer = _db.Customers.FirstOrDefault(c => c.Id == id)!;
+    after: |2-
+          public IActionResult OnGet(int id)
+          {
+              Customer = _db.Customers.Include(c => c.Rates).FirstOrDefault(c => c.Id == id)!;
+  - file: src/Billing.Web/Pages/Customers/Edit.cshtml.cs
+    before: |2-
+          {
+              Customer = _db.Customers.FirstOrDefault(c => c.Id == id)!;
+              if (Customer == null)
+    after: |2-
+          {
+              Customer = _db.Customers.Include(c => c.Rates).FirstOrDefault(c => c.Id == id)!;
+              if (Customer == null)
+  - file: src/Billing.Web/Pages/Customers/Edit.cshtml.cs
+    before: |-
+      using Microsoft.AspNetCore.Mvc.RazorPages;
+
+      namespace
+    after: |-
+      using Microsoft.AspNetCore.Mvc.RazorPages;
+      using Microsoft.EntityFrameworkCore;
+
+      namespace
+- date: '2025-02-17T13:33:00+02:00'
+  author: mikael
+  message: BILL-1146 Do not change the PO on final invoices
+  defect: BILL-1146
+  changes:
+  - file: src/Billing.Web/Services/ProposalService.cs
+    before: |2-
+              if (invoice == null)
+              {
+                  throw new BillingException("Proposal not found.");
+              }
+              invoice.PoNumber
+    after: |2-
+              if (invoice == null || InvoiceService.IsLocked(invoice))
+              {
+                  throw new BillingException("This invoice is final. Changes are made with a credit note.");
+              }
+              invoice.PoNumber
+- date: '2025-03-07T15:42:00+02:00'
+  author: mikael
+  message: BILL-1151 Refuse credit notes without amounts
+  defect: BILL-1151
+  changes:
+  - file: src/Billing.Web/Services/CreditNoteService.cs
+    before: ''
+    after: |2+
+              if (note.Lines.Count == 0)
+              {
+                  throw new BillingException("Enter an amount to credit on at least one line.");
+              }
+
+- date: '2025-03-13T12:25:00+02:00'
+  author: jonas
+  message: BILL-1153 No unbilled hours for fixed-price projects
+  defect: BILL-1153
+  changes:
+  - file: src/Billing.Web/Pages/Projects/Index.cshtml.cs
+    before: '            var hours = unbilled.GetValueOrDefault(p.Id);'
+    after: '            var hours = p.BillingType == BillingType.FixedPrice ? 0m : unbilled.GetValueOrDefault(p.Id);'
+- date: '2025-03-17T11:56:00+02:00'
+  author: mikael
+  message: Update EF Core to 8.0.11
+  changes:
+  - file: src/Billing.Web/Billing.Web.csproj
+    before: Version="8.0.2"
+    after: Version="8.0.11"
+- date: '2025-03-21T16:57:00+02:00'
+  author: tuomas
+  message: BILL-1156 Exemption note for exempt tax codes
+  defect: BILL-1156
+  changes:
+  - file: src/Billing.Web/Services/TaxService.cs
+    before: ''
+    after: |2+
+              if (code.IsExempt)
+              {
+                  return new TaxResult(code.Code, 0m, $"Exempt from VAT: {code.Description}.");
+              }
+
+- date: '2025-04-07T11:50:00+03:00'
+  author: mikael
+  message: BILL-1159 Large write-downs need billing manager sign-off
+  defect: BILL-1159
+  changes:
+  - file: src/Billing.Web/Services/AdjustmentService.cs
+    before: '    private readonly BillingContext _db;'
+    after: |2-
+          private const decimal WD_LIMIT = 0.10m;
+
+          private readonly BillingContext _db;
+  - file: src/Billing.Web/Services/AdjustmentService.cs
+    before: ''
+    after: |2+
+              var writeDowns = invoice.Lines.Where(l => l.Adjustment < 0).Sum(l => -l.Adjustment);
+              var before = invoice.Lines.Sum(l => l.SourceAmount);
+              if (before > 0 && writeDowns / before > WD_LIMIT)
+              {
+                  invoice.Status = InvoiceStatus.PendingApproval;
+              }
+
+  - file: src/Billing.Web/Services/InvoiceService.cs
+    before: ''
+    after: |2
+              if (invoice.Status == InvoiceStatus.PendingApproval)
+              {
+                  throw new BillingException("Write-downs on this proposal are waiting for a billing manager's approval.");
+              }
+- date: '2025-04-16T14:04:00+03:00'
+  author: mikael
+  message: BILL-1161 Release the approval when write-downs drop below the limit
+  defect: BILL-1161
+  changes:
+  - file: src/Billing.Web/Services/AdjustmentService.cs
+    before: ''
+    after: |2
+              else if (invoice.Status == InvoiceStatus.PendingApproval)
+              {
+                  invoice.Status = InvoiceStatus.Proposal;
+              }
+- date: '2025-04-18T14:01:00+03:00'
+  author: mikael
+  message: BILL-1162 Only billing managers approve write-downs
+  defect: BILL-1162
+  changes:
+  - file: src/Billing.Web/Services/ApprovalService.cs
+    before: |2-
+          public void Approve(int invoiceId)
+          {
+    after: |2-
+          public void Approve(int invoiceId)
+          {
+              if (!_user.IsBillingManager)
+              {
+                  throw new BillingException("Only a billing manager can approve write-downs.");
+              }
+  - file: src/Billing.Web/Services/ApprovalService.cs
+    before: |2-
+          public void Reject(int invoiceId, string? comment)
+          {
+    after: |2-
+          public void Reject(int invoiceId, string? comment)
+          {
+              if (!_user.IsBillingManager)
+              {
+                  throw new BillingException("Only a billing manager can reject write-downs.");
+              }
+- date: '2025-04-24T11:45:00+03:00'
+  author: jonas
+  message: BILL-1164 Load lines on the approvals list
+  defect: BILL-1164
+  changes:
+  - file: src/Billing.Web/Services/ApprovalService.cs
+    before: |2-
+                  .Include(i => i.Project)
+                  .Where(i => i.Status == InvoiceStatus.PendingApproval)
+    after: |2-
+                  .Include(i => i.Project)
+                  .Include(i => i.Lines)
+                  .Where(i => i.Status == InvoiceStatus.PendingApproval)
+- date: '2025-05-05T11:21:00+03:00'
+  author: jonas
+  message: BILL-1167 Readable label for proposals awaiting approval
+  defect: BILL-1167
+  changes:
+  - file: src/Billing.Web/Helpers/BillingHelper.cs
+    before: ''
+    after: |2
+                  case InvoiceStatus.PendingApproval:
+                      return "Awaiting approval";
+- date: '2025-05-09T15:13:00+03:00'
+  author: mikael
+  message: BILL-1169 Count proposals awaiting approval as open
+  defect: BILL-1169
+  changes:
+  - file: src/Billing.Web/Services/ProposalService.cs
+    before: '            i.Status == InvoiceStatus.Proposal);'
+    after: '            (i.Status == InvoiceStatus.Proposal || i.Status == InvoiceStatus.PendingApproval));'
+- date: '2025-05-15T11:35:00+03:00'
+  author: jonas
+  message: BILL-1171 Tell the clerk the proposal needs approval
+  defect: BILL-1171
+  changes:
+  - file: src/Billing.Web/Pages/Proposals/Edit.cshtml.cs
+    before: |2-
+                  _adjustments.Adjust(id, lineId, amount, reason);
+                  TempData["Message"] = "Adjustment saved.";
+    after: |2-
+                  _adjustments.Adjust(id, lineId, amount, reason);
+                  var invoice = _proposals.Load(id)!;
+                  TempData["Message"] = invoice.Status == InvoiceStatus.PendingApproval
+                      ? "Adjustment saved. The proposal now needs a billing manager's approval."
+                      : "Adjustment saved.";
+- date: '2025-05-19T10:02:00+03:00'
+  author: priya
+  message: Add Playwright tests for payment terms and write-ups
+  changes:
+  - file: tests/e2e/fixtures/testData.ts
+    before: ''
+    after: |2
+        brightwaterSurvey: 'P-1010 Brightwater asset survey',
+  - file: tests/e2e/fixtures/testData.ts
+    before: ''
+    after: |2
+        vestfold: 'P-1030 Vestfold fleet optimisation',
+  - file: tests/e2e/pages/InvoicePage.ts
+    before: ''
+    after: |2+
+        get dueDate(): Locator {
+          return this.page.locator('#due-date');
+        }
+
+  - file: tests/e2e/pages/ProposalPage.ts
+    before: ''
+    after: |2+
+        async adjust(sequence: number, amount: string, reason = '') {
+          const row = this.line(sequence);
+          await row.getByLabel(`Adjustment for line ${sequence}`).fill(amount);
+          await row.getByLabel(`Reason for line ${sequence}`).fill(reason);
+          await row.getByRole('button', { name: 'Adjust' }).click();
+        }
+
+  added:
+  - tests/e2e/specs/invoicing/payment-terms.spec.ts
+  - tests/e2e/specs/proposals/write-up.spec.ts
+- date: '2025-05-26T15:50:00+03:00'
+  author: mikael
+  message: Release 4.6.0
+  changes:
+  - file: src/Billing.Web/Pages/Shared/_Layout.cshtml
+    before: Project Billing 4.5.0 &middot;
+    after: Project Billing 4.6.0 &middot;
+- date: '2025-05-29T16:08:00+03:00'
+  author: jonas
+  message: BILL-1177 Apply the document type filter on the invoice list
+  defect: BILL-1177
+  changes:
+  - file: src/Billing.Web/Services/InvoiceService.cs
+    before: ''
+    after: |2
+              if (kind.HasValue)
+              {
+                  query = query.Where(i => i.Kind == kind.Value);
+              }
+- date: '2025-06-06T12:27:00+03:00'
+  author: tuomas
+  message: BILL-1180 Compare country codes case-insensitively
+  defect: BILL-1180
+  changes:
+  - file: src/Billing.Web/Helpers/BillingHelper.cs
+    before: '        return countryCode != null && EuCountries.Contains(countryCode);'
+    after: '        return countryCode != null && EuCountries.Contains(countryCode.ToUpperInvariant());'
+- date: '2025-06-11T14:59:00+03:00'
+  author: elif
+  message: BILL-1183 Keep the invoice line order on credit notes
+  defect: BILL-1183
+  changes:
+  - file: src/Billing.Web/Services/CreditNoteService.cs
+    before: |2-
+                  .Include(i => i.Lines)
+                  .FirstOrDefault(i => i.Id == invoiceId && i.Kind == InvoiceKind.Invoice);
+    after: |2-
+                  .Include(i => i.Lines.OrderBy(l => l.Sequence))
+                  .FirstOrDefault(i => i.Id == invoiceId && i.Kind == InvoiceKind.Invoice);
+- date: '2025-06-13T12:16:00+03:00'
+  author: elif
+  message: BILL-1185 Recalculate after rejecting write-downs
+  defect: BILL-1185
+  changes:
+  - file: src/Billing.Web/Services/ApprovalService.cs
+    before: ''
+    after: |2
+              ProposalService.Recalculate(invoice);
+- date: '2025-06-17T16:56:00+03:00'
+  author: elif
+  message: BILL-1187 No decimals for JPY
+  defect: BILL-1187
+  changes:
+  - file: src/Billing.Web/Helpers/RoundingHelper.cs
+    before: '    /// <summary>Decimal places for a currency.</summary>'
+    after: '    /// <summary>Decimal places for a currency (ISO 4217 minor units).</summary>'
+  - file: src/Billing.Web/Helpers/RoundingHelper.cs
+    before: '        return 2;'
+    after: |2-
+              switch (currency?.ToUpperInvariant())
+              {
+                  case "JPY":
+                      return 0;
+                  default:
+                      return 2;
+              }
+- date: '2025-06-27T14:45:00+03:00'
+  author: elif
+  message: BILL-1189 Clear the approval when write-downs go over the limit again
+  defect: BILL-1189
+  changes:
+  - file: src/Billing.Web/Services/AdjustmentService.cs
+    before: |2-
+                  invoice.Status = InvoiceStatus.PendingApproval;
+              }
+    after: |2-
+                  invoice.Status = InvoiceStatus.PendingApproval;
+                  invoice.ApprovedBy = null;
+                  invoice.ApprovedAt = null;
+              }
+- date: '2025-07-04T14:10:00+03:00'
+  author: priya
+  message: BILL-1191 Show adjustment reasons under the line
+  defect: BILL-1191
+  changes:
+  - file: src/Billing.Web/Pages/Proposals/Edit.cshtml
+    before: ''
+    after: |2
+                      @if (!string.IsNullOrEmpty(l.AdjustmentReason))
+                      {
+                          <div class="reason">@l.AdjustmentReason</div>
+                      }
+  - file: tests/e2e/specs/proposals/write-up.spec.ts
+    before: ''
+    after: |2
+        await expect(proposal.line(1)).toContainText('Extra workshop preparation');
+- date: '2025-07-17T14:31:00+03:00'
+  author: tuomas
+  message: BILL-1193 Count final invoices only in interim billing
+  defect: BILL-1193
+  changes:
+  - file: src/Billing.Web/Services/PercentCompleteBilling.cs
+    before: '            .Where(i => i.ProjectId == projectId && i.Kind == InvoiceKind.Invoice)'
+    after: '            .Where(i => i.ProjectId == projectId && i.Status == InvoiceStatus.Final && i.Kind == InvoiceKind.Invoice)'
+- date: '2025-08-06T16:12:00+03:00'
+  author: jonas
+  message: BILL-1195 Show the latest 200 documents on the invoice list
+  defect: BILL-1195
+  changes:
+  - file: src/Billing.Web/Pages/Invoices/Index.cshtml
+    before: '    @foreach (var i in Model.Invoices)'
+    after: '    @foreach (var i in Model.Invoices.Take(200))'
+  - file: src/Billing.Web/Pages/Invoices/Index.cshtml
+    before: </table>
+    after: |-
+      </table>
+      <p class="muted">@Model.Invoices.Count documents@(Model.Invoices.Count > 200 ? ", showing the latest 200" : "").</p>
+- date: '2025-08-13T14:02:00+03:00'
+  author: elif
+  message: BILL-1197 Reject zero and negative exchange rates
+  defect: BILL-1197
+  changes:
+  - file: src/Billing.Web/Pages/Admin/ExchangeRates.cshtml.cs
+    before: ''
+    after: |2
+                  if (value <= 0)
+                  {
+                      throw new BillingException("Enter a rate greater than zero.");
+                  }
+- date: '2025-08-21T13:23:00+03:00'
+  author: jonas
+  message: BILL-1199 Keep entered credit amounts after an error
+  defect: BILL-1199
+  changes:
+  - file: src/Billing.Web/Pages/CreditNotes/Create.cshtml
+    before: ' size="10" />'
+    after: ' size="10" value="@Model.Entered.GetValueOrDefault(l.Id)" />'
+  - file: src/Billing.Web/Pages/CreditNotes/Create.cshtml
+    before: ' size="60" />'
+    after: ' size="60" value="@Model.Reason" />'
+- date: '2025-09-02T15:33:00+03:00'
+  author: jonas
+  message: BILL-1201 Wrap inline forms
+  defect: BILL-1201
+  changes:
+  - file: src/Billing.Web/wwwroot/css/site.css
+    before: '.form.inline { display: flex; align-items: flex-end; gap: 14px; max-width: none; }'
+    after: '.form.inline { display: flex; align-items: flex-end; gap: 14px; flex-wrap: wrap; max-width: none; }'
+- date: '2025-09-09T16:04:00+03:00'
+  author: elif
+  message: BILL-1203 Work out tax on the rounded line
+  defect: BILL-1203
+  changes:
+  - file: src/Billing.Web/Helpers/RoundingHelper.cs
+    before: '    /// <summary>Tax on one line.</summary>'
+    after: '    /// <summary>Tax on one line, worked out on the rounded line amount.</summary>'
+  - file: src/Billing.Web/Helpers/RoundingHelper.cs
+    before: '        return RoundMoney(sourceAmount * rate * taxPercent / 100m, currency);'
+    after: |2-
+              var lineAmount = Convert(sourceAmount, rate, currency);
+              return RoundMoney(lineAmount * taxPercent / 100m, currency);
+- date: '2025-09-24T12:47:00+03:00'
+  author: tuomas
+  message: BILL-1205 Clear message for unknown tax codes
+  defect: BILL-1205
+  changes:
+  - file: src/Billing.Web/Services/TaxService.cs
+    before: '        var code = _db.TaxCodes.Find(projectTaxCode)!;'
+    after: |2-
+              var code = _db.TaxCodes.Find(projectTaxCode);
+              if (code == null)
+              {
+                  throw new BillingException($"Tax code {projectTaxCode} does not exist.");
+              }
+- date: '2025-10-06T15:25:00+03:00'
+  author: mikael
+  message: Release 4.7.0
+  changes:
+  - file: src/Billing.Web/Pages/Shared/_Layout.cshtml
+    before: Project Billing 4.6.0 &middot;
+    after: Project Billing 4.7.0 &middot;
+- date: '2025-10-15T13:23:00+03:00'
+  author: jonas
+  message: BILL-1207 Ask for a project on New proposal
+  defect: BILL-1207
+  changes:
+  - file: src/Billing.Web/Pages/Proposals/Create.cshtml.cs
+    before: ''
+    after: |2
+              if (projectId == null)
+              {
+                  Error = "Select a project.";
+                  return Page();
+              }
+- date: '2025-11-05T14:31:00+02:00'
+  author: elif
+  message: BILL-1209 Date on expense lines
+  defect: BILL-1209
+  changes:
+  - file: src/Billing.Web/Services/ProposalService.cs
+    before: '                Description = x.Description,'
+    after: '                Description = x.Date.ToString("yyyy-MM-dd") + " " + x.Description,'
+- date: '2025-11-26T11:38:00+02:00'
+  author: elif
+  message: BILL-1212 Round the completion percentage in the line text
+  defect: BILL-1212
+  changes:
+  - file: src/Billing.Web/Services/PercentCompleteBilling.cs
+    before: '            Description = "Progress billing " + (costToDate / estimatedCost * 100m) + "% complete",'
+    after: '            Description = "Progress billing " + Math.Round(costToDate / estimatedCost * 100m, 1) + "% complete",'
+- date: '2025-12-10T11:28:00+02:00'
+  author: jonas
+  message: BILL-1214 Not found instead of an error for unknown invoices
+  defect: BILL-1214
+  changes:
+  - file: src/Billing.Web/Pages/CreditNotes/Create.cshtml.cs
+    before: ''
+    after: |2
+              if (Original == null)
+              {
+                  return false;
+              }
+- date: '2026-01-14T11:43:00+02:00'
+  author: jonas
+  message: BILL-1216 Count billable time only on the home page
+  defect: BILL-1216
+  changes:
+  - file: src/Billing.Web/Pages/Index.cshtml.cs
+    before: '            .Where(t => t.Status == EntryStatus.Approved && t.InvoiceLineId == null && t.Date <= PeriodEnd)'
+    after: '            .Where(t => t.Status == EntryStatus.Approved && t.Billable && t.InvoiceLineId == null && t.Date <= PeriodEnd)'
+- date: '2026-02-10T11:22:00+02:00'
+  author: jonas
+  message: BILL-1219 No decimals for KRW and ISK
+  defect: BILL-1219
+  changes:
+  - file: src/Billing.Web/Helpers/RoundingHelper.cs
+    before: '            case "JPY":'
+    after: |2-
+                  case "JPY":
+                  case "ISK":
+                  case "KRW":
+- date: '2026-03-04T15:52:00+02:00'
+  author: jonas
+  message: BILL-1222 Wider label column on detail pages
+  defect: BILL-1222
+  changes:
+  - file: src/Billing.Web/wwwroot/css/site.css
+    before: 'grid-template-columns: 160px 1fr;'
+    after: 'grid-template-columns: 200px 1fr;'
+- date: '2026-03-09T15:05:00+02:00'
+  author: mikael
+  message: Release 4.8.0
+  changes:
+  - file: src/Billing.Web/Pages/Shared/_Layout.cshtml
+    before: Project Billing 4.7.0 &middot;
+    after: Project Billing 4.8.0 &middot;
+- date: '2026-04-08T11:30:00+03:00'
+  author: elif
+  message: BILL-1225 Handle a zero cost estimate
+  defect: BILL-1225
+  changes:
+  - file: src/Billing.Web/Helpers/BillingHelper.cs
+    before: ''
+    after: |2
+              if (estimatedCost <= 0)
+              {
+                  return 0m;
+              }
+- date: '2026-05-13T11:59:00+03:00'
+  author: jonas
+  message: BILL-1228 Leave EUR out of the rate currencies
+  defect: BILL-1228
+  changes:
+  - file: src/Billing.Web/Pages/Admin/ExchangeRates.cshtml.cs
+    before: '            .OrderBy(c => c).ToList();'
+    after: '            .Where(c => c != "EUR").OrderBy(c => c).ToList();'
+- date: '2026-06-10T15:18:00+03:00'
+  author: jonas
+  message: BILL-1231 Period end on the home page is the end of the month
+  defect: BILL-1231
+  changes:
+  - file: src/Billing.Web/Pages/Index.cshtml.cs
+    before: '        PeriodEnd = _clock.Today;'
+    after: '        PeriodEnd = BillingHelper.EndOfMonth(_clock.Today);'
+- date: '2026-06-15T15:45:00+03:00'
+  author: mikael
+  message: Release 4.8.1
+  changes:
+  - file: src/Billing.Web/Pages/Shared/_Layout.cshtml
+    before: Project Billing 4.8.0 &middot;
+    after: Project Billing 4.8.1 &middot;
+- date: '2026-07-22T12:32:00+03:00'
+  author: elif
+  message: BILL-1235 Audit write-ups and write-downs separately
+  defect: BILL-1235
+  changes:
+  - file: src/Billing.Web/Services/AdjustmentService.cs
+    before: '        BillingHelper.Audit(_db, _user.Name, "Adjustment",'
+    after: '        BillingHelper.Audit(_db, _user.Name, adjustment >= 0 ? "Write-up" : "Write-down",'
+- date: '2026-08-26T15:03:00+03:00'
+  author: jonas
+  message: BILL-1238 Stay on the currency after saving a rate
+  defect: BILL-1238
+  changes:
+  - file: src/Billing.Web/Pages/Admin/ExchangeRates.cshtml.cs
+    before: '            return RedirectToPage();'
+    after: '            return RedirectToPage(new { currency });'
+- date: '2026-09-16T13:41:00+03:00'
+  author: elif
+  message: BILL-1240 Require a reason for a customer billing hold
+  defect: BILL-1240
+  changes:
+  - file: src/Billing.Web/Pages/Customers/Edit.cshtml.cs
+    before: ''
+    after: |2
+                  if (isOnHold && string.IsNullOrWhiteSpace(holdReason))
+                  {
+                      throw new BillingException("Enter a reason for the billing hold.");
+                  }
+  - file: src/Billing.Web/Pages/Customers/Edit.cshtml.cs
+    before: '            Customer.HoldReason = isOnHold ? holdReason?.Trim() : null;'
+    after: '            Customer.HoldReason = isOnHold ? holdReason!.Trim() : null;'
+- date: '2026-09-28T15:30:00+03:00'
+  author: mikael
+  message: Release 4.8.2
+  changes:
+  - file: src/Billing.Web/Pages/Shared/_Layout.cshtml
+    before: Project Billing 4.8.1 &middot;
+    after: Project Billing 4.8.2 &middot;
+defects:
+- id: BILL-1001
+  title: Expense on P-1040 billed at thirteen times its cost
+  created: '2023-11-06T09:02:00+02:00'
+  severity: 1
+  priority: 1
+  build: 4.0.0
+  reported_by: Anna Virtanen
+  tests: manual
+  cluster: Expenses
+  rule: BR-12
+  faults: []
+  repro: |-
+    1. Open project P-1040, which has a 12% expense markup.
+    2. Create a proposal for October with the approved hotel expense of 250.00 EUR.
+    3. Look at the expense line.
+    Expected: 280.00
+    Actual: 3,250.00
+  resolution: The markup was stored as a fraction (0.12) in 4.0 and the migration converted it to a percentage (12). ExpenseWithMarkup still multiplied by the value directly. It now divides by 100.
+- id: BILL-1003
+  title: No VAT on invoices to Finnish customers
+  created: '2023-11-08T09:24:00+02:00'
+  severity: 1
+  priority: 1
+  build: 4.0.0
+  reported_by: Hanna Koskinen
+  tests: manual
+  cluster: VAT
+  rule: BR-03
+  faults: []
+  repro: |-
+    1. Create a proposal for any Finnish business customer with a VAT number (for example Halden, P-1001).
+    2. Look at the tax column.
+    Expected: S 24%
+    Actual: RC with 0.00 tax and the reverse charge note
+  resolution: IsReverseCharge treated every EU business customer with a VAT number as reverse charged, including customers in Finland. It now also checks that the customer's country differs from the company's.
+- id: BILL-1004
+  title: Due date one day earlier than the payment terms
+  created: '2023-11-13T10:28:00+02:00'
+  severity: 3
+  priority: 2
+  build: 4.0.0
+  reported_by: Lars Eriksson
+  tests: none
+  cluster: Due dates
+  rule: BR-10
+  faults: []
+  repro: |-
+    1. Finalise an invoice dated 31 Oct for a customer with 30 day terms.
+    Expected: due 30 Nov
+    Actual: due 29 Nov
+  resolution: DueDate subtracted a day from the terms (carried over from the 4.0 report logic, which counted the invoice date as day one).
+- id: BILL-1006
+  title: Amounts shown without thousand separators
+  created: '2023-11-16T09:51:00+02:00'
+  severity: 4
+  priority: 3
+  build: 4.0.0
+  reported_by: Anna Virtanen
+  tests: none
+  cluster: Formatting
+  rule: null
+  faults: []
+  repro: |-
+    1. Open any invoice over 1,000 EUR.
+    Expected: 2,447.25 EUR
+    Actual: 2447.25 EUR
+  resolution: 'FormatMoney and FormatAmount now use the #,##0.00 pattern.'
+- id: BILL-1007
+  title: Non-billable internal time appears on customer invoices
+  created: '2023-11-20T08:39:00+02:00'
+  severity: 2
+  priority: 1
+  build: 4.0.0
+  reported_by: Sofia Berg
+  tests: manual
+  cluster: Billable time
+  rule: BR-01
+  faults: []
+  repro: |-
+    1. On P-1001, record 2 h of internal time with Billable unticked and approve it.
+    2. Create a proposal for the period.
+    Expected: the internal time is not on the proposal
+    Actual: it is billed at the consultant's rate
+  resolution: The time entry query in CreateProposal did not filter on Billable. Added the condition.
+- id: BILL-1009
+  title: Credit note numbers not padded like invoice numbers
+  created: '2023-11-23T10:09:00+02:00'
+  severity: 3
+  priority: 2
+  build: 4.0.0
+  reported_by: Lars Eriksson
+  tests: manual
+  cluster: Numbering
+  rule: BR-09
+  faults: []
+  repro: |-
+    1. Issue a credit note.
+    Expected: CN-000004
+    Actual: CN-4
+  resolution: The credit note branch in NumberingService did not format the number. Both sequences now use six digits.
+- id: BILL-1010
+  title: Error when crediting an invoice migrated from 4.0
+  created: '2023-11-28T09:03:00+02:00'
+  severity: 2
+  priority: 1
+  build: 4.0.0
+  reported_by: Lars Eriksson
+  tests: manual
+  cluster: Credit notes
+  rule: null
+  faults: []
+  repro: |-
+    1. Open invoice INV-000112 (migrated from TFS, EUR, no exchange rate stored).
+    2. Create credit note, enter 100.00 on line 1, give a reason and issue.
+    Expected: credit note issued
+    Actual: error page (Nullable object must have a value)
+  resolution: Invoices migrated from 4.0 have no exchange rate. The credit line now keeps the amount as the company-currency value when the rate is missing or zero.
+- id: BILL-1012
+  title: Final invoice can be deleted
+  created: '2023-12-04T10:13:00+02:00'
+  severity: 1
+  priority: 1
+  build: 4.0.0
+  reported_by: Mikko Laine
+  tests: manual
+  cluster: Final invoice lock
+  rule: BR-13
+  faults: []
+  repro: |-
+    1. Finalise a proposal.
+    2. Open /Proposals/Edit/<id> for the invoice from the browser history and press Delete proposal.
+    Expected: refused
+    Actual: the invoice is deleted and its time goes back to unbilled
+  resolution: ProposalService.Delete did not check the status. A final invoice is now refused with a pointer to credit notes.
+- id: BILL-1013
+  title: UK customers reverse charged after Brexit
+  created: '2023-12-07T09:59:00+02:00'
+  severity: 2
+  priority: 1
+  build: 4.0.0
+  reported_by: Hanna Koskinen
+  tests: manual
+  cluster: VAT
+  rule: BR-03
+  faults: []
+  repro: |-
+    1. Create a proposal for Brightline Ltd (GB, VAT number GB...).
+    Expected: no reverse charge note, export treatment as configured
+    Actual: RC and the EU reverse charge wording
+  resolution: The country list came from 4.0 and still had GB. Removed.
+- id: BILL-1015
+  title: Empty brackets after time line descriptions
+  created: '2023-12-12T09:50:00+02:00'
+  severity: 4
+  priority: 3
+  build: 4.0.0
+  reported_by: Anna Virtanen
+  tests: none
+  cluster: Labels and messages
+  rule: null
+  faults: []
+  repro: |-
+    1. Create a proposal where a time entry has no comment.
+    Expected: 2023-11-02 Pekka Salo - CONS
+    Actual: 2023-11-02 Pekka Salo - CONS ()
+  resolution: The comment is only added when there is one.
+- id: BILL-1018
+  title: VAT not updated after a write-up
+  created: '2023-12-19T08:10:00+02:00'
+  severity: 2
+  priority: 1
+  build: 4.0.0
+  reported_by: Anna Virtanen
+  tests: manual
+  cluster: Adjustments
+  rule: null
+  faults: []
+  repro: |-
+    1. On a proposal, write line 1 up by 100.00 with a reason.
+    Expected: tax on line 1 rises by 24.00
+    Actual: amount changes, tax stays the same
+  resolution: Recalculate passed the unadjusted source amount to the tax calculation. Amount and tax now use the same adjusted value.
+- id: BILL-1020
+  title: Halden billed at rate card instead of agreed rate
+  created: '2024-01-08T09:10:00+02:00'
+  severity: 2
+  priority: 1
+  build: 4.0.0
+  reported_by: Sofia Berg
+  tests: manual
+  cluster: Rates
+  rule: BR-02
+  faults:
+  - F02a
+  repro: |-
+    1. Create a proposal for P-1003 (Halden support retainer).
+    2. Look at senior consultant time.
+    Expected: 140.00 (Halden agreement)
+    Actual: 155.00 (project rate card)
+  resolution: ResolveRate looked at the project rate card first. The customer agreement is now checked first, as in the contract terms.
+- id: BILL-1021
+  title: Private customer invoiced without VAT
+  created: '2024-01-10T10:59:00+02:00'
+  severity: 3
+  priority: 2
+  build: 4.0.0
+  reported_by: Hanna Koskinen
+  tests: manual
+  cluster: VAT
+  rule: BR-03
+  faults: []
+  repro: |-
+    1. Create a proposal for a private customer in Sweden that has a personal tax number entered in the VAT field.
+    Expected: Finnish VAT
+    Actual: reverse charge
+  resolution: Reverse charge applies to business customers only. IsReverseCharge now checks IsBusiness first.
+- id: BILL-1023
+  title: Submitted time billed before the project manager approved it
+  created: '2024-01-16T08:50:00+02:00'
+  severity: 2
+  priority: 1
+  build: 4.1.0
+  reported_by: Sofia Berg
+  tests: manual
+  cluster: Billable time
+  rule: BR-01
+  faults:
+  - F01a
+  repro: |-
+    1. On P-1001, submit 4 h for the period but do not approve it.
+    2. Create a proposal.
+    Expected: the submitted entry is not billed
+    Actual: it is on the proposal
+  resolution: The query excluded rejected entries only, so draft and submitted entries were billed. It now takes approved entries only.
+- id: BILL-1026
+  title: Billing hold message does not say which customer
+  created: '2024-01-22T08:16:00+02:00'
+  severity: 4
+  priority: 3
+  build: 4.1.0
+  reported_by: Anna Virtanen
+  tests: none
+  cluster: Billing holds
+  rule: BR-05
+  faults: []
+  repro: |-
+    1. Put Ostra Logistics on hold with a reason.
+    2. Create a proposal for P-1120.
+    Expected: Billing hold: customer Ostra Logistics Oy is on hold. <reason>
+    Actual: Customer C140 is on billing hold.
+  resolution: The message now gives the customer name and the hold reason.
+- id: BILL-1027
+  title: Ledger rejects invoices with long PO numbers
+  created: '2024-01-24T09:45:00+02:00'
+  severity: 3
+  priority: 2
+  build: 4.1.0
+  reported_by: Lars Eriksson
+  tests: manual
+  cluster: Purchase orders
+  rule: BR-17
+  faults: []
+  repro: |-
+    1. Enter a 40 character purchase order number on a proposal and finalise.
+    Expected: validation message
+    Actual: invoice finalised, ledger posting fails overnight
+  resolution: The ledger PO field is 30 characters. IsValidPoNumber now rejects longer values.
+- id: BILL-1029
+  title: Fixed-price milestone billed again the next month
+  created: '2024-01-30T10:24:00+02:00'
+  severity: 2
+  priority: 1
+  build: 4.1.0
+  reported_by: Mikko Laine
+  tests: manual
+  cluster: Milestones
+  rule: BR-11
+  faults:
+  - F11b
+  repro: |-
+    1. P-1080: bill the completed milestone Solution design in January and finalise.
+    2. Create the February proposal.
+    Expected: no milestone line
+    Actual: Solution design billed again
+  resolution: Finalise now records the invoice on each milestone it bills, and proposals skip milestones that already have an invoice.
+- id: BILL-1030
+  title: Header shows the calendar date instead of the business date
+  created: '2024-02-01T10:44:00+02:00'
+  severity: 3
+  priority: 2
+  build: 4.1.0
+  reported_by: Anna Virtanen
+  tests: manual
+  cluster: Page layout
+  rule: null
+  faults: []
+  repro: |-
+    1. Set Billing:BusinessDate to 2024-01-31 during the January run.
+    2. Look at the header on 1 Feb.
+    Expected: Business date 31 Jan 2024
+    Actual: 1 Feb 2024
+  resolution: The layout used DateTime.Today. It now reads the SystemClock like the rest of the application.
+- id: BILL-1032
+  title: Two invoices got the same number
+  created: '2024-02-06T09:38:00+02:00'
+  severity: 1
+  priority: 1
+  build: 4.1.0
+  reported_by: Lars Eriksson
+  tests: manual
+  cluster: Numbering
+  rule: BR-09
+  faults: []
+  repro: |-
+    1. Two billing clerks finalise proposals at the same moment (seen in the January run: INV-000041 twice).
+    Expected: consecutive numbers
+    Actual: duplicate number
+  resolution: NumberingService read and incremented the counter without a lock. Allocation is now serialised and the company row is reloaded before use.
+- id: BILL-1033
+  title: Due date counted from the day of finalising
+  created: '2024-02-08T09:46:00+02:00'
+  severity: 3
+  priority: 2
+  build: 4.1.0
+  reported_by: Lars Eriksson
+  tests: manual
+  cluster: Due dates
+  rule: BR-10
+  faults: []
+  repro: |-
+    1. Create a proposal with invoice date 31 Jan, finalise it on 2 Feb.
+    Expected: due 1 Mar (31 Jan + 30)
+    Actual: due 3 Mar
+  resolution: Finalise passed the business date to DueDate. It now passes the invoice date.
+- id: BILL-1035
+  title: Credit note can be issued without a reason
+  created: '2024-02-13T09:15:00+02:00'
+  severity: 3
+  priority: 2
+  build: 4.1.0
+  reported_by: Mikko Laine
+  tests: manual
+  cluster: Credit notes
+  rule: null
+  faults: []
+  repro: |-
+    1. Open a final invoice, Create credit note.
+    2. Enter 50.00 on line 1, leave Reason empty, issue.
+    Expected: Enter a reason for the credit note.
+    Actual: credit note issued with the note 'Credit for invoice INV-000057. '
+  resolution: A reason is now required, and it is trimmed before it goes on the credit note.
+- id: BILL-1038
+  title: Period end shown as 28 February in a leap year
+  created: '2024-02-29T09:04:00+02:00'
+  severity: 2
+  priority: 1
+  build: 4.1.0
+  reported_by: Anna Virtanen
+  tests: manual
+  cluster: Proposal dates
+  rule: null
+  faults: []
+  repro: |-
+    1. Open New proposal on 29 Feb 2024.
+    Expected: period end 2024-02-29
+    Actual: 2024-02-28, and time entered on the 29th is left out
+  resolution: EndOfMonth had a fixed table of month lengths. It now uses DateTime.DaysInMonth.
+- id: BILL-1039
+  title: Invoice date defaults to the business date, not the period end
+  created: '2024-03-04T10:35:00+02:00'
+  severity: 3
+  priority: 2
+  build: 4.1.0
+  reported_by: Anna Virtanen
+  tests: none
+  cluster: Proposal dates
+  rule: null
+  faults: []
+  repro: |-
+    1. On 4 March, open New proposal.
+    Expected: period end 2024-03-31, invoice date 2024-03-31
+    Actual: invoice date 2024-03-04, which then fails 'The invoice date cannot be before the period end'
+  resolution: The page defaults the invoice date to the period end.
+- id: BILL-1041
+  title: Missing exchange rate silently treated as 1.0
+  created: '2024-03-07T08:12:00+02:00'
+  severity: 2
+  priority: 1
+  build: 4.1.0
+  reported_by: Hanna Koskinen
+  tests: manual
+  cluster: Exchange rates
+  rule: BR-15
+  faults: []
+  repro: |-
+    1. Delete the SEK rate for March (or create a proposal before it is entered).
+    2. Create a proposal for a SEK customer.
+    Expected: a clear warning that the rate is missing
+    Actual: SEK amounts equal to the EUR amounts, no warning
+  resolution: The proposal keeps an empty rate instead of 1.0, the page shows a warning banner and 'Missing' in the rate field.
+- id: BILL-1042
+  title: Invoice export fails when credit notes are in the list
+  created: '2024-03-11T10:57:00+02:00'
+  severity: 3
+  priority: 2
+  build: 4.1.0
+  reported_by: Lars Eriksson
+  tests: none
+  cluster: Export
+  rule: null
+  faults: []
+  repro: |-
+    1. Invoices, search for Lumo, press Export.
+    Expected: CSV file
+    Actual: error page
+  resolution: Credit notes have no due date. The export now leaves the field empty.
+- id: BILL-1044
+  title: Amounts with a thousand separator are rejected
+  created: '2024-03-14T09:46:00+02:00'
+  severity: 3
+  priority: 2
+  build: 4.1.0
+  reported_by: Anna Virtanen
+  tests: manual
+  cluster: Input parsing
+  rule: null
+  faults: []
+  repro: |-
+    1. On a credit note, enter 1,480.00 for line 1.
+    Expected: accepted
+    Actual: '1,480.00' is not a valid amount.
+  resolution: ParseMoney removes spaces and commas before parsing.
+- id: BILL-1046
+  title: Invoice line 0.5 cent amounts round down to even
+  created: '2024-03-18T10:29:00+02:00'
+  severity: 2
+  priority: 1
+  build: 4.1.0
+  reported_by: Hanna Koskinen
+  tests: manual
+  cluster: Multi-currency rounding
+  rule: BR-04
+  faults:
+  - F04a
+  repro: |-
+    1. Create a proposal for a SEK customer where a line converts to 1,234.565 SEK.
+    Expected: 1,234.57
+    Actual: 1,234.56 (and 1,234.575 gives 1,234.58)
+  resolution: Math.Round defaults to banker's rounding. RoundMoney now rounds half away from zero, as finance and the customer's AP systems expect.
+- id: BILL-1047
+  title: Reverse charge note lacks the legal reference
+  created: '2024-03-21T09:50:00+02:00'
+  severity: 3
+  priority: 2
+  build: 4.1.0
+  reported_by: Hanna Koskinen
+  tests: manual
+  cluster: VAT
+  rule: BR-03
+  faults: []
+  repro: |-
+    1. Create a proposal for Atlas (DE, VAT number).
+    Expected: wording with the directive article, as required by the German customer's AP
+    Actual: 'Reverse charge.'
+  resolution: The note now carries the full wording.
+- id: BILL-1049
+  title: April exchange rate used on March invoices
+  created: '2024-03-26T10:42:00+02:00'
+  severity: 2
+  priority: 1
+  build: 4.1.0
+  reported_by: Hanna Koskinen
+  tests: manual
+  cluster: Exchange rates
+  rule: BR-15
+  faults:
+  - F15a
+  repro: |-
+    1. Enter the GBP rate effective 1 April on 26 March.
+    2. Create a March proposal for a GBP customer.
+    Expected: the March rate
+    Actual: the April rate
+  resolution: GetRate took the newest rate regardless of its effective date. It now takes the latest rate on or before the date.
+- id: BILL-1050
+  title: Invoice quantity shows recorded hours but bills quarter hours
+  created: '2024-03-28T09:43:00+02:00'
+  severity: 3
+  priority: 2
+  build: 4.1.0
+  reported_by: Sofia Berg
+  tests: manual
+  cluster: Quarter hours
+  rule: BR-18
+  faults: []
+  repro: |-
+    1. Record 1.10 h on P-1001 and create a proposal.
+    Expected: quantity 1.25, amount 1.25 x rate
+    Actual: quantity 1.10, amount 1.25 x rate, so the line does not add up
+  resolution: The line quantity is now the rounded hours that are billed.
+- id: BILL-1052
+  title: Credit note dated in the original invoice's period
+  created: '2024-04-03T08:58:00+03:00'
+  severity: 3
+  priority: 2
+  build: 4.1.0
+  reported_by: Lars Eriksson
+  tests: manual
+  cluster: Credit notes
+  rule: null
+  faults: []
+  repro: |-
+    1. Credit a January invoice in April.
+    Expected: credit note dated in April
+    Actual: dated in January, a closed ledger period, posting fails
+  resolution: Credit notes take the business date as their invoice date.
+- id: BILL-1053
+  title: User switch redirects to any address in returnUrl
+  created: '2024-04-05T08:45:00+03:00'
+  severity: 2
+  priority: 1
+  build: 4.1.0
+  reported_by: Priya Nair
+  tests: manual
+  cluster: Security
+  rule: null
+  faults: []
+  repro: |-
+    1. POST /User/Switch with returnUrl=https://example.org.
+    Expected: back to the home page
+    Actual: redirected to the external site
+  resolution: The switch uses LocalRedirect and falls back to the home page for anything not local.
+- id: BILL-1055
+  title: Expenses stay reserved after a proposal is deleted
+  created: '2024-04-11T08:43:00+03:00'
+  severity: 2
+  priority: 1
+  build: 4.2.0
+  reported_by: Anna Virtanen
+  tests: manual
+  cluster: Billable time
+  rule: null
+  faults: []
+  repro: |-
+    1. Create a proposal for P-1040 with an expense line, delete the proposal.
+    2. Create the proposal again.
+    Expected: the expense is on it
+    Actual: time is back, the expense is missing
+  resolution: Delete released time entries only. It now releases expenses too.
+- id: BILL-1056
+  title: Agreement discount of 150% accepted
+  created: '2024-04-16T09:10:00+03:00'
+  severity: 3
+  priority: 2
+  build: 4.2.0
+  reported_by: Mikko Laine
+  tests: manual
+  cluster: Discounts
+  rule: BR-16
+  faults: []
+  repro: |-
+    1. Customers, open C100, enter 150 as discount and save.
+    Expected: rejected
+    Actual: saved, next proposal has negative time lines
+  resolution: The discount must be between 0 and 50%, the maximum in the price policy.
+- id: BILL-1058
+  title: PO of a single space accepted for PO customers
+  created: '2024-04-22T08:48:00+03:00'
+  severity: 3
+  priority: 2
+  build: 4.2.0
+  reported_by: Lars Eriksson
+  tests: manual
+  cluster: Purchase orders
+  rule: BR-17
+  faults: []
+  repro: |-
+    1. Meridian requires a PO. Enter a space as PO number and finalise.
+    Expected: A purchase order number is required
+    Actual: finalised, customer rejects the invoice
+  resolution: Finalise now uses IsValidPoNumber instead of an empty check.
+- id: BILL-1059
+  title: Correcting a rate adds a second rate for the same day
+  created: '2024-04-25T10:19:00+03:00'
+  severity: 3
+  priority: 2
+  build: 4.2.0
+  reported_by: Hanna Koskinen
+  tests: manual
+  cluster: Exchange rates
+  rule: BR-15
+  faults: []
+  repro: |-
+    1. Exchange rates, save SEK 11.40 effective 2024-04-01, then save 11.45 for the same date.
+    Expected: one rate, 11.45
+    Actual: two rates, invoices pick either
+  resolution: Saving a rate for a date that already has one now updates it.
+- id: BILL-1061
+  title: Final invoice of a closing project deferred as too small
+  created: '2024-05-06T09:07:00+03:00'
+  severity: 3
+  priority: 2
+  build: 4.2.0
+  reported_by: Sofia Berg
+  tests: manual
+  cluster: Minimum invoice
+  rule: BR-14
+  faults: []
+  repro: |-
+    1. Set P-1090 to Closing with 30.00 EUR of unbilled time.
+    2. Create a proposal.
+    Expected: proposal for 30.00
+    Actual: deferred, and the project cannot be closed
+  resolution: A closing project gets its last invoice regardless of the minimum.
+- id: BILL-1062
+  title: Amounts wrap onto two lines in narrow columns
+  created: '2024-05-08T10:14:00+03:00'
+  severity: 4
+  priority: 3
+  build: 4.2.0
+  reported_by: Anna Virtanen
+  tests: none
+  cluster: Page layout
+  rule: null
+  faults: []
+  repro: |-
+    1. Open a proposal on a laptop screen.
+    Expected: 1,234.50 EUR on one line
+    Actual: currency code wraps under the amount
+  resolution: Number cells no longer wrap.
+- id: BILL-1063
+  title: Converted amounts off by a cent on large SEK invoices
+  created: '2024-05-13T09:51:00+03:00'
+  severity: 2
+  priority: 1
+  build: 4.2.0
+  reported_by: Hanna Koskinen
+  tests: manual
+  cluster: Multi-currency rounding
+  rule: BR-04
+  faults: []
+  repro: |-
+    1. Create a proposal for Nordvik (SEK) with a line of 12,345.67 EUR at rate 11.4523.
+    Expected: 141,385.32 SEK
+    Actual: 141,385.31 SEK
+  resolution: Convert went through double, which loses precision. It now multiplies in decimal.
+- id: BILL-1064
+  title: June expenses billed on the May invoice
+  created: '2024-05-16T08:26:00+03:00'
+  severity: 2
+  priority: 1
+  build: 4.2.0
+  reported_by: Sofia Berg
+  tests: manual
+  cluster: Billable time
+  rule: BR-01
+  faults: []
+  repro: |-
+    1. Approve an expense dated 3 June on P-1040.
+    2. Create a proposal with period end 31 May.
+    Expected: not included
+    Actual: included
+  resolution: The expense query had no period end condition. Added.
+- id: BILL-1066
+  title: Due date equals invoice date for customers without terms
+  created: '2024-05-21T08:48:00+03:00'
+  severity: 3
+  priority: 2
+  build: 4.2.0
+  reported_by: Lars Eriksson
+  tests: manual
+  cluster: Due dates
+  rule: BR-10
+  faults: []
+  repro: |-
+    1. Customer C170 has payment terms 0 (not set in the migration).
+    2. Finalise an invoice.
+    Expected: due 30 days after the invoice date
+    Actual: due on the invoice date
+  resolution: Customers without payment terms get the 30 day default.
+- id: BILL-1068
+  title: Deferred proposal can be finalised
+  created: '2024-05-27T08:21:00+03:00'
+  severity: 3
+  priority: 2
+  build: 4.2.0
+  reported_by: Mikko Laine
+  tests: none
+  cluster: Minimum invoice
+  rule: BR-14
+  faults: []
+  repro: |-
+    1. Create a proposal under 50 EUR (deferred).
+    2. Post to the Finalise handler of that proposal.
+    Expected: refused
+    Actual: invoice for 12.00 EUR finalised
+  resolution: Finalise refuses deferred proposals.
+- id: BILL-1069
+  title: Milestone completed on the last day not billed
+  created: '2024-05-29T08:58:00+03:00'
+  severity: 2
+  priority: 1
+  build: 4.2.0
+  reported_by: Sofia Berg
+  tests: manual
+  cluster: Milestones
+  rule: BR-11
+  faults: []
+  repro: |-
+    1. During the May run (business date 31 May), on 3 June mark a P-1080 milestone complete.
+    2. Create the May proposal.
+    Expected: the milestone is billed
+    Actual: it is completed on 3 June, after the period end, and left out
+  resolution: Mark complete now uses the business date.
+- id: BILL-1071
+  title: Negative credit amount increases what the customer owes
+  created: '2024-06-04T09:43:00+03:00'
+  severity: 2
+  priority: 1
+  build: 4.2.0
+  reported_by: Lars Eriksson
+  tests: manual
+  cluster: Credit notes
+  rule: BR-08
+  faults: []
+  repro: |-
+    1. Create a credit note and enter -100 on line 1.
+    Expected: rejected
+    Actual: a credit note with a positive amount is issued
+  resolution: Credit amounts must be positive.
+- id: BILL-1073
+  title: Still open to credit shows more than the invoice total
+  created: '2024-06-18T08:40:00+03:00'
+  severity: 2
+  priority: 1
+  build: 4.2.0
+  reported_by: Lars Eriksson
+  tests: automated
+  cluster: Credit notes
+  rule: BR-08
+  faults: []
+  repro: |-
+    1. Open INV-000291 (already credited by CN-000013) and press Create credit note.
+    Expected: Still open to credit 1,857.40 EUR
+    Actual: 4,116.40 EUR
+  resolution: Credit note totals are negative, so subtracting them added to the open amount. CreditedSoFar now sums absolute values.
+- id: BILL-1074
+  title: Milestone billed before it was complete
+  created: '2024-06-20T08:53:00+03:00'
+  severity: 2
+  priority: 1
+  build: 4.2.0
+  reported_by: Sofia Berg
+  tests: manual
+  cluster: Milestones
+  rule: BR-11
+  faults:
+  - F11a
+  repro: |-
+    1. P-1080: a milestone planned for 15 June is not complete yet.
+    2. Create the June proposal.
+    Expected: not billed
+    Actual: billed because its planned date has passed
+  resolution: 4.0 billed milestones on their planned date. Only completed milestones are billed now.
+- id: BILL-1076
+  title: Finalise button shown on a final invoice
+  created: '2024-06-25T09:17:00+03:00'
+  severity: 3
+  priority: 2
+  build: 4.2.0
+  reported_by: Anna Virtanen
+  tests: automated
+  cluster: Final invoice lock
+  rule: BR-13
+  faults: []
+  repro: |-
+    1. Open /Proposals/Edit/<id> for a final invoice.
+    Expected: locked banner, no Finalise or Delete buttons
+    Actual: both buttons shown (they fail with an error)
+  resolution: The action buttons are only rendered for open proposals.
+- id: BILL-1077
+  title: Agreement discount taken off expenses
+  created: '2024-06-27T09:06:00+03:00'
+  severity: 2
+  priority: 1
+  build: 4.2.0
+  reported_by: Mikko Laine
+  tests: automated
+  cluster: Discounts
+  rule: BR-16
+  faults:
+  - F16
+  repro: |-
+    1. Set a 10% discount on Halden (C100).
+    2. Create a proposal for P-1002.
+    Expected: time lines discounted, expense line 120.00
+    Actual: expense line 108.00
+  resolution: ApplyDiscount ignored the line kind. It now discounts time lines only.
+- id: BILL-1079
+  title: Credit notes take numbers from the invoice sequence
+  created: '2024-07-02T09:02:00+03:00'
+  severity: 2
+  priority: 1
+  build: 4.3.0
+  reported_by: Lars Eriksson
+  tests: automated
+  cluster: Numbering
+  rule: BR-09
+  faults:
+  - F09b
+  repro: |-
+    1. Issue a credit note.
+    Expected: CN-000014
+    Actual: INV-000188, and the next invoice skips a number
+  resolution: CreateAsync asked for an invoice number. It now uses the credit note sequence.
+- id: BILL-1080
+  title: Reverse charge applied to EU customer without a VAT number
+  created: '2024-07-04T09:07:00+03:00'
+  severity: 2
+  priority: 1
+  build: 4.3.0
+  reported_by: Hanna Koskinen
+  tests: automated
+  cluster: VAT
+  rule: BR-03
+  faults:
+  - F03b
+  repro: |-
+    1. Create a proposal for P-1060 (Lumo, DE, no VAT number on file).
+    Expected: Finnish VAT
+    Actual: RC, no VAT
+  resolution: Without a VAT number the customer cannot account for the VAT. IsReverseCharge now requires one.
+- id: BILL-1082
+  title: Proposal totals shown under the adjustment column
+  created: '2024-07-09T10:36:00+03:00'
+  severity: 4
+  priority: 3
+  build: 4.3.0
+  reported_by: Anna Virtanen
+  tests: none
+  cluster: Page layout
+  rule: null
+  faults: []
+  repro: |-
+    1. Open any proposal.
+    Expected: Subtotal, Tax and Total under Amount
+    Actual: one column to the left
+  resolution: The footer colspan did not count the Adjustment column.
+- id: BILL-1084
+  title: Gaps in invoice numbers after deleting proposals
+  created: '2024-07-11T09:55:00+03:00'
+  severity: 2
+  priority: 1
+  build: 4.3.0
+  reported_by: Lars Eriksson
+  tests: automated
+  cluster: Numbering
+  rule: BR-09
+  faults:
+  - F09a
+  repro: |-
+    1. Create a proposal (number INV-000190 shown), delete it.
+    2. Create and finalise another.
+    Expected: INV-000190
+    Actual: INV-000191, the auditors flagged the gap
+  resolution: Proposals took a number when they were created. The number is now given when the invoice is finalised, and the proposal shows 'Assigned when finalised'.
+- id: BILL-1085
+  title: Project on billing hold still invoiced
+  created: '2024-07-16T10:54:00+03:00'
+  severity: 2
+  priority: 1
+  build: 4.3.0
+  reported_by: Mikko Laine
+  tests: automated
+  cluster: Billing holds
+  rule: BR-05
+  faults: []
+  repro: |-
+    1. Put P-1011 on billing hold (disputed hours).
+    2. Create a proposal for it.
+    Expected: Billing hold: project P-1011 is on hold.
+    Actual: proposal created
+  resolution: Only the customer hold was checked. The project hold is checked too.
+- id: BILL-1087
+  title: Write-down can take a line below zero
+  created: '2024-07-18T10:21:00+03:00'
+  severity: 3
+  priority: 2
+  build: 4.3.0
+  reported_by: Anna Virtanen
+  tests: manual
+  cluster: Adjustments
+  rule: BR-07
+  faults: []
+  repro: |-
+    1. Write line 1 (500.00) down by 600.00 with a reason.
+    Expected: refused
+    Actual: line -100.00
+  resolution: A write-down cannot be larger than the line.
+- id: BILL-1088
+  title: Credit note one cent short of the invoice line
+  created: '2024-07-22T08:48:00+03:00'
+  severity: 2
+  priority: 1
+  build: 4.3.0
+  reported_by: Lars Eriksson
+  tests: manual
+  cluster: Multi-currency rounding
+  rule: BR-04
+  faults: []
+  repro: |-
+    1. Credit 99.995 GBP equivalent on a GBP invoice line (full credit of a converted line).
+    Expected: -100.00
+    Actual: -99.99, leaving 0.01 open on the invoice
+  resolution: CreditAmount truncated to two decimals. It now uses the same rounding as invoice lines.
+- id: BILL-1090
+  title: Reverse charge note missing from the proposal
+  created: '2024-07-30T09:37:00+03:00'
+  severity: 3
+  priority: 2
+  build: 4.3.0
+  reported_by: Hanna Koskinen
+  tests: automated
+  cluster: VAT
+  rule: BR-03
+  faults: []
+  repro: |-
+    1. Create a proposal for Atlas (P-1050).
+    Expected: the reverse charge note under the header
+    Actual: no note; it only appears on the PDF
+  resolution: The note from the tax result is now stored on the invoice when the proposal is created.
+- id: BILL-1092
+  title: Invoice credited twice over
+  created: '2024-08-06T10:11:00+03:00'
+  severity: 1
+  priority: 1
+  build: 4.3.0
+  reported_by: Lars Eriksson
+  tests: automated
+  cluster: Credit notes
+  rule: BR-08
+  faults:
+  - F08a
+  repro: |-
+    1. INV-000291 has line 2 credited by CN-000013.
+    2. Create another credit note for both lines in full.
+    Expected: refused, only 1,857.40 EUR is still open
+    Actual: issued; the customer received 900.00 + tax twice
+  resolution: The credit limit was the invoice total. It is now the total less what earlier credit notes have credited.
+- id: BILL-1093
+  title: Not-to-exceed limit reached too early
+  created: '2024-08-08T08:19:00+03:00'
+  severity: 2
+  priority: 1
+  build: 4.3.0
+  reported_by: Sofia Berg
+  tests: manual
+  cluster: Not-to-exceed
+  rule: BR-19
+  faults: []
+  repro: |-
+    1. P-1030 has a not-to-exceed of 40,000 EUR, 32,000 invoiced and 4,000 credited.
+    2. Create a proposal with 6,000 EUR of time.
+    Expected: all time billed (28,000 + 6,000 is under the limit)
+    Actual: entries held back; open proposals and deferred proposals were also counted
+  resolution: Billed to date now counts final invoices and subtracts final credit notes.
+- id: BILL-1095
+  title: Proposal does not say that entries were held back
+  created: '2024-08-14T10:23:00+03:00'
+  severity: 3
+  priority: 2
+  build: 4.3.0
+  reported_by: Sofia Berg
+  tests: manual
+  cluster: Not-to-exceed
+  rule: BR-19
+  faults: []
+  repro: |-
+    1. Create a proposal for a project close to its not-to-exceed limit.
+    Expected: a message that some entries were held back
+    Actual: entries silently missing
+  resolution: The proposal stores how many entries were held back and the page shows the status reason as a banner.
+- id: BILL-1098
+  title: Cancelled invoice can be adjusted
+  created: '2024-08-22T10:51:00+03:00'
+  severity: 3
+  priority: 2
+  build: 4.3.0
+  reported_by: Mikko Laine
+  tests: none
+  cluster: Final invoice lock
+  rule: BR-13
+  faults: []
+  repro: |-
+    1. Open a cancelled invoice from 4.0 in the proposal screen.
+    Expected: locked
+    Actual: lines can be adjusted
+  resolution: IsLocked now covers cancelled invoices too.
+- id: BILL-1100
+  title: Time on the last day of the period left out
+  created: '2024-08-28T10:57:00+03:00'
+  severity: 2
+  priority: 1
+  build: 4.3.0
+  reported_by: Sofia Berg
+  tests: automated
+  cluster: Billable time
+  rule: BR-01
+  faults:
+  - F01b
+  repro: |-
+    1. Record approved time on P-1001 on 31 August.
+    2. Create a proposal with period end 31 August.
+    Expected: included
+    Actual: left out, billed a month late
+  resolution: The period end comparison was exclusive. It is now on or before.
+- id: BILL-1102
+  title: New 25.5% VAT rate shown as 26%
+  created: '2024-09-03T08:28:00+03:00'
+  severity: 2
+  priority: 1
+  build: 4.3.0
+  reported_by: Hanna Koskinen
+  tests: manual
+  cluster: VAT
+  rule: BR-03
+  faults: []
+  repro: |-
+    1. After the VAT change on 1 September, open a proposal or invoice.
+    Expected: S 25.5%
+    Actual: S 26% (amounts are right)
+  resolution: Rates were formatted without decimals. Proposal, invoice and credit note pages now show up to two.
+- id: BILL-1103
+  title: Credit note for an August invoice charges 25.5% VAT
+  created: '2024-09-05T08:01:00+03:00'
+  severity: 2
+  priority: 1
+  build: 4.3.0
+  reported_by: Hanna Koskinen
+  tests: manual
+  cluster: Credit notes
+  rule: BR-20
+  faults:
+  - F20
+  repro: |-
+    1. Credit an invoice from August 2024 (24% VAT).
+    Expected: credit note at 24%
+    Actual: 25.5%, today's rate for code S
+  resolution: Credit lines took the current rate of the tax code. They now take the rate charged on the original line.
+- id: BILL-1105
+  title: Proposal fails for roles without a rate card entry
+  created: '2024-09-11T09:24:00+03:00'
+  severity: 2
+  priority: 1
+  build: 4.3.0
+  reported_by: Sofia Berg
+  tests: automated
+  cluster: Rates
+  rule: BR-02
+  faults: []
+  repro: |-
+    1. Add junior consultant time to P-1003 (no Halden or card rate for juniors).
+    2. Create a proposal.
+    Expected: billed at the standard junior rate 85.00
+    Actual: No rate found for role JUN on project P-1003.
+  resolution: ResolveRate falls back to the role's standard rate.
+- id: BILL-1107
+  title: Credit note does not show which invoice it credits
+  created: '2024-09-17T10:26:00+03:00'
+  severity: 3
+  priority: 2
+  build: 4.3.0
+  reported_by: Lars Eriksson
+  tests: automated
+  cluster: Credit notes
+  rule: BR-08
+  faults: []
+  repro: |-
+    1. Issue a credit note and open it.
+    Expected: 'Credits invoice INV-...' with a link
+    Actual: nothing
+  resolution: The details page loads the original invoice and links to it.
+- id: BILL-1108
+  title: Invoice finalised in October uses October rate for a September invoice date
+  created: '2024-09-19T09:38:00+03:00'
+  severity: 2
+  priority: 1
+  build: 4.3.0
+  reported_by: Hanna Koskinen
+  tests: manual
+  cluster: Exchange rates
+  rule: BR-15
+  faults:
+  - F15b
+  repro: |-
+    1. Create a proposal dated 30 Sep, finalise on 2 Oct after the October rate is entered.
+    Expected: September rate
+    Actual: October rate
+  resolution: Finalise looked the rate up on the business date. It now uses the invoice date.
+- id: BILL-1110
+  title: Expenses billed over the not-to-exceed limit
+  created: '2024-09-25T09:39:00+03:00'
+  severity: 2
+  priority: 1
+  build: 4.3.0
+  reported_by: Sofia Berg
+  tests: manual
+  cluster: Not-to-exceed
+  rule: BR-19
+  faults: []
+  repro: |-
+    1. P-1030 is 100 EUR under its limit; approve a 400 EUR expense.
+    2. Create a proposal.
+    Expected: the expense is held back
+    Actual: billed, limit exceeded
+  resolution: The limit was only checked for time. Expenses are checked the same way.
+- id: BILL-1112
+  title: Proposal total shown without the currency
+  created: '2024-10-01T09:49:00+03:00'
+  severity: 4
+  priority: 3
+  build: 4.3.0
+  reported_by: Anna Virtanen
+  tests: automated
+  cluster: Labels and messages
+  rule: null
+  faults: []
+  repro: |-
+    1. Open a proposal for a SEK customer.
+    Expected: Total 12,450.00 SEK
+    Actual: Total 12,450.00
+  resolution: The total uses FormatMoney like the invoice page.
+- id: BILL-1113
+  title: SEK invoice finalised with EUR amounts
+  created: '2024-10-03T08:27:00+03:00'
+  severity: 1
+  priority: 1
+  build: 4.3.0
+  reported_by: Hanna Koskinen
+  tests: manual
+  cluster: Exchange rates
+  rule: BR-15
+  faults: []
+  repro: |-
+    1. Create a proposal for a SEK customer before the October rate is entered.
+    2. Finalise it.
+    Expected: refused until the rate is entered
+    Actual: finalised at 1.0, customer invoiced 1,500 SEK instead of 17,000 SEK
+  resolution: Finalise stops with a message naming the currency and date when no rate is found.
+- id: BILL-1115
+  title: Adjust buttons shown on a final invoice
+  created: '2024-10-09T09:15:00+03:00'
+  severity: 3
+  priority: 2
+  build: 4.4.0
+  reported_by: Anna Virtanen
+  tests: automated
+  cluster: Final invoice lock
+  rule: BR-13
+  faults: []
+  repro: |-
+    1. Open /Proposals/Edit/<id> for a final invoice.
+    Expected: no adjustment column
+    Actual: Adjust buttons on every line (they fail with an error)
+  resolution: The adjustment column is only rendered for open proposals.
+- id: BILL-1116
+  title: One large entry stops all later time being billed
+  created: '2024-10-14T08:57:00+03:00'
+  severity: 2
+  priority: 1
+  build: 4.4.0
+  reported_by: Sofia Berg
+  tests: manual
+  cluster: Not-to-exceed
+  rule: BR-19
+  faults:
+  - F19b
+  repro: |-
+    1. P-1030 has 900 EUR left under its limit. Time: 2 h, 8 h, 1 h.
+    2. Create a proposal.
+    Expected: the 8 h entry held back, the 1 h entry billed
+    Actual: both later entries held back
+  resolution: The time loop stopped at the first entry over the limit. It now skips that entry and carries on.
+- id: BILL-1119
+  title: Credit line can exceed the invoice line
+  created: '2024-10-29T09:28:00+02:00'
+  severity: 3
+  priority: 2
+  build: 4.4.0
+  reported_by: Lars Eriksson
+  tests: manual
+  cluster: Credit notes
+  rule: BR-08
+  faults: []
+  repro: |-
+    1. Credit 2,000.00 on a 1,480.00 line of an invoice that has other lines.
+    Expected: refused for the line
+    Actual: accepted as long as the invoice total is not exceeded
+  resolution: Each line can be credited up to its own amount.
+- id: BILL-1121
+  title: Printed SEK lines do not add up to the invoice total
+  created: '2024-11-04T08:32:00+02:00'
+  severity: 2
+  priority: 1
+  build: 4.4.0
+  reported_by: Hanna Koskinen
+  tests: manual
+  cluster: Multi-currency rounding
+  rule: BR-04
+  faults:
+  - F04b
+  repro: |-
+    1. Create a proposal for Nordvik (SEK) with 14 time lines.
+    2. Add up the printed line amounts.
+    Expected: equal to the subtotal
+    Actual: 0.03 SEK different; the customer's AP rejected the invoice
+  resolution: Lines were converted without rounding and only the total was rounded. Each line is now rounded in the invoice currency and the totals are the sum of the rounded lines.
+- id: BILL-1123
+  title: Short time entries rounded down to the quarter hour
+  created: '2024-11-12T08:53:00+02:00'
+  severity: 3
+  priority: 2
+  build: 4.4.0
+  reported_by: Sofia Berg
+  tests: manual
+  cluster: Quarter hours
+  rule: BR-18
+  faults: []
+  repro: |-
+    1. Record 0.10 h (a six minute call) on P-1001.
+    2. Create a proposal.
+    Expected: 0.25 h billed
+    Actual: 0.00 h, line with zero amount
+  resolution: Hours were rounded to the nearest quarter. They are rounded up, per the billing policy.
+- id: BILL-1125
+  title: Credit limit check ignores VAT
+  created: '2024-11-19T10:51:00+02:00'
+  severity: 2
+  priority: 1
+  build: 4.4.0
+  reported_by: Lars Eriksson
+  tests: manual
+  cluster: Credit notes
+  rule: BR-08
+  faults: []
+  repro: |-
+    1. An invoice has 100.00 open including VAT.
+    2. Credit 90.00 before tax (112.95 with VAT).
+    Expected: refused
+    Actual: issued, invoice over-credited by 12.95
+  resolution: The check compared the credit before tax with the open amount including tax. It now compares the credit total.
+- id: BILL-1131
+  title: Milestone billed on two proposals
+  created: '2024-12-05T09:12:00+02:00'
+  severity: 2
+  priority: 1
+  build: 4.4.0
+  reported_by: Mikko Laine
+  tests: manual
+  cluster: Milestones
+  rule: BR-11
+  faults: []
+  repro: |-
+    1. Create a December proposal for P-1080 (completed milestone).
+    2. Create another one for the same project before finalising the first.
+    Expected: refused
+    Actual: second proposal with the same milestone; both were finalised
+  resolution: A project can only have one open proposal.
+- id: BILL-1133
+  title: Saving an exchange rate without a date gives an error page
+  created: '2024-12-11T10:27:00+02:00'
+  severity: 3
+  priority: 2
+  build: 4.4.0
+  reported_by: Hanna Koskinen
+  tests: none
+  cluster: Exchange rates
+  rule: null
+  faults: []
+  repro: |-
+    1. Exchange rates, enter a rate, leave the date empty, Save rate.
+    Expected: message asking for the date
+    Actual: error page
+  resolution: The page checks the date before saving.
+- id: BILL-1135
+  title: Write-up saved without a reason
+  created: '2025-01-08T08:02:00+02:00'
+  severity: 3
+  priority: 2
+  build: 4.4.0
+  reported_by: Mikko Laine
+  tests: manual
+  cluster: Adjustments
+  rule: BR-06
+  faults:
+  - F06
+  repro: |-
+    1. On a proposal, write line 1 up by 100 without a reason.
+    Expected: Enter a reason for the write-up.
+    Actual: saved; the customer queried the extra amount and nobody knew why
+  resolution: Both write-ups and write-downs now need a reason.
+- id: BILL-1136
+  title: Interim billing above the contract value
+  created: '2025-01-10T08:48:00+02:00'
+  severity: 3
+  priority: 2
+  build: 4.4.0
+  reported_by: Sofia Berg
+  tests: manual
+  cluster: Percent complete
+  rule: null
+  faults: []
+  repro: |-
+    1. On a pilot fixed-price project, cost to date exceeds the estimate.
+    2. Build the interim proposal.
+    Expected: billing stops at the contract value
+    Actual: 112% of the contract billed
+  resolution: The completion percentage is capped at 100%.
+- id: BILL-1140
+  title: PO numbers in lower case rejected by the customer's AP
+  created: '2025-01-22T08:11:00+02:00'
+  severity: 4
+  priority: 3
+  build: 4.5.0
+  reported_by: Lars Eriksson
+  tests: none
+  cluster: Purchase orders
+  rule: BR-17
+  faults: []
+  repro: |-
+    1. Enter po-4471 as purchase order on a Meridian proposal and finalise.
+    Expected: PO-4471 on the invoice
+    Actual: po-4471, rejected by Meridian's matching
+  resolution: PO numbers are trimmed and upper-cased when saved, and an empty value no longer fails.
+- id: BILL-1141
+  title: Written-down proposal deferred as below minimum
+  created: '2025-01-24T10:32:00+02:00'
+  severity: 3
+  priority: 2
+  build: 4.5.0
+  reported_by: Anna Virtanen
+  tests: manual
+  cluster: Adjustments
+  rule: BR-14
+  faults: []
+  repro: |-
+    1. Write a proposal up from 40 to 80 EUR.
+    Expected: proposal counted at 80 EUR
+    Actual: the subtotal used for the minimum and the not-to-exceed check stays at 40
+  resolution: BaseSubtotal now includes write-ups and write-downs.
+- id: BILL-1143
+  title: Invoice amounts not updated to the final exchange rate
+  created: '2025-02-04T10:23:00+02:00'
+  severity: 2
+  priority: 1
+  build: 4.5.0
+  reported_by: Hanna Koskinen
+  tests: manual
+  cluster: Exchange rates
+  rule: BR-15
+  faults: []
+  repro: |-
+    1. Create a GBP proposal before the month's rate is entered, enter the rate, finalise.
+    Expected: lines converted at the stored rate
+    Actual: rate on the invoice is new, amounts are still in EUR
+  resolution: Finalise recalculates the lines after setting the rate.
+- id: BILL-1146
+  title: PO number can be changed on a final invoice
+  created: '2025-02-12T10:37:00+02:00'
+  severity: 3
+  priority: 2
+  build: 4.5.0
+  reported_by: Lars Eriksson
+  tests: manual
+  cluster: Final invoice lock
+  rule: BR-13
+  faults: []
+  repro: |-
+    1. Post a PO change to a final invoice from an old browser tab.
+    Expected: refused
+    Actual: PO changed on the final invoice, different from the ledger
+  resolution: SetPurchaseOrder refuses locked invoices.
+- id: BILL-1151
+  title: Empty credit note issued and numbered
+  created: '2025-03-06T09:59:00+02:00'
+  severity: 3
+  priority: 2
+  build: 4.5.0
+  reported_by: Lars Eriksson
+  tests: manual
+  cluster: Credit notes
+  rule: BR-09
+  faults: []
+  repro: |-
+    1. Open Create credit note and press Issue without entering amounts.
+    Expected: Enter an amount to credit on at least one line.
+    Actual: CN-000031 issued for 0.00
+  resolution: A credit note needs at least one line.
+- id: BILL-1153
+  title: Fixed-price projects listed with unbilled hours
+  created: '2025-03-12T10:42:00+02:00'
+  severity: 4
+  priority: 3
+  build: 4.5.0
+  reported_by: Sofia Berg
+  tests: none
+  cluster: Project screens
+  rule: null
+  faults: []
+  repro: |-
+    1. Open Projects.
+    Expected: fixed-price projects show 0.00 unbilled hours
+    Actual: they show logged hours, which are never billed
+  resolution: Fixed-price projects bill milestones, so the list shows 0.00 for them.
+- id: BILL-1156
+  title: Exempt invoices lack the exemption wording
+  created: '2025-03-20T08:17:00+02:00'
+  severity: 3
+  priority: 2
+  build: 4.5.0
+  reported_by: Hanna Koskinen
+  tests: manual
+  cluster: VAT
+  rule: BR-03
+  faults: []
+  repro: |-
+    1. Create a proposal for the training project P-1095 (tax code E, exempt).
+    Expected: 0% and the exemption note
+    Actual: 0%, no note
+  resolution: Exempt tax codes return a note with the code description.
+- id: BILL-1159
+  title: Write-down of 40% finalised without review
+  created: '2025-04-03T10:40:00+03:00'
+  severity: 2
+  priority: 1
+  build: 4.5.0
+  reported_by: Mikko Laine
+  tests: none
+  cluster: Write-down approval
+  rule: BR-07
+  faults: []
+  repro: |-
+    1. On a 12,000 EUR proposal for P-1001, write lines down by 4,800 EUR with a reason.
+    2. Finalise.
+    Expected: the proposal waits for a billing manager
+    Actual: finalised straight away; finance found it at month end
+  resolution: Write-downs above 10% of the proposal now put it in Awaiting approval, and Finalise refuses it until a billing manager approves.
+- id: BILL-1161
+  title: Proposal stays awaiting approval after the write-down is removed
+  created: '2025-04-15T10:48:00+03:00'
+  severity: 3
+  priority: 2
+  build: 4.5.0
+  reported_by: Anna Virtanen
+  tests: manual
+  cluster: Write-down approval
+  rule: BR-07
+  faults: []
+  repro: |-
+    1. Write a proposal down by 20%, it goes to Awaiting approval.
+    2. Set the adjustment back to 0.
+    Expected: back to Proposal
+    Actual: still Awaiting approval
+  resolution: When write-downs fall back under the limit the proposal returns to Proposal.
+- id: BILL-1162
+  title: Project manager can approve write-downs
+  created: '2025-04-17T09:16:00+03:00'
+  severity: 2
+  priority: 1
+  build: 4.5.0
+  reported_by: Mikko Laine
+  tests: manual
+  cluster: Write-down approval
+  rule: BR-07
+  faults: []
+  repro: |-
+    1. Switch user to Sofia Berg (project manager).
+    2. Approvals, approve her own write-down.
+    Expected: refused
+    Actual: approved
+  resolution: Approve and Reject check the billing manager role.
+- id: BILL-1164
+  title: Approvals list shows 0.00 written down
+  created: '2025-04-23T08:37:00+03:00'
+  severity: 3
+  priority: 2
+  build: 4.5.0
+  reported_by: Mikko Laine
+  tests: none
+  cluster: Write-down approval
+  rule: null
+  faults: []
+  repro: |-
+    1. Open Approvals with one proposal waiting.
+    Expected: amounts before and written down
+    Actual: 0.00 and 0.00, no reasons
+  resolution: The list query now loads the proposal lines.
+- id: BILL-1167
+  title: Status shown as PendingApproval
+  created: '2025-05-02T08:57:00+03:00'
+  severity: 4
+  priority: 3
+  build: 4.5.0
+  reported_by: Anna Virtanen
+  tests: none
+  cluster: Labels and messages
+  rule: null
+  faults: []
+  repro: |-
+    1. Open a proposal awaiting approval.
+    Expected: Status Awaiting approval
+    Actual: PendingApproval
+  resolution: StatusLabel has a label for the new status.
+- id: BILL-1169
+  title: Second proposal created while the first awaits approval
+  created: '2025-05-08T08:13:00+03:00'
+  severity: 2
+  priority: 1
+  build: 4.5.0
+  reported_by: Mikko Laine
+  tests: manual
+  cluster: Billable time
+  rule: null
+  faults: []
+  repro: |-
+    1. P-1001 has a proposal awaiting approval.
+    2. Create another proposal for P-1001.
+    Expected: refused
+    Actual: created with the milestone and new time; both were finalised
+  resolution: The open proposal check includes proposals awaiting approval.
+- id: BILL-1171
+  title: No message when a write-down sends the proposal for approval
+  created: '2025-05-14T08:14:00+03:00'
+  severity: 4
+  priority: 3
+  build: 4.5.0
+  reported_by: Anna Virtanen
+  tests: none
+  cluster: Write-down approval
+  rule: null
+  faults: []
+  repro: |-
+    1. Write a proposal down by 20%.
+    Expected: message that it now needs a billing manager's approval
+    Actual: 'Adjustment saved.'
+  resolution: The message says when the proposal needs approval.
+- id: BILL-1177
+  title: Type filter on the invoice list shows everything
+  created: '2025-05-28T09:09:00+03:00'
+  severity: 3
+  priority: 2
+  build: 4.6.0
+  reported_by: Lars Eriksson
+  tests: none
+  cluster: Invoice list
+  rule: null
+  faults: []
+  repro: |-
+    1. Invoices, choose Type: Credit notes, Search.
+    Expected: credit notes only
+    Actual: invoices and credit notes
+  resolution: The list query ignored the type. It now filters on it when one is chosen.
+- id: BILL-1180
+  title: Customer with lower-case country code charged VAT
+  created: '2025-06-05T09:00:00+03:00'
+  severity: 3
+  priority: 2
+  build: 4.6.0
+  reported_by: Hanna Koskinen
+  tests: manual
+  cluster: VAT
+  rule: BR-03
+  faults: []
+  repro: |-
+    1. Customer C210 was imported with country 'de'.
+    2. Create a proposal.
+    Expected: reverse charge (German business with VAT number)
+    Actual: Finnish VAT
+  resolution: IsEu upper-cases the country code before the lookup.
+- id: BILL-1183
+  title: Credit note lines in a different order from the invoice
+  created: '2025-06-10T08:13:00+03:00'
+  severity: 4
+  priority: 3
+  build: 4.6.0
+  reported_by: Lars Eriksson
+  tests: none
+  cluster: Credit notes
+  rule: null
+  faults: []
+  repro: |-
+    1. Credit lines 1, 2 and 3 of a three-line invoice.
+    Expected: credit lines in the same order
+    Actual: sometimes 2, 1, 3
+  resolution: The original invoice is loaded with its lines in sequence order.
+- id: BILL-1185
+  title: Totals unchanged after write-downs are rejected
+  created: '2025-06-12T10:41:00+03:00'
+  severity: 3
+  priority: 2
+  build: 4.6.0
+  reported_by: Mikko Laine
+  tests: manual
+  cluster: Write-down approval
+  rule: BR-07
+  faults: []
+  repro: |-
+    1. Reject the write-downs on a proposal awaiting approval.
+    Expected: lines and totals back to the original amounts
+    Actual: lines show no adjustment but the total is still the written-down total
+  resolution: Reject recalculates the proposal after clearing the write-downs.
+- id: BILL-1187
+  title: Yen invoices show decimals
+  created: '2025-06-16T08:18:00+03:00'
+  severity: 2
+  priority: 1
+  build: 4.6.0
+  reported_by: Hanna Koskinen
+  tests: none
+  cluster: Multi-currency rounding
+  rule: BR-04
+  faults:
+  - F04c
+  repro: |-
+    1. Create a proposal for Kaito Systems (JPY).
+    Expected: amounts in whole yen
+    Actual: 152,340.47 JPY; the customer's bank rejected the payment reference
+  resolution: MinorUnits returned 2 for every currency. JPY has none.
+- id: BILL-1189
+  title: Approval kept after a further write-down
+  created: '2025-06-26T10:53:00+03:00'
+  severity: 2
+  priority: 1
+  build: 4.6.0
+  reported_by: Mikko Laine
+  tests: manual
+  cluster: Write-down approval
+  rule: BR-07
+  faults: []
+  repro: |-
+    1. A billing manager approves a 15% write-down.
+    2. The clerk writes another line down; total 30%.
+    Expected: Awaiting approval again
+    Actual: still approved, finalised at 30%
+  resolution: Any write-down over the limit clears an earlier approval.
+- id: BILL-1191
+  title: Write-up reason not shown on the proposal
+  created: '2025-07-03T09:28:00+03:00'
+  severity: 3
+  priority: 2
+  build: 4.6.0
+  reported_by: Mikko Laine
+  tests: automated
+  cluster: Adjustments
+  rule: BR-06
+  faults: []
+  repro: |-
+    1. Write line 1 up with a reason.
+    Expected: reason shown under the line description
+    Actual: only visible in the audit log
+  resolution: The proposal page shows the reason under the line.
+- id: BILL-1193
+  title: Interim billing counts open proposals as billed
+  created: '2025-07-15T10:32:00+03:00'
+  severity: 3
+  priority: 2
+  build: 4.6.0
+  reported_by: Sofia Berg
+  tests: manual
+  cluster: Percent complete
+  rule: null
+  faults: []
+  repro: |-
+    1. Build an interim proposal, then build another before finalising the first.
+    Expected: second one bills the same amount
+    Actual: second one bills less, the open proposal counted as billed
+  resolution: Billed to date counts final invoices only.
+- id: BILL-1195
+  title: Invoice list takes a minute to open
+  created: '2025-08-05T09:21:00+03:00'
+  severity: 3
+  priority: 2
+  build: 4.6.0
+  reported_by: Lars Eriksson
+  tests: manual
+  cluster: Invoice list
+  rule: null
+  faults: []
+  repro: |-
+    1. Open Invoices without a search.
+    Expected: list in a few seconds
+    Actual: about 60 s with 6,000 documents
+  resolution: The page shows the latest 200 and says how many there are; search narrows the list.
+- id: BILL-1197
+  title: Exchange rate of zero accepted
+  created: '2025-08-12T09:46:00+03:00'
+  severity: 3
+  priority: 2
+  build: 4.6.0
+  reported_by: Hanna Koskinen
+  tests: none
+  cluster: Exchange rates
+  rule: BR-15
+  faults: []
+  repro: |-
+    1. Exchange rates, enter 0 for SEK and save.
+    Expected: refused
+    Actual: saved; proposals show 0.00 SEK
+  resolution: The rate must be greater than zero.
+- id: BILL-1199
+  title: Credit amounts cleared after a validation error
+  created: '2025-08-20T10:27:00+03:00'
+  severity: 4
+  priority: 3
+  build: 4.6.0
+  reported_by: Lars Eriksson
+  tests: none
+  cluster: Credit notes
+  rule: null
+  faults: []
+  repro: |-
+    1. Enter amounts on five lines, leave the reason empty, issue.
+    Expected: error, amounts still filled in
+    Actual: error, all fields empty
+  resolution: The form shows the entered amounts and reason again.
+- id: BILL-1201
+  title: Purchase order form runs off the screen
+  created: '2025-09-02T10:14:00+03:00'
+  severity: 4
+  priority: 3
+  build: 4.6.0
+  reported_by: Anna Virtanen
+  tests: none
+  cluster: Page layout
+  rule: null
+  faults: []
+  repro: |-
+    1. Open a proposal on a 1366 px laptop.
+    Expected: PO form fits
+    Actual: Save PO button off screen
+  resolution: Inline forms wrap.
+- id: BILL-1203
+  title: VAT on SEK invoices off by a few öre
+  created: '2025-09-08T10:28:00+03:00'
+  severity: 2
+  priority: 1
+  build: 4.6.0
+  reported_by: Hanna Koskinen
+  tests: none
+  cluster: Multi-currency rounding
+  rule: BR-04
+  faults:
+  - F04d
+  repro: |-
+    1. Create a proposal for Nordvik (SEK) and check the VAT on each line.
+    Expected: VAT = rounded line amount x 25.5%, rounded
+    Actual: VAT worked out on the unrounded converted amount; 0.01 SEK out on some lines
+  resolution: LineTax now converts and rounds the line first and works out the tax on that amount.
+- id: BILL-1205
+  title: Error page when a project has an unknown tax code
+  created: '2025-09-23T08:38:00+03:00'
+  severity: 3
+  priority: 2
+  build: 4.6.0
+  reported_by: Anna Virtanen
+  tests: none
+  cluster: VAT
+  rule: BR-03
+  faults: []
+  repro: |-
+    1. Project P-1097 has tax code S2 (removed).
+    2. Create a proposal.
+    Expected: message naming the tax code
+    Actual: error page
+  resolution: TaxService reports the missing code.
+- id: BILL-1207
+  title: Error page when creating a proposal without a project
+  created: '2025-10-14T08:31:00+03:00'
+  severity: 4
+  priority: 3
+  build: 4.7.0
+  reported_by: Anna Virtanen
+  tests: none
+  cluster: Proposal screens
+  rule: null
+  faults: []
+  repro: |-
+    1. New proposal, leave Project empty, Create proposal.
+    Expected: Select a project.
+    Actual: error page
+  resolution: The page asks for a project.
+- id: BILL-1209
+  title: Expense lines on the invoice have no date
+  created: '2025-11-04T10:57:00+02:00'
+  severity: 4
+  priority: 3
+  build: 4.7.0
+  reported_by: Lars Eriksson
+  tests: none
+  cluster: Expenses
+  rule: BR-12
+  faults: []
+  repro: |-
+    1. Create a proposal with two hotel expenses.
+    Expected: each line starts with the expense date
+    Actual: only the description
+  resolution: Expense lines start with the date, like time lines.
+- id: BILL-1212
+  title: Interim billing line shows 37.142857142857% complete
+  created: '2025-11-25T08:31:00+02:00'
+  severity: 4
+  priority: 3
+  build: 4.7.0
+  reported_by: Sofia Berg
+  tests: none
+  cluster: Percent complete
+  rule: null
+  faults: []
+  repro: |-
+    1. Build an interim proposal for a pilot project.
+    Expected: Progress billing 37.1% complete
+    Actual: 37.142857142857142857142857143%
+  resolution: The percentage is rounded to one decimal in the description.
+- id: BILL-1214
+  title: Error page for a credit note link to a missing invoice
+  created: '2025-12-09T09:33:00+02:00'
+  severity: 4
+  priority: 3
+  build: 4.7.0
+  reported_by: Lars Eriksson
+  tests: none
+  cluster: Credit notes
+  rule: null
+  faults: []
+  repro: |-
+    1. Open /CreditNotes/Create?invoiceId=999999.
+    Expected: Not found
+    Actual: error page
+  resolution: The page returns Not found when the invoice does not exist.
+- id: BILL-1216
+  title: Home page counts projects with only non-billable time
+  created: '2026-01-13T09:27:00+02:00'
+  severity: 4
+  priority: 3
+  build: 4.7.0
+  reported_by: Sofia Berg
+  tests: none
+  cluster: Home page
+  rule: null
+  faults: []
+  repro: |-
+    1. Open the home page.
+    Expected: Projects with unbilled time counts billable time only
+    Actual: includes internal projects with non-billable time
+  resolution: The tile counts billable time only.
+- id: BILL-1219
+  title: KRW and ISK invoices show decimals
+  created: '2026-02-09T08:33:00+02:00'
+  severity: 3
+  priority: 2
+  build: 4.7.0
+  reported_by: Hanna Koskinen
+  tests: manual
+  cluster: Multi-currency rounding
+  rule: BR-04
+  faults: []
+  repro: |-
+    1. Create a proposal for Hanseo Logistics (KRW) or Fjord Data ehf (ISK).
+    Expected: whole won / krónur
+    Actual: two decimals
+  resolution: KRW and ISK have no minor units either. Added them next to JPY.
+- id: BILL-1222
+  title: Labels wrap in the proposal header
+  created: '2026-03-03T09:53:00+02:00'
+  severity: 4
+  priority: 3
+  build: 4.7.0
+  reported_by: Anna Virtanen
+  tests: none
+  cluster: Page layout
+  rule: null
+  faults: []
+  repro: |-
+    1. Open an approved proposal.
+    Expected: 'Write-downs approved by' on one line
+    Actual: wraps onto two lines
+  resolution: The label column is wider.
+- id: BILL-1225
+  title: Interim billing fails with a division error
+  created: '2026-04-07T08:33:00+03:00'
+  severity: 3
+  priority: 2
+  build: 4.8.0
+  reported_by: Sofia Berg
+  tests: manual
+  cluster: Percent complete
+  rule: null
+  faults: []
+  repro: |-
+    1. Build an interim proposal with an estimated cost of 0.
+    Expected: nothing to bill
+    Actual: error page (attempted to divide by zero)
+  resolution: A zero or negative estimate gives nothing to bill.
+- id: BILL-1228
+  title: EUR offered on the exchange rate page
+  created: '2026-05-12T08:56:00+03:00'
+  severity: 4
+  priority: 3
+  build: 4.8.0
+  reported_by: Hanna Koskinen
+  tests: none
+  cluster: Exchange rates
+  rule: null
+  faults: []
+  repro: |-
+    1. Open Exchange rates.
+    Expected: foreign currencies only
+    Actual: EUR is in the list and a EUR to EUR rate can be saved
+  resolution: The company currency is left out of the list.
+- id: BILL-1231
+  title: Home page shows the business date as the period end
+  created: '2026-06-09T09:06:00+03:00'
+  severity: 4
+  priority: 3
+  build: 4.8.0
+  reported_by: Anna Virtanen
+  tests: none
+  cluster: Home page
+  rule: null
+  faults: []
+  repro: |-
+    1. Open the home page on 9 June.
+    Expected: Billing period ending 30 June 2026
+    Actual: Billing period ending 9 June 2026
+  resolution: The home page uses the end of the month.
+- id: BILL-1235
+  title: Audit log does not say whether a line was written up or down
+  created: '2026-07-21T09:23:00+03:00'
+  severity: 4
+  priority: 3
+  build: 4.8.1
+  reported_by: Mikko Laine
+  tests: none
+  cluster: Adjustments
+  rule: null
+  faults: []
+  repro: |-
+    1. Write a line down, open the audit log.
+    Expected: Write-down
+    Actual: Adjustment
+  resolution: The audit action says Write-up or Write-down.
+- id: BILL-1238
+  title: Rate page jumps back to the first currency after saving
+  created: '2026-08-25T09:30:00+03:00'
+  severity: 4
+  priority: 3
+  build: 4.8.1
+  reported_by: Hanna Koskinen
+  tests: none
+  cluster: Exchange rates
+  rule: null
+  faults: []
+  repro: |-
+    1. Exchange rates, choose SEK, save a rate.
+    Expected: SEK history shown
+    Actual: GBP history shown
+  resolution: The redirect keeps the currency.
+- id: BILL-1240
+  title: Customer put on hold without a reason
+  created: '2026-09-15T08:06:00+03:00'
+  severity: 3
+  priority: 2
+  build: 4.8.1
+  reported_by: Mikko Laine
+  tests: manual
+  cluster: Billing holds
+  rule: BR-05
+  faults: []
+  repro: |-
+    1. Customers, open C140, tick Billing hold, leave the reason empty, save.
+    Expected: Enter a reason for the billing hold.
+    Actual: error page
+  resolution: A hold needs a reason, as on the project page.

@@ -1,0 +1,43 @@
+@page
+@model Kestrel.Billing.Pages.Approvals.IndexModel
+@{
+    ViewData["Title"] = "Approvals";
+}
+<h1>Write-downs awaiting approval</h1>
+<partial name="_Error" model="Model.Error" />
+@if (Model.Waiting.Count == 0)
+{
+    <p id="no-approvals">Nothing is waiting for approval.</p>
+}
+else
+{
+    <table class="grid" id="approvals">
+        <thead>
+        <tr><th>Proposal</th><th>Project</th><th>Customer</th><th class="num">Before write-downs (EUR)</th><th class="num">Written down (EUR)</th><th>Reasons</th><th></th></tr>
+        </thead>
+        <tbody>
+        @foreach (var i in Model.Waiting)
+        {
+            var before = i.Lines.Sum(l => l.SourceAmount);
+            var down = i.Lines.Where(l => l.Adjustment < 0).Sum(l => -l.Adjustment);
+            <tr data-proposal="@i.Id">
+                <td><a href="/Proposals/Edit/@i.Id">P@(i.Id.ToString("00000"))</a></td>
+                <td>@i.Project.Code</td>
+                <td>@i.Customer.Name</td>
+                <td class="num">@before.ToString("#,##0.00")</td>
+                <td class="num">@down.ToString("#,##0.00")</td>
+                <td>@string.Join("; ", i.Lines.Where(l => l.Adjustment < 0).Select(l => l.AdjustmentReason))</td>
+                <td>
+                    <form method="post" asp-page-handler="Approve" asp-route-id="@i.Id" class="inline">
+                        <button type="submit" class="primary">Approve</button>
+                    </form>
+                    <form method="post" asp-page-handler="Reject" asp-route-id="@i.Id" class="inline">
+                        <input name="Comment" aria-label="Rejection comment" placeholder="Comment" size="14" />
+                        <button type="submit">Reject</button>
+                    </form>
+                </td>
+            </tr>
+        }
+        </tbody>
+    </table>
+}

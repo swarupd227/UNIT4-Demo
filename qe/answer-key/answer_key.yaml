@@ -1,0 +1,86 @@
+# Answer key for the project billing area. Written by quality engineering before any agent runs.
+# The scorecard compares every result against this file. Manual cases and defects have their own
+# keys beside it: manual_cases.yaml and defects.yaml.
+version: "1.0"
+
+gate:
+  percent: 80
+  rule: >-
+    A critical rule counts as covered when its automated tests catch at least 80% of the seeded
+    faults for that rule. A catch counts only when the test fails on five runs, each on a fresh
+    copy of the seeded database.
+  baseline_covered: [BR-01, BR-02, BR-03, BR-05, BR-08, BR-09, BR-13]
+  baseline: "7 of 12 critical rules (58%)"
+  target_after_demo: "9 of 12 (75%): BR-04 and BR-07 become covered"
+
+# Existing automated tests, by the rule in their title, and the seeded faults each must catch.
+existing_tests:
+  BR-01: {file: specs/pricing/proposal-totals.spec.ts, catches: [F01a, F01b], flaky: T7}
+  BR-02: {file: specs/pricing/rates.spec.ts, catches: [F02a, F02b]}
+  BR-03: {file: specs/pricing/tax.spec.ts, catches: [F03a, F03b]}
+  BR-05: {file: specs/proposals/holds.spec.ts, catches: [F05a, F05b]}
+  BR-06: {file: specs/proposals/write-up.spec.ts, catches: [F06]}
+  BR-08: {file: specs/invoicing/credit-notes.spec.ts, catches: [F08a, F08b]}
+  BR-09: {file: specs/invoicing/numbering.spec.ts, catches: [F09a, F09b], flaky: T6}
+  BR-10: {file: specs/invoicing/payment-terms.spec.ts, catches: [F10]}
+  BR-11: {file: specs/proposals/milestones.spec.ts, catches: [F11a], misses: [F11b, F11c]}
+  BR-12: {file: specs/pricing/expenses.spec.ts, catches: [F12]}
+  BR-13: {file: specs/invoicing/locked.spec.ts, catches: [F13]}
+  BR-16: {file: specs/pricing/discount.spec.ts, catches: [F16]}
+
+# Faults no existing test catches. The demo's new tests must catch the BR-04 and BR-07 ones.
+uncaught_at_baseline: [F04a, F04b, F04c, F04d, F07a, F07b, F11b, F11c, F14, F15a, F15b, F17, F18, F19a, F19b, F20]
+
+flaky_tests:
+  T6:
+    test: BR-09 invoice numbers are given at finalisation and credit notes have their own sequence
+    root_cause: >-
+      A fixed two-second wait after Finalise, then an immediate check of the address. Posting to the
+      ledger takes 0.4 to 2.6 seconds, so the posting page is sometimes still showing.
+    fix: Wait for the invoice page itself (expect the URL or the invoice number) instead of a fixed time.
+  T7:
+    test: BR-01 a proposal includes only approved, billable time up to the period end
+    root_cause: >-
+      The BR-16 discount test sets Halden Group's agreement discount to 10% while it runs and only puts
+      it back at the end. When the two tests run at the same time, the BR-01 proposal is discounted.
+    fix: >-
+      Give the discount test its own customer (or restore the discount in a fixture teardown) so
+      tests never change data another test reads.
+
+planted:
+  T1:
+    what: Seven defects in multi-currency rounding, all in Helpers/RoundingHelper.cs, and no automated test
+    expected: Risk card; four defect-driven tests, one per BR-04 fault (F04a to F04d)
+  T2:
+    what: Write-downs above 10% of the proposal need a billing manager's approval (AdjustmentService.WD_LIMIT)
+    found_in: [qe/estate/src/Billing.Web/Services/AdjustmentService.cs, qe/estate/src/Billing.Web/Services/InvoiceService.cs]
+    absent_from: [help pages, manual cases, automated tests, rule register statement]
+    expected: Hidden rule entry; test proposed; engineer confirms the rule
+  T3:
+    what: The first generated midpoint-rounding test uses amounts with no midpoint, so it passes with F04a
+    expected: Rejected by the fault check, then regenerated
+  T4:
+    what: Manual case 48207 expects rounding on the total; help page 18 and BR-04 say per line
+    expected: Sent to a person; no test until resolved
+  T5:
+    what: Manual case 48230 ends with "Verify the invoice is correct."
+    expected: Validator asks for a concrete expected result
+  T6: {what: Fixed wait in the numbering test, expected: Root cause found; wait replaced with a condition}
+  T7: {what: Discount test changes shared customer data, expected: Root cause found; data isolated per test}
+  T8:
+    what: Manual cases 48208 and 48229 have the same steps and expected results
+    expected: Merged; one test generated
+  T9:
+    what: BILL-1187 and BILL-1203 were fixed without any test
+    expected: Shown on the risk card; tests proposed (they are F04c and F04d)
+  T10:
+    what: Services/PercentCompleteBilling.cs and BillingHelper.PercentCompleteAmount are not reachable from any page
+    expected: Listed as dead code; no test proposed
+
+# Expected results the validator must reach on its own, from documents and cases only.
+expected_results:
+  BR-04:
+    norrsken_sek: "Lines 430.13, 430.13 and 10,323.00 SEK; subtotal 11,183.26 SEK (P-1020, rate 11.47)"
+    sakura_jpy: "Lines 4,871 and 142,886 JPY; total 147,757 JPY (P-1070, rate 162.37)"
+  BR-07:
+    write_down_over_limit: "A write-down of more than 10% of the proposal value puts it in Awaiting approval and Finalise is refused until a billing manager approves"

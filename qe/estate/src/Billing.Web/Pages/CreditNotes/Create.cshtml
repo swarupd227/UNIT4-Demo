@@ -1,0 +1,39 @@
+@page
+@model Kestrel.Billing.Pages.CreditNotes.CreateModel
+@{
+    var o = Model.Original;
+    ViewData["Title"] = "Credit " + o.Number;
+}
+<h1>Credit invoice @o.Number</h1>
+<partial name="_Error" model="Model.Error" />
+<dl class="facts">
+    <dt>Customer</dt><dd>@o.Customer.Name</dd>
+    <dt>Invoice total</dt><dd>@BillingHelper.FormatMoney(o.Total, o.Currency)</dd>
+    <dt>Still open to credit</dt><dd id="remaining">@BillingHelper.FormatMoney(Model.Remaining, o.Currency)</dd>
+</dl>
+<form method="post" class="form" id="credit-form">
+    <input type="hidden" name="InvoiceId" value="@o.Id" />
+    <table class="grid" id="credit-lines">
+        <thead>
+        <tr><th>#</th><th>Description</th><th class="num">Amount (@o.Currency)</th><th>Tax</th><th class="num">Credit before tax</th></tr>
+        </thead>
+        <tbody>
+        @foreach (var l in o.Lines.OrderBy(l => l.Sequence))
+        {
+            <tr data-line="@l.Sequence">
+                <td>@l.Sequence</td>
+                <td>@l.Description</td>
+                <td class="num">@BillingHelper.FormatAmount(l.Amount, o.Currency)</td>
+                <td>@l.TaxCode @(l.TaxRate == 0 ? "" : l.TaxRate.ToString("0.##") + "%")</td>
+                <td class="num"><input name="Credit[@l.Id]" aria-label="Credit for line @l.Sequence" size="10" value="@Model.Entered.GetValueOrDefault(l.Id)" /></td>
+            </tr>
+        }
+        </tbody>
+    </table>
+    <div class="field">
+        <label for="Reason">Reason</label>
+        <input id="Reason" name="Reason" size="60" value="@Model.Reason" />
+    </div>
+    <button type="submit" class="primary" id="issue-credit-note">Issue credit note</button>
+    <a href="/Invoices/Details/@o.Id">Cancel</a>
+</form>

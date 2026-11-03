@@ -1,0 +1,45 @@
+@inject CurrentUser CurrentUser
+@inject SystemClock Clock
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>@ViewData["Title"] - Project Billing</title>
+    <link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
+</head>
+<body>
+    <header class="topbar">
+        <div class="brand">Kestrel Consulting <span>Project Billing</span></div>
+        <div class="sysdate">Business date <strong id="business-date">@Clock.Today.ToString("d MMM yyyy")</strong></div>
+        <form method="post" action="/User/Switch" class="user-switch">
+            <label for="current-user">User</label>
+            <select id="current-user" name="user" onchange="this.form.submit()">
+                @foreach (var (key, person) in CurrentUser.Users)
+                {
+                    <option value="@key" selected="@(key == CurrentUser.Key)">@person.Name (@person.Role)</option>
+                }
+            </select>
+            <input type="hidden" name="returnUrl" value="@(Context.Request.Path + Context.Request.QueryString)" />
+        </form>
+    </header>
+    <nav class="menu">
+        <a href="/">Home</a>
+        <a href="/Customers">Customers</a>
+        <a href="/Projects">Projects</a>
+        <a href="/Proposals">Proposals</a>
+        <a href="/Approvals">Approvals</a>
+        <a href="/Invoices">Invoices</a>
+        <a href="/Admin/ExchangeRates">Exchange rates</a>
+        <a href="/Admin/TaxCodes">Tax codes</a>
+    </nav>
+    <main class="content">
+        @if (TempData["Message"] is string message)
+        {
+            <div class="message" role="status">@message</div>
+        }
+        @RenderBody()
+    </main>
+    <footer class="footer">Project Billing 4.8.2 &middot; Kestrel Consulting Oy</footer>
+</body>
+</html>

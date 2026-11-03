@@ -1,0 +1,18 @@
+@page "{id:int}"
+@model Kestrel.Billing.Pages.Invoices.PostingModel
+@{
+    ViewData["Title"] = "Posting";
+}
+<h1>Posting @Model.Number to the ledger</h1>
+<p id="posting">Please wait. This can take a few seconds.</p>
+<script>
+    (function poll() {
+        fetch('/Invoices/Posting/@Model.Id?handler=Status')
+            .then(function (r) { return r.json(); })
+            .then(function (s) {
+                if (s.posted) { location.replace('/Invoices/Details/@Model.Id'); }
+                else { setTimeout(poll, 300); }
+            })
+            .catch(function () { setTimeout(poll, 1000); });
+    })();
+</script>

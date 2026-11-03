@@ -1,0 +1,67 @@
+@page "{id:int}"
+@model Kestrel.Billing.Pages.Invoices.DetailsModel
+@{
+    var i = Model.Invoice;
+    ViewData["Title"] = i.Number ?? "Invoice";
+}
+<h1>@(i.Kind == InvoiceKind.CreditNote ? "Credit note" : "Invoice") <span id="invoice-number">@i.Number</span></h1>
+<dl class="facts">
+    <dt>Status</dt><dd id="invoice-status">@BillingHelper.StatusLabel(i.Status)</dd>
+    <dt>Customer</dt><dd id="invoice-customer">@BillingHelper.CustomerDisplayName(i.Customer)</dd>
+    <dt>Project</dt><dd>@i.Project.Code @i.Project.Name</dd>
+    <dt>Invoice date</dt><dd id="invoice-date">@i.InvoiceDate.ToString("yyyy-MM-dd")</dd>
+    <dt>Due date</dt><dd id="due-date">@i.DueDate?.ToString("yyyy-MM-dd")</dd>
+    <dt>Currency</dt><dd>@i.Currency</dd>
+    <dt>Exchange rate</dt><dd>@i.ExchangeRate?.ToString("0.0000####")</dd>
+    @if (!string.IsNullOrEmpty(i.PoNumber))
+    {
+        <dt>Purchase order</dt><dd id="invoice-po">@i.PoNumber</dd>
+    }
+    @if (Model.Original != null)
+    {
+        <dt>Credits invoice</dt><dd id="original-invoice"><a href="/Invoices/Details/@Model.Original.Id">@Model.Original.Number</a></dd>
+    }
+    <dt>Finalised</dt><dd>@i.FinalisedAt?.ToString("yyyy-MM-dd HH:mm") by @i.FinalisedBy</dd>
+</dl>
+@if (!string.IsNullOrEmpty(i.Notes))
+{
+    <p class="note" id="invoice-note">@i.Notes</p>
+}
+<table class="grid" id="invoice-lines">
+    <thead>
+    <tr><th>#</th><th>Type</th><th>Description</th><th class="num">Qty</th><th class="num">Amount (@i.Currency)</th><th>Tax</th><th class="num">Tax amount</th></tr>
+    </thead>
+    <tbody>
+    @foreach (var l in i.Lines.OrderBy(l => l.Sequence))
+    {
+        <tr data-line="@l.Sequence">
+            <td>@l.Sequence</td>
+            <td>@BillingHelper.LineKindLabel(l.Kind)</td>
+            <td class="line-description">@l.Description</td>
+            <td class="num">@l.Quantity.ToString("0.00")</td>
+            <td class="num line-amount">@BillingHelper.FormatAmount(l.Amount, i.Currency)</td>
+            <td class="line-tax-code">@l.TaxCode @(l.TaxRate == 0 ? "" : l.TaxRate.ToString("0.##") + "%")</td>
+            <td class="num line-tax">@BillingHelper.FormatAmount(l.TaxAmount, i.Currency)</td>
+        </tr>
+    }
+    </tbody>
+    <tfoot>
+    <tr><td colspan="4">Subtotal</td><td class="num" id="invoice-subtotal">@BillingHelper.FormatAmount(i.Subtotal, i.Currency)</td><td></td><td></td></tr>
+    <tr><td colspan="4">Tax</td><td class="num" id="invoice-tax">@BillingHelper.FormatAmount(i.TaxTotal, i.Currency)</td><td></td><td></td></tr>
+    <tr class="total"><td colspan="4">Total</td><td class="num" id="invoice-total">@BillingHelper.FormatMoney(i.Total, i.Currency)</td><td></td><td></td></tr>
+    </tfoot>
+</table>
+@if (i.Kind == InvoiceKind.Invoice)
+{
+    <p>Credited so far: <strong id="credited">@BillingHelper.FormatMoney(Model.Credited, i.Currency)</strong></p>
+    @if (Model.CreditNotes.Count > 0)
+    {
+        <ul id="credit-notes">
+            @foreach (var c in Model.CreditNotes)
+            {
+                <li><a href="/Invoices/Details/@c.Id">@c.Number</a> @c.InvoiceDate.ToString("yyyy-MM-dd") @BillingHelper.FormatMoney(c.Total, c.Currency)</li>
+            }
+        </ul>
+    }
+    <p><a class="button" id="create-credit-note" href="/CreditNotes/Create?invoiceId=@i.Id">Create credit note</a></p>
+}

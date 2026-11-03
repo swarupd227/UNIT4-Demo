@@ -1,0 +1,322 @@
+# Answer key for estate/manual-cases/billing-manual-cases.csv. Private: do not share with the estate.
+cases:
+  - id: 48201
+    rule: BR-01
+    title: "Proposal includes only approved billable October time - Halden ERP rollout"
+    planted: null
+    duplicate_of: null
+    expected_correct: true
+    manual_minutes: 6
+    note: "Baseline proposal for P-1001; verified in the app."
+  - id: 48202
+    rule: BR-01
+    title: "Time dated after the period end is not billed"
+    planted: null
+    duplicate_of: null
+    expected_correct: true
+    manual_minutes: 5
+    note: "Period end 2026-10-15 drops the 2026-10-31 entry; verified in the app."
+  - id: 48203
+    rule: BR-02
+    title: "Rates - agreed customer rate, project rate card and standard rate on Halden support"
+    planted: null
+    duplicate_of: null
+    expected_correct: true
+    manual_minutes: 6
+    note: "Unit prices 140/170/85 verified in the app."
+  - id: 48204
+    rule: BR-03
+    title: "Reverse charge for EU business customer with VAT number (Atlas Retail)"
+    planted: null
+    duplicate_of: null
+    expected_correct: true
+    manual_minutes: 6
+    note: "Verified in the app."
+  - id: 48205
+    rule: BR-03
+    title: "Finnish VAT charged to German customer without a VAT number (Lumo)"
+    planted: null
+    duplicate_of: null
+    expected_correct: true
+    manual_minutes: 5
+    note: "91.80 on 360.00 verified in the app."
+  - id: 48206
+    rule: BR-05
+    title: "Customer on billing hold - proposal cannot be created"
+    planted: null
+    duplicate_of: null
+    expected_correct: true
+    manual_minutes: 4
+    note: "Error text verified in the app."
+  - id: 48207
+    rule: BR-04
+    title: "SEK proposal rounding - Norrsken grid analytics short calls"
+    planted: T4
+    duplicate_of: null
+    expected_correct: false
+    manual_minutes: 7
+    note: "Planted T4: expects rounding on the total (975.00 x 11.47 = 11,183.25). Correct per-line result is 430.13 + 430.13 + 10,323.00 = 11,183.26 SEK (verified in the app)."
+  - id: 48208
+    rule: BR-12
+    title: "Expenses are charged with the project markup"
+    planted: T8
+    duplicate_of: null
+    expected_correct: true
+    manual_minutes: 6
+    note: "Original of the T8 pair (written by Marja Toivonen, March 2024). 280.00 verified in the app."
+  - id: 48209
+    rule: BR-06
+    title: "Write-up needs a reason"
+    planted: null
+    duplicate_of: null
+    expected_correct: true
+    manual_minutes: 7
+    note: "Verified in the app (proposal created, adjusted and deleted)."
+  - id: 48210
+    rule: BR-01
+    title: "Draft, submitted and non-billable hours stay unbilled after the proposal run"
+    planted: null
+    duplicate_of: null
+    expected_correct: true
+    manual_minutes: 10
+    note: "Unbilled time list verified in the app; reservation/release follows ProposalService code."
+  - id: 48211
+    rule: BR-02
+    title: "Project rate card used when the customer has no agreed rate"
+    planted: null
+    duplicate_of: null
+    expected_correct: true
+    manual_minutes: 6
+    note: "Verified in the app."
+  - id: 48212
+    rule: BR-04
+    title: "JPY invoice lines are rounded to whole yen (Sakura)"
+    planted: null
+    duplicate_of: null
+    expected_correct: true
+    manual_minutes: 6
+    note: "Verified in the app. Line 2 is 142,886 JPY (Noora Salo is a developer at 110.00), not 155,875 as given in the brief."
+  - id: 48213
+    rule: BR-05
+    title: "Project hold blocks proposal even when the customer is active"
+    planted: null
+    duplicate_of: null
+    expected_correct: true
+    manual_minutes: 5
+    note: "Verified in the app."
+  - id: 48214
+    rule: BR-07
+    title: "Small write-down with reason on Halden rollout"
+    planted: null
+    duplicate_of: null
+    expected_correct: true
+    manual_minutes: 7
+    note: "50.00 on 1,950.00 (2.6%); verified in the app."
+  - id: 48215
+    rule: BR-11
+    title: "Fixed price project bills only the completed milestone"
+    planted: null
+    duplicate_of: null
+    expected_correct: true
+    manual_minutes: 7
+    note: "Verified in the app, including the 15 Oct message."
+  - id: 48216
+    rule: BR-16
+    title: "Agreement discount applies to time lines, not expenses"
+    planted: null
+    duplicate_of: null
+    expected_correct: true
+    manual_minutes: 9
+    note: "Line amounts match the automated test; totals calculated from code (customer not changed in the shared app)."
+  - id: 48217
+    rule: BR-13
+    title: "Final invoice cannot be changed"
+    planted: null
+    duplicate_of: null
+    expected_correct: true
+    manual_minutes: 4
+    note: "Verified in the app (read only)."
+  - id: 48218
+    rule: BR-14
+    title: "Proposal under 50 EUR is deferred"
+    planted: null
+    duplicate_of: null
+    expected_correct: true
+    manual_minutes: 7
+    note: "Deferred status and banner verified in the app; finalise error taken from InvoiceService (finalise not run in the shared app)."
+  - id: 48219
+    rule: BR-04
+    title: "USD lines are rounded one by one and VAT is worked out on the rounded line"
+    planted: null
+    duplicate_of: null
+    expected_correct: true
+    manual_minutes: 7
+    note: "Verified in the app."
+  - id: 48220
+    rule: BR-06
+    title: "Write-up can be taken off again before finalising"
+    planted: null
+    duplicate_of: null
+    expected_correct: true
+    manual_minutes: 6
+    note: "Verified in the app."
+  - id: 48221
+    rule: BR-16
+    title: "Discount is not taken off milestones"
+    planted: null
+    duplicate_of: null
+    expected_correct: true
+    manual_minutes: 10
+    note: "Calculated from code (customer not changed in the shared app): 4 x 195 x 0.95 = 741.00 EUR x 1.0835 = 802.8735 -> 802.87 USD."
+  - id: 48222
+    rule: BR-15
+    title: "CHF invoice cannot be finalised before a rate exists"
+    planted: null
+    duplicate_of: null
+    expected_correct: true
+    manual_minutes: 6
+    note: "Banner verified in the app; finalise error taken from InvoiceService."
+  - id: 48223
+    rule: BR-18
+    title: "2.1 hours billed as 2.25"
+    planted: null
+    duplicate_of: null
+    expected_correct: true
+    manual_minutes: 4
+    note: "Verified in the app."
+  - id: 48224
+    rule: BR-14
+    title: "Closing project is billed even when below the minimum"
+    planted: null
+    duplicate_of: null
+    expected_correct: true
+    manual_minutes: 4
+    note: "Verified in the app."
+  - id: 48225
+    rule: BR-15
+    title: "Rate effective on or before the invoice date is used (CHF, November)"
+    planted: null
+    duplicate_of: null
+    expected_correct: true
+    manual_minutes: 5
+    note: "Verified in the app."
+  - id: 48226
+    rule: BR-17
+    title: "PO number is mandatory for Norrsken"
+    planted: null
+    duplicate_of: null
+    expected_correct: true
+    manual_minutes: 6
+    note: "PO save message and finalise check taken from code (finalise not run in the shared app)."
+  - id: 48227
+    rule: BR-19
+    title: "Not-to-exceed limit holds back an entry on Koivula"
+    planted: null
+    duplicate_of: null
+    expected_correct: true
+    manual_minutes: 8
+    note: "Verified in the app."
+  - id: 48228
+    rule: BR-08
+    title: "Credit per line cannot be more than the line amount"
+    planted: null
+    duplicate_of: null
+    expected_correct: true
+    manual_minutes: 5
+    note: "Messages from CreditNoteService; nothing issued."
+  - id: 48229
+    rule: BR-12
+    title: "Meridian hotel expense billed at cost + 12%"
+    planted: T8
+    duplicate_of: 48208
+    expected_correct: true
+    manual_minutes: 6
+    note: "Planted T8: same steps and expected results as 48208, written by Hanna Lahti in April 2026, two years after the original."
+  - id: 48230
+    rule: BR-03
+    title: "Invoice to non-EU customer (Vestfold, Norway)"
+    planted: T5
+    duplicate_of: null
+    expected_correct: true
+    manual_minutes: 8
+    note: "Planted T5: final step expected result is vague. Earlier steps verified in the app."
+  - id: 48231
+    rule: BR-09
+    title: "Invoice number is given only at finalisation"
+    planted: null
+    duplicate_of: null
+    expected_correct: true
+    manual_minutes: 8
+    note: "Number format from NumberingService; next number on a fresh seed is INV-000298 (297 seeded invoices). Not finalised in the shared app."
+  - id: 48232
+    rule: BR-09
+    title: "Deleting a proposal does not use up an invoice number"
+    planted: null
+    duplicate_of: null
+    expected_correct: true
+    manual_minutes: 8
+    note: "From code: numbers are taken in FinaliseAsync only. Not finalised in the shared app."
+  - id: 48233
+    rule: BR-10
+    title: "Due date follows customer payment terms - Brightwater 45 days"
+    planted: null
+    duplicate_of: null
+    expected_correct: true
+    manual_minutes: 6
+    note: "Proposal verified in the app; due date from BillingHelper.DueDate (matches the automated test)."
+  - id: 48234
+    rule: BR-10
+    title: "30 day default when the customer has no payment terms"
+    planted: null
+    duplicate_of: null
+    expected_correct: true
+    manual_minutes: 8
+    note: "From code: terms of 0 fall back to 30 days. Customer not changed in the shared app."
+  - id: 48235
+    rule: BR-17
+    title: "Norrsken invoice finalised with a purchase order number"
+    planted: null
+    duplicate_of: null
+    expected_correct: true
+    manual_minutes: 6
+    note: "Totals verified in the app; PO handling (trim, upper case) from ProposalService/BillingHelper."
+  - id: 48236
+    rule: BR-11
+    title: "Milestone is billed once (Koivula permit system)"
+    planted: null
+    duplicate_of: null
+    expected_correct: true
+    manual_minutes: 10
+    note: "Proposal and 30 Sep message verified in the app; finalise and re-run from code."
+  - id: 48237
+    rule: BR-19
+    title: "Nothing more can be billed once the not-to-exceed limit is reached"
+    planted: null
+    duplicate_of: null
+    expected_correct: true
+    manual_minutes: 9
+    note: "From code: 18,500 + 1,270 = 19,770 billed, the 900.00 entry would exceed 20,000. Not finalised in the shared app."
+  - id: 48238
+    rule: BR-08
+    title: "Credit note cannot exceed what is still open - Lumo INV-000291"
+    planted: null
+    duplicate_of: null
+    expected_correct: true
+    manual_minutes: 8
+    note: "Remaining 1,857.40 verified in the app; error text from CreditNoteService (credit not issued in the shared app)."
+  - id: 48239
+    rule: BR-09
+    title: "Credit notes have their own CN sequence"
+    planted: null
+    duplicate_of: null
+    expected_correct: true
+    manual_minutes: 7
+    note: "From NumberingService. Not issued in the shared app."
+  - id: 48240
+    rule: BR-20
+    title: "Credit note on 2024 invoice keeps the old 24% VAT"
+    planted: null
+    duplicate_of: null
+    expected_correct: true
+    manual_minutes: 7
+    note: "Original invoice verified in the app; credit at 24% from CreditNoteService (not issued in the shared app)."

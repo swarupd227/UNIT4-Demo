@@ -1,0 +1,29 @@
+@page
+@model Kestrel.Billing.Pages.Projects.IndexModel
+@{
+    ViewData["Title"] = "Projects";
+}
+<h1>Projects</h1>
+<form method="get" class="filter">
+    <label for="q">Search</label>
+    <input id="q" name="q" value="@Model.Q" />
+    <button type="submit">Search</button>
+</form>
+<table class="grid" id="projects">
+    <thead>
+    <tr><th>Code</th><th>Name</th><th>Customer</th><th>Billing</th><th>Status</th><th class="num">Unbilled hours</th></tr>
+    </thead>
+    <tbody>
+    @foreach (var row in Model.Rows)
+    {
+        <tr>
+            <td><a href="/Projects/Details/@row.Project.Id">@row.Project.Code</a></td>
+            <td>@row.Project.Name</td>
+            <td>@row.Project.Customer.Name</td>
+            <td>@(row.Project.BillingType == BillingType.FixedPrice ? "Fixed price" : "Time and materials")</td>
+            <td>@(row.Project.IsOnHold ? "On hold" : row.Project.Status.ToString())</td>
+            <td class="num">@row.UnbilledHours.ToString("0.00")</td>
+        </tr>
+    }
+    </tbody>
+</table>

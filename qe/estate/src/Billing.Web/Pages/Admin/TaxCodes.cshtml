@@ -1,0 +1,16 @@
+@page
+@model Kestrel.Billing.Pages.Admin.TaxCodesModel
+@{
+    ViewData["Title"] = "Tax codes";
+}
+<h1>Tax codes</h1>
+<table class="grid" id="tax-codes">
+    <thead><tr><th>Code</th><th>Description</th><th class="num">Rate</th><th>Exempt</th></tr></thead>
+    <tbody>
+    @foreach (var t in Model.Codes)
+    {
+        <tr><td>@t.Code</td><td>@t.Description</td><td class="num">@t.Rate.ToString("0.##")%</td><td>@(t.IsExempt ? "Yes" : "")</td></tr>
+    }
+    <tr><td>RC</td><td>Reverse charge (set automatically for EU business customers with a VAT number)</td><td class="num">0%</td><td></td></tr>
+    </tbody>
+</table>

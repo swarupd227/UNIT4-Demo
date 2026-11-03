@@ -1,0 +1,30 @@
+@page
+@model Kestrel.Billing.Pages.IndexModel
+@{
+    ViewData["Title"] = "Home";
+}
+<h1>Project Billing</h1>
+<p class="lead">Billing period ending <strong>@Model.PeriodEnd.ToString("d MMMM yyyy")</strong></p>
+<div class="tiles">
+    <a class="tile" href="/Proposals"><span class="tile-value" id="open-proposals">@Model.OpenProposals</span><span>Open proposals</span></a>
+    <a class="tile" href="/Approvals"><span class="tile-value" id="awaiting-approval">@Model.AwaitingApproval</span><span>Awaiting approval</span></a>
+    <a class="tile" href="/Projects"><span class="tile-value">@Model.ProjectsToBill</span><span>Projects with unbilled time</span></a>
+    <a class="tile" href="/Invoices"><span class="tile-value">@Model.FinalisedThisMonth</span><span>Invoices this month</span></a>
+</div>
+<h2>Billing holds</h2>
+@if (Model.Holds.Count == 0)
+{
+    <p>No customers or projects are on hold.</p>
+}
+else
+{
+    <table class="grid">
+        <thead><tr><th>On hold</th><th>Reason</th></tr></thead>
+        <tbody>
+        @foreach (var (name, reason) in Model.Holds)
+        {
+            <tr><td>@name</td><td>@reason</td></tr>
+        }
+        </tbody>
+    </table>
+}

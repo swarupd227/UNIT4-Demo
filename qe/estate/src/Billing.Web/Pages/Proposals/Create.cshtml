@@ -1,0 +1,29 @@
+@page
+@model Kestrel.Billing.Pages.Proposals.CreateModel
+@{
+    ViewData["Title"] = "New proposal";
+}
+<h1>New invoice proposal</h1>
+<partial name="_Error" model="Model.Error" />
+<form method="post" class="form" id="proposal-form">
+    <div class="field">
+        <label for="ProjectId">Project</label>
+        <select id="ProjectId" name="ProjectId">
+            <option value="">Select a project</option>
+            @foreach (var p in Model.Projects)
+            {
+                <option value="@p.Id" selected="@(p.Id == Model.ProjectId)">@p.Code @p.Name</option>
+            }
+        </select>
+    </div>
+    <div class="field">
+        <label for="PeriodEnd">Period end</label>
+        <input id="PeriodEnd" name="PeriodEnd" type="date" value="@Model.PeriodEnd.ToString("yyyy-MM-dd")" />
+    </div>
+    <div class="field">
+        <label for="InvoiceDate">Invoice date</label>
+        <input id="InvoiceDate" name="InvoiceDate" type="date" value="@Model.InvoiceDate.ToString("yyyy-MM-dd")" />
+    </div>
+    <button type="submit" class="primary" id="create-proposal">Create proposal</button>
+    <a href="/Proposals">Cancel</a>
+</form>

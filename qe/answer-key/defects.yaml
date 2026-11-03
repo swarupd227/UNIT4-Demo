@@ -1,0 +1,1607 @@
+# Answer key for the Project Billing defect history (qe/estate/defects/billing-defects.csv).
+# Written by qe/history/build_history.py. Do not edit by hand.
+defects:
+- id: BILL-1001
+  title: Expense on P-1040 billed at thirteen times its cost
+  rule: BR-12
+  cluster: Expenses
+  severity: 1
+  created: '2023-11-06'
+  fix_commit: 191de5f36c58be8c219891c2b1b33f8018aa2295
+  files:
+  - src/Billing.Web/Helpers/BillingHelper.cs
+  tests_added: manual
+  spec: null
+  reintroduced_by_fault: false
+  faults: []
+- id: BILL-1003
+  title: No VAT on invoices to Finnish customers
+  rule: BR-03
+  cluster: VAT
+  severity: 1
+  created: '2023-11-08'
+  fix_commit: 88ce9dd551acdc4e5dee03d03258dd67650da1ee
+  files:
+  - src/Billing.Web/Helpers/BillingHelper.cs
+  tests_added: manual
+  spec: null
+  reintroduced_by_fault: false
+  faults: []
+- id: BILL-1004
+  title: Due date one day earlier than the payment terms
+  rule: BR-10
+  cluster: Due dates
+  severity: 3
+  created: '2023-11-13'
+  fix_commit: 76163507909fb4cdac70ab59a650044376c41b90
+  files:
+  - src/Billing.Web/Helpers/BillingHelper.cs
+  tests_added: none
+  spec: null
+  reintroduced_by_fault: false
+  faults: []
+- id: BILL-1006
+  title: Amounts shown without thousand separators
+  rule: null
+  cluster: Formatting
+  severity: 4
+  created: '2023-11-16'
+  fix_commit: b51d5e67397fc2b8db3998815c8db8ece5cf777d
+  files:
+  - src/Billing.Web/Helpers/BillingHelper.cs
+  tests_added: none
+  spec: null
+  reintroduced_by_fault: false
+  faults: []
+- id: BILL-1007
+  title: Non-billable internal time appears on customer invoices
+  rule: BR-01
+  cluster: Billable time
+  severity: 2
+  created: '2023-11-20'
+  fix_commit: ccc3f61ee99cea0c3ed4ab8e7fac15985da20551
+  files:
+  - src/Billing.Web/Services/ProposalService.cs
+  tests_added: manual
+  spec: null
+  reintroduced_by_fault: false
+  faults: []
+- id: BILL-1009
+  title: Credit note numbers not padded like invoice numbers
+  rule: BR-09
+  cluster: Numbering
+  severity: 3
+  created: '2023-11-23'
+  fix_commit: b17e7a420b256f1ad4fa5a5c43500b31634f83e9
+  files:
+  - src/Billing.Web/Services/NumberingService.cs
+  tests_added: manual
+  spec: null
+  reintroduced_by_fault: false
+  faults: []
+- id: BILL-1010
+  title: Error when crediting an invoice migrated from 4.0
+  rule: null
+  cluster: Credit notes
+  severity: 2
+  created: '2023-11-28'
+  fix_commit: 10429293ae8aa9b654998da62aea8db595f0f12e
+  files:
+  - src/Billing.Web/Services/CreditNoteService.cs
+  tests_added: manual
+  spec: null
+  reintroduced_by_fault: false
+  faults: []
+- id: BILL-1012
+  title: Final invoice can be deleted
+  rule: BR-13
+  cluster: Final invoice lock
+  severity: 1
+  created: '2023-12-04'
+  fix_commit: 1300b33115a474fbd60f26a571b3ec2d932761e6
+  files:
+  - src/Billing.Web/Services/ProposalService.cs
+  tests_added: manual
+  spec: null
+  reintroduced_by_fault: false
+  faults: []
+- id: BILL-1013
+  title: UK customers reverse charged after Brexit
+  rule: BR-03
+  cluster: VAT
+  severity: 2
+  created: '2023-12-07'
+  fix_commit: 9d8ccbb33785e35fbd9d8168552f5a3e921800fa
+  files:
+  - src/Billing.Web/Helpers/BillingHelper.cs
+  tests_added: manual
+  spec: null
+  reintroduced_by_fault: false
+  faults: []
+- id: BILL-1015
+  title: Empty brackets after time line descriptions
+  rule: null
+  cluster: Labels and messages
+  severity: 4
+  created: '2023-12-12'
+  fix_commit: 6be1b13aba380f37d70b84a3c59117d2fc1b0f0e
+  files:
+  - src/Billing.Web/Services/ProposalService.cs
+  tests_added: none
+  spec: null
+  reintroduced_by_fault: false
+  faults: []
+- id: BILL-1018
+  title: VAT not updated after a write-up
+  rule: null
+  cluster: Adjustments
+  severity: 2
+  created: '2023-12-19'
+  fix_commit: d79a4c9280718f962baeafc5b28c3b59c3ee4145
+  files:
+  - src/Billing.Web/Services/ProposalService.cs
+  tests_added: manual
+  spec: null
+  reintroduced_by_fault: false
+  faults: []
+- id: BILL-1020
+  title: Halden billed at rate card instead of agreed rate
+  rule: BR-02
+  cluster: Rates
+  severity: 2
+  created: '2024-01-08'
+  fix_commit: 622dca0345297f001b3ee2e1af7245effecff68c
+  files:
+  - src/Billing.Web/Helpers/BillingHelper.cs
+  tests_added: manual
+  spec: null
+  reintroduced_by_fault: true
+  faults:
+  - F02a
+- id: BILL-1021
+  title: Private customer invoiced without VAT
+  rule: BR-03
+  cluster: VAT
+  severity: 3
+  created: '2024-01-10'
+  fix_commit: 1ef4069b20fdbde79d730d17be67d16c331b233e
+  files:
+  - src/Billing.Web/Helpers/BillingHelper.cs
+  tests_added: manual
+  spec: null
+  reintroduced_by_fault: false
+  faults: []
+- id: BILL-1023
+  title: Submitted time billed before the project manager approved it
+  rule: BR-01
+  cluster: Billable time
+  severity: 2
+  created: '2024-01-16'
+  fix_commit: 61da2d382a9826cfbc5580b142259487218aaca6
+  files:
+  - src/Billing.Web/Services/ProposalService.cs
+  tests_added: manual
+  spec: null
+  reintroduced_by_fault: true
+  faults:
+  - F01a
+- id: BILL-1026
+  title: Billing hold message does not say which customer
+  rule: BR-05
+  cluster: Billing holds
+  severity: 4
+  created: '2024-01-22'
+  fix_commit: df200156560bf48dcc448728ea4beb5b9bc09820
+  files:
+  - src/Billing.Web/Services/ProposalService.cs
+  tests_added: none
+  spec: null
+  reintroduced_by_fault: false
+  faults: []
+- id: BILL-1027
+  title: Ledger rejects invoices with long PO numbers
+  rule: BR-17
+  cluster: Purchase orders
+  severity: 3
+  created: '2024-01-24'
+  fix_commit: 01245c115eb59ea386abfaf6211600a29974dbad
+  files:
+  - src/Billing.Web/Helpers/BillingHelper.cs
+  tests_added: manual
+  spec: null
+  reintroduced_by_fault: false
+  faults: []
+- id: BILL-1029
+  title: Fixed-price milestone billed again the next month
+  rule: BR-11
+  cluster: Milestones
+  severity: 2
+  created: '2024-01-30'
+  fix_commit: 537231347efd097dd50cf852069a7e98ad662463
+  files:
+  - src/Billing.Web/Services/InvoiceService.cs
+  - src/Billing.Web/Services/ProposalService.cs
+  tests_added: manual
+  spec: null
+  reintroduced_by_fault: true
+  faults:
+  - F11b
+- id: BILL-1030
+  title: Header shows the calendar date instead of the business date
+  rule: null
+  cluster: Page layout
+  severity: 3
+  created: '2024-02-01'
+  fix_commit: dce9760cecb473c3152c189a938d09d0809d9dfa
+  files:
+  - src/Billing.Web/Pages/Shared/_Layout.cshtml
+  tests_added: manual
+  spec: null
+  reintroduced_by_fault: false
+  faults: []
+- id: BILL-1032
+  title: Two invoices got the same number
+  rule: BR-09
+  cluster: Numbering
+  severity: 1
+  created: '2024-02-06'
+  fix_commit: 0453aae430ff6770f5a7e98f8d92e2c99e443555
+  files:
+  - src/Billing.Web/Services/NumberingService.cs
+  tests_added: manual
+  spec: null
+  reintroduced_by_fault: false
+  faults: []
+- id: BILL-1033
+  title: Due date counted from the day of finalising
+  rule: BR-10
+  cluster: Due dates
+  severity: 3
+  created: '2024-02-08'
+  fix_commit: aceef5e1bad430bfd26c4a9ec2b7591fe3d83dbc
+  files:
+  - src/Billing.Web/Services/InvoiceService.cs
+  tests_added: manual
+  spec: null
+  reintroduced_by_fault: false
+  faults: []
+- id: BILL-1035
+  title: Credit note can be issued without a reason
+  rule: null
+  cluster: Credit notes
+  severity: 3
+  created: '2024-02-13'
+  fix_commit: eeef766b5523cce77c6ce86a67dda0915399fee7
+  files:
+  - src/Billing.Web/Services/CreditNoteService.cs
+  tests_added: manual
+  spec: null
+  reintroduced_by_fault: false
+  faults: []
+- id: BILL-1038
+  title: Period end shown as 28 February in a leap year
+  rule: null
+  cluster: Proposal dates
+  severity: 2
+  created: '2024-02-29'
+  fix_commit: 13d2464132de794911cab5e5061b2dc915a1c43c
+  files:
+  - src/Billing.Web/Helpers/BillingHelper.cs
+  tests_added: manual
+  spec: null
+  reintroduced_by_fault: false
+  faults: []
+- id: BILL-1039
+  title: Invoice date defaults to the business date, not the period end
+  rule: null
+  cluster: Proposal dates
+  severity: 3
+  created: '2024-03-04'
+  fix_commit: 18204a17016ba0966dd11d772f17ca0a39a9ab95
+  files:
+  - src/Billing.Web/Pages/Proposals/Create.cshtml.cs
+  tests_added: none
+  spec: null
+  reintroduced_by_fault: false
+  faults: []
+- id: BILL-1041
+  title: Missing exchange rate silently treated as 1.0
+  rule: BR-15
+  cluster: Exchange rates
+  severity: 2
+  created: '2024-03-07'
+  fix_commit: 355f6b961b430dc661ae073509526ff36e541323
+  files:
+  - src/Billing.Web/Pages/Proposals/Edit.cshtml
+  - src/Billing.Web/Services/ProposalService.cs
+  tests_added: manual
+  spec: null
+  reintroduced_by_fault: false
+  faults: []
+- id: BILL-1042
+  title: Invoice export fails when credit notes are in the list
+  rule: null
+  cluster: Export
+  severity: 3
+  created: '2024-03-11'
+  fix_commit: 54e0ed08cbcb771f77401c13041eaa05d6ff1b1e
+  files:
+  - src/Billing.Web/Helpers/BillingHelper.cs
+  tests_added: none
+  spec: null
+  reintroduced_by_fault: false
+  faults: []
+- id: BILL-1044
+  title: Amounts with a thousand separator are rejected
+  rule: null
+  cluster: Input parsing
+  severity: 3
+  created: '2024-03-14'
+  fix_commit: 1543870d5162636cec71512016b14971cab4e177
+  files:
+  - src/Billing.Web/Helpers/BillingHelper.cs
+  tests_added: manual
+  spec: null
+  reintroduced_by_fault: false
+  faults: []
+- id: BILL-1046
+  title: Invoice line 0.5 cent amounts round down to even
+  rule: BR-04
+  cluster: Multi-currency rounding
+  severity: 2
+  created: '2024-03-18'
+  fix_commit: 80eb863c269ec028cba4ee36e830ae97e9a06c29
+  files:
+  - src/Billing.Web/Helpers/RoundingHelper.cs
+  tests_added: manual
+  spec: null
+  reintroduced_by_fault: true
+  faults:
+  - F04a
+- id: BILL-1047
+  title: Reverse charge note lacks the legal reference
+  rule: BR-03
+  cluster: VAT
+  severity: 3
+  created: '2024-03-21'
+  fix_commit: 1ea60055f39a5e83170e10cf22f49b6c409328a7
+  files:
+  - src/Billing.Web/Services/TaxService.cs
+  tests_added: manual
+  spec: null
+  reintroduced_by_fault: false
+  faults: []
+- id: BILL-1049
+  title: April exchange rate used on March invoices
+  rule: BR-15
+  cluster: Exchange rates
+  severity: 2
+  created: '2024-03-26'
+  fix_commit: 4ea9d972a7b0e40518728ceac1a55598d8152dfb
+  files:
+  - src/Billing.Web/Services/ExchangeRateService.cs
+  tests_added: manual
+  spec: null
+  reintroduced_by_fault: true
+  faults:
+  - F15a
+- id: BILL-1050
+  title: Invoice quantity shows recorded hours but bills quarter hours
+  rule: BR-18
+  cluster: Quarter hours
+  severity: 3
+  created: '2024-03-28'
+  fix_commit: 3c3643189a4051c991899ece944696ae50ea0649
+  files:
+  - src/Billing.Web/Services/ProposalService.cs
+  tests_added: manual
+  spec: null
+  reintroduced_by_fault: false
+  faults: []
+- id: BILL-1052
+  title: Credit note dated in the original invoice's period
+  rule: null
+  cluster: Credit notes
+  severity: 3
+  created: '2024-04-03'
+  fix_commit: 930700cee1163364c1bc6c452a8303f02247eb88
+  files:
+  - src/Billing.Web/Services/CreditNoteService.cs
+  tests_added: manual
+  spec: null
+  reintroduced_by_fault: false
+  faults: []
+- id: BILL-1053
+  title: User switch redirects to any address in returnUrl
+  rule: null
+  cluster: Security
+  severity: 2
+  created: '2024-04-05'
+  fix_commit: 44987a7573bc774671ddd922aa52f078b8ff9242
+  files:
+  - src/Billing.Web/Pages/User/Switch.cshtml.cs
+  tests_added: manual
+  spec: null
+  reintroduced_by_fault: false
+  faults: []
+- id: BILL-1055
+  title: Expenses stay reserved after a proposal is deleted
+  rule: null
+  cluster: Billable time
+  severity: 2
+  created: '2024-04-11'
+  fix_commit: 817b08e74d62fe2a71b38aef8eefc402b96efcc1
+  files:
+  - src/Billing.Web/Services/ProposalService.cs
+  tests_added: manual
+  spec: null
+  reintroduced_by_fault: false
+  faults: []
+- id: BILL-1056
+  title: Agreement discount of 150% accepted
+  rule: BR-16
+  cluster: Discounts
+  severity: 3
+  created: '2024-04-16'
+  fix_commit: 7cb4ebe0137a8f463365cdc1295d3da5461561a2
+  files:
+  - src/Billing.Web/Pages/Customers/Edit.cshtml.cs
+  tests_added: manual
+  spec: null
+  reintroduced_by_fault: false
+  faults: []
+- id: BILL-1058
+  title: PO of a single space accepted for PO customers
+  rule: BR-17
+  cluster: Purchase orders
+  severity: 3
+  created: '2024-04-22'
+  fix_commit: 23d01a7a419913ca2eeb2e9d498d1081014ab93d
+  files:
+  - src/Billing.Web/Services/InvoiceService.cs
+  tests_added: manual
+  spec: null
+  reintroduced_by_fault: false
+  faults: []
+- id: BILL-1059
+  title: Correcting a rate adds a second rate for the same day
+  rule: BR-15
+  cluster: Exchange rates
+  severity: 3
+  created: '2024-04-25'
+  fix_commit: cd6279e6ec9a2f598c44f4ab73ed657c60570cc7
+  files:
+  - src/Billing.Web/Services/ExchangeRateService.cs
+  tests_added: manual
+  spec: null
+  reintroduced_by_fault: false
+  faults: []
+- id: BILL-1061
+  title: Final invoice of a closing project deferred as too small
+  rule: BR-14
+  cluster: Minimum invoice
+  severity: 3
+  created: '2024-05-06'
+  fix_commit: 226f8028d032da23d8f39452611dc3663c0cd6ea
+  files:
+  - src/Billing.Web/Services/ProposalService.cs
+  tests_added: manual
+  spec: null
+  reintroduced_by_fault: false
+  faults: []
+- id: BILL-1062
+  title: Amounts wrap onto two lines in narrow columns
+  rule: null
+  cluster: Page layout
+  severity: 4
+  created: '2024-05-08'
+  fix_commit: 449de3772da55464eb9b89a1cad33bf5b03b0732
+  files:
+  - src/Billing.Web/wwwroot/css/site.css
+  tests_added: none
+  spec: null
+  reintroduced_by_fault: false
+  faults: []
+- id: BILL-1063
+  title: Converted amounts off by a cent on large SEK invoices
+  rule: BR-04
+  cluster: Multi-currency rounding
+  severity: 2
+  created: '2024-05-13'
+  fix_commit: 4bca4ea94197d6d35a7c6cd76bb57d334da5870e
+  files:
+  - src/Billing.Web/Helpers/RoundingHelper.cs
+  tests_added: manual
+  spec: null
+  reintroduced_by_fault: false
+  faults: []
+- id: BILL-1064
+  title: June expenses billed on the May invoice
+  rule: BR-01
+  cluster: Billable time
+  severity: 2
+  created: '2024-05-16'
+  fix_commit: a62107b18df79767c905d3f20fb00b978cc195ec
+  files:
+  - src/Billing.Web/Services/ProposalService.cs
+  tests_added: manual
+  spec: null
+  reintroduced_by_fault: false
+  faults: []
+- id: BILL-1066
+  title: Due date equals invoice date for customers without terms
+  rule: BR-10
+  cluster: Due dates
+  severity: 3
+  created: '2024-05-21'
+  fix_commit: 54dc490aa5a253805203b3a7fef07d2f0c4298aa
+  files:
+  - src/Billing.Web/Helpers/BillingHelper.cs
+  tests_added: manual
+  spec: null
+  reintroduced_by_fault: false
+  faults: []
+- id: BILL-1068
+  title: Deferred proposal can be finalised
+  rule: BR-14
+  cluster: Minimum invoice
+  severity: 3
+  created: '2024-05-27'
+  fix_commit: a736ee277658f5fcf8c788e97473150a93ad5e11
+  files:
+  - src/Billing.Web/Services/InvoiceService.cs
+  tests_added: none
+  spec: null
+  reintroduced_by_fault: false
+  faults: []
+- id: BILL-1069
+  title: Milestone completed on the last day not billed
+  rule: BR-11
+  cluster: Milestones
+  severity: 2
+  created: '2024-05-29'
+  fix_commit: a2425bae1ad2ec8923feb4e2715e7e58fc1df999
+  files:
+  - src/Billing.Web/Pages/Projects/Details.cshtml.cs
+  tests_added: manual
+  spec: null
+  reintroduced_by_fault: false
+  faults: []
+- id: BILL-1071
+  title: Negative credit amount increases what the customer owes
+  rule: BR-08
+  cluster: Credit notes
+  severity: 2
+  created: '2024-06-04'
+  fix_commit: 3d3a5016ed9821813d07c2104b0b3c8c72a898b3
+  files:
+  - src/Billing.Web/Services/CreditNoteService.cs
+  tests_added: manual
+  spec: null
+  reintroduced_by_fault: false
+  faults: []
+- id: BILL-1073
+  title: Still open to credit shows more than the invoice total
+  rule: BR-08
+  cluster: Credit notes
+  severity: 2
+  created: '2024-06-18'
+  fix_commit: ffaca797c70e3de4dde81e5e2232c72adfee4b8c
+  files:
+  - src/Billing.Web/Services/InvoiceService.cs
+  - tests/e2e/specs/invoicing/credit-notes.spec.ts
+  tests_added: automated
+  spec: tests/e2e/specs/invoicing/credit-notes.spec.ts
+  reintroduced_by_fault: false
+  faults: []
+- id: BILL-1074
+  title: Milestone billed before it was complete
+  rule: BR-11
+  cluster: Milestones
+  severity: 2
+  created: '2024-06-20'
+  fix_commit: a56d3125abf52728f3350100e373e9265c263df8
+  files:
+  - src/Billing.Web/Services/ProposalService.cs
+  tests_added: manual
+  spec: null
+  reintroduced_by_fault: true
+  faults:
+  - F11a
+- id: BILL-1076
+  title: Finalise button shown on a final invoice
+  rule: BR-13
+  cluster: Final invoice lock
+  severity: 3
+  created: '2024-06-25'
+  fix_commit: 325a2db2bfe9d245b591a88f345731b563b44ae6
+  files:
+  - src/Billing.Web/Pages/Proposals/Edit.cshtml
+  - tests/e2e/specs/invoicing/locked.spec.ts
+  tests_added: automated
+  spec: tests/e2e/specs/invoicing/locked.spec.ts
+  reintroduced_by_fault: false
+  faults: []
+- id: BILL-1077
+  title: Agreement discount taken off expenses
+  rule: BR-16
+  cluster: Discounts
+  severity: 2
+  created: '2024-06-27'
+  fix_commit: 8b19585e5553fb5b6600dd5d75aa6fd590ead8b1
+  files:
+  - src/Billing.Web/Helpers/BillingHelper.cs
+  - tests/e2e/specs/pricing/discount.spec.ts
+  tests_added: automated
+  spec: tests/e2e/specs/pricing/discount.spec.ts
+  reintroduced_by_fault: true
+  faults:
+  - F16
+- id: BILL-1079
+  title: Credit notes take numbers from the invoice sequence
+  rule: BR-09
+  cluster: Numbering
+  severity: 2
+  created: '2024-07-02'
+  fix_commit: d95777a911b8bef1e0672d27f88b8225fc1974b7
+  files:
+  - src/Billing.Web/Services/CreditNoteService.cs
+  - tests/e2e/specs/invoicing/numbering.spec.ts
+  tests_added: automated
+  spec: tests/e2e/specs/invoicing/numbering.spec.ts
+  reintroduced_by_fault: true
+  faults:
+  - F09b
+- id: BILL-1080
+  title: Reverse charge applied to EU customer without a VAT number
+  rule: BR-03
+  cluster: VAT
+  severity: 2
+  created: '2024-07-04'
+  fix_commit: 431aa228a2f03b22882e980d90aecd4445c97f63
+  files:
+  - src/Billing.Web/Helpers/BillingHelper.cs
+  - tests/e2e/specs/pricing/tax.spec.ts
+  tests_added: automated
+  spec: tests/e2e/specs/pricing/tax.spec.ts
+  reintroduced_by_fault: true
+  faults:
+  - F03b
+- id: BILL-1082
+  title: Proposal totals shown under the adjustment column
+  rule: null
+  cluster: Page layout
+  severity: 4
+  created: '2024-07-09'
+  fix_commit: 5c55d32f8059afa7044668f85faac97fcd944127
+  files:
+  - src/Billing.Web/Pages/Proposals/Edit.cshtml
+  tests_added: none
+  spec: null
+  reintroduced_by_fault: false
+  faults: []
+- id: BILL-1084
+  title: Gaps in invoice numbers after deleting proposals
+  rule: BR-09
+  cluster: Numbering
+  severity: 2
+  created: '2024-07-11'
+  fix_commit: 08cf877f732c0ae887ede4d338aff2e07c27f9b5
+  files:
+  - src/Billing.Web/Pages/Proposals/Edit.cshtml
+  - src/Billing.Web/Services/InvoiceService.cs
+  - src/Billing.Web/Services/ProposalService.cs
+  - tests/e2e/specs/invoicing/numbering.spec.ts
+  tests_added: automated
+  spec: tests/e2e/specs/invoicing/numbering.spec.ts
+  reintroduced_by_fault: true
+  faults:
+  - F09a
+- id: BILL-1085
+  title: Project on billing hold still invoiced
+  rule: BR-05
+  cluster: Billing holds
+  severity: 2
+  created: '2024-07-16'
+  fix_commit: 2b9a7dd72aabb4b8cce96829982dc9f96987fcd7
+  files:
+  - src/Billing.Web/Services/ProposalService.cs
+  - tests/e2e/specs/proposals/holds.spec.ts
+  tests_added: automated
+  spec: tests/e2e/specs/proposals/holds.spec.ts
+  reintroduced_by_fault: false
+  faults: []
+- id: BILL-1087
+  title: Write-down can take a line below zero
+  rule: BR-07
+  cluster: Adjustments
+  severity: 3
+  created: '2024-07-18'
+  fix_commit: 776e71542db99c3dda6e992de2322293a1044544
+  files:
+  - src/Billing.Web/Services/AdjustmentService.cs
+  tests_added: manual
+  spec: null
+  reintroduced_by_fault: false
+  faults: []
+- id: BILL-1088
+  title: Credit note one cent short of the invoice line
+  rule: BR-04
+  cluster: Multi-currency rounding
+  severity: 2
+  created: '2024-07-22'
+  fix_commit: 4856d56c5608b1acec2152b2dafd0b2a885a21af
+  files:
+  - src/Billing.Web/Helpers/RoundingHelper.cs
+  tests_added: manual
+  spec: null
+  reintroduced_by_fault: false
+  faults: []
+- id: BILL-1090
+  title: Reverse charge note missing from the proposal
+  rule: BR-03
+  cluster: VAT
+  severity: 3
+  created: '2024-07-30'
+  fix_commit: 7a5382dcd86b5ad322110d7a576d07cf778d67d3
+  files:
+  - src/Billing.Web/Services/ProposalService.cs
+  - tests/e2e/specs/pricing/tax.spec.ts
+  tests_added: automated
+  spec: tests/e2e/specs/pricing/tax.spec.ts
+  reintroduced_by_fault: false
+  faults: []
+- id: BILL-1092
+  title: Invoice credited twice over
+  rule: BR-08
+  cluster: Credit notes
+  severity: 1
+  created: '2024-08-06'
+  fix_commit: a550b9557b084ef48f6b8dbd2a6f33d96a025f09
+  files:
+  - src/Billing.Web/Services/CreditNoteService.cs
+  - tests/e2e/pages/CreditNotePage.ts
+  - tests/e2e/specs/invoicing/credit-notes.spec.ts
+  tests_added: automated
+  spec: tests/e2e/specs/invoicing/credit-notes.spec.ts
+  reintroduced_by_fault: true
+  faults:
+  - F08a
+- id: BILL-1093
+  title: Not-to-exceed limit reached too early
+  rule: BR-19
+  cluster: Not-to-exceed
+  severity: 2
+  created: '2024-08-08'
+  fix_commit: 7f0966397ebaffe737b34264734049e8652de62c
+  files:
+  - src/Billing.Web/Services/ProposalService.cs
+  tests_added: manual
+  spec: null
+  reintroduced_by_fault: false
+  faults: []
+- id: BILL-1095
+  title: Proposal does not say that entries were held back
+  rule: BR-19
+  cluster: Not-to-exceed
+  severity: 3
+  created: '2024-08-14'
+  fix_commit: 4024a5747e55c515cbd328f81c05bd22df1e7daa
+  files:
+  - src/Billing.Web/Pages/Proposals/Edit.cshtml
+  - src/Billing.Web/Services/ProposalService.cs
+  tests_added: manual
+  spec: null
+  reintroduced_by_fault: false
+  faults: []
+- id: BILL-1098
+  title: Cancelled invoice can be adjusted
+  rule: BR-13
+  cluster: Final invoice lock
+  severity: 3
+  created: '2024-08-22'
+  fix_commit: aee1a50e3b4c011f74663e6519a09606d62ead38
+  files:
+  - src/Billing.Web/Services/InvoiceService.cs
+  tests_added: none
+  spec: null
+  reintroduced_by_fault: false
+  faults: []
+- id: BILL-1100
+  title: Time on the last day of the period left out
+  rule: BR-01
+  cluster: Billable time
+  severity: 2
+  created: '2024-08-28'
+  fix_commit: eb63e483fe93ac9893485aa5d7b5ef1aa57ae086
+  files:
+  - src/Billing.Web/Services/ProposalService.cs
+  - tests/e2e/specs/pricing/proposal-totals.spec.ts
+  tests_added: automated
+  spec: tests/e2e/specs/pricing/proposal-totals.spec.ts
+  reintroduced_by_fault: true
+  faults:
+  - F01b
+- id: BILL-1102
+  title: New 25.5% VAT rate shown as 26%
+  rule: BR-03
+  cluster: VAT
+  severity: 2
+  created: '2024-09-03'
+  fix_commit: aa3a3d95db11fb35cd9f2c2d1aad43be2c2fd4fc
+  files:
+  - src/Billing.Web/Pages/CreditNotes/Create.cshtml
+  - src/Billing.Web/Pages/Invoices/Details.cshtml
+  - src/Billing.Web/Pages/Proposals/Edit.cshtml
+  tests_added: manual
+  spec: null
+  reintroduced_by_fault: false
+  faults: []
+- id: BILL-1103
+  title: Credit note for an August invoice charges 25.5% VAT
+  rule: BR-20
+  cluster: Credit notes
+  severity: 2
+  created: '2024-09-05'
+  fix_commit: 436232b243800cff86a000089fd939e5ed5f429a
+  files:
+  - src/Billing.Web/Services/CreditNoteService.cs
+  tests_added: manual
+  spec: null
+  reintroduced_by_fault: true
+  faults:
+  - F20
+- id: BILL-1105
+  title: Proposal fails for roles without a rate card entry
+  rule: BR-02
+  cluster: Rates
+  severity: 2
+  created: '2024-09-11'
+  fix_commit: 5ff34a17001e990662695eb2fa2f121de7ef8bf9
+  files:
+  - src/Billing.Web/Helpers/BillingHelper.cs
+  - tests/e2e/specs/pricing/rates.spec.ts
+  tests_added: automated
+  spec: tests/e2e/specs/pricing/rates.spec.ts
+  reintroduced_by_fault: false
+  faults: []
+- id: BILL-1107
+  title: Credit note does not show which invoice it credits
+  rule: BR-08
+  cluster: Credit notes
+  severity: 3
+  created: '2024-09-17'
+  fix_commit: 936913467e78ccb01b905f8efeb785f50439822f
+  files:
+  - src/Billing.Web/Pages/Invoices/Details.cshtml
+  - src/Billing.Web/Pages/Invoices/Details.cshtml.cs
+  - tests/e2e/specs/invoicing/credit-notes.spec.ts
+  tests_added: automated
+  spec: tests/e2e/specs/invoicing/credit-notes.spec.ts
+  reintroduced_by_fault: false
+  faults: []
+- id: BILL-1108
+  title: Invoice finalised in October uses October rate for a September invoice date
+  rule: BR-15
+  cluster: Exchange rates
+  severity: 2
+  created: '2024-09-19'
+  fix_commit: 004a3cdd5f8ac589dd03f1891751b197fcb667cf
+  files:
+  - src/Billing.Web/Services/InvoiceService.cs
+  tests_added: manual
+  spec: null
+  reintroduced_by_fault: true
+  faults:
+  - F15b
+- id: BILL-1110
+  title: Expenses billed over the not-to-exceed limit
+  rule: BR-19
+  cluster: Not-to-exceed
+  severity: 2
+  created: '2024-09-25'
+  fix_commit: 40e20e17f054600f33b103b24a1c08afe3bc9d22
+  files:
+  - src/Billing.Web/Services/ProposalService.cs
+  tests_added: manual
+  spec: null
+  reintroduced_by_fault: false
+  faults: []
+- id: BILL-1112
+  title: Proposal total shown without the currency
+  rule: null
+  cluster: Labels and messages
+  severity: 4
+  created: '2024-10-01'
+  fix_commit: 872f568783ec2b658f4e7e2dc76810755593e2e1
+  files:
+  - src/Billing.Web/Pages/Proposals/Edit.cshtml
+  - tests/e2e/specs/pricing/proposal-totals.spec.ts
+  tests_added: automated
+  spec: tests/e2e/specs/pricing/proposal-totals.spec.ts
+  reintroduced_by_fault: false
+  faults: []
+- id: BILL-1113
+  title: SEK invoice finalised with EUR amounts
+  rule: BR-15
+  cluster: Exchange rates
+  severity: 1
+  created: '2024-10-03'
+  fix_commit: 6d8498cdafc6d337e1d96672b4c0f28e74c635c6
+  files:
+  - src/Billing.Web/Services/InvoiceService.cs
+  tests_added: manual
+  spec: null
+  reintroduced_by_fault: false
+  faults: []
+- id: BILL-1115
+  title: Adjust buttons shown on a final invoice
+  rule: BR-13
+  cluster: Final invoice lock
+  severity: 3
+  created: '2024-10-09'
+  fix_commit: 9696de4c782f0a20fffa28ac2ca88ef901ea28b4
+  files:
+  - src/Billing.Web/Pages/Proposals/Edit.cshtml
+  - tests/e2e/specs/invoicing/locked.spec.ts
+  tests_added: automated
+  spec: tests/e2e/specs/invoicing/locked.spec.ts
+  reintroduced_by_fault: false
+  faults: []
+- id: BILL-1116
+  title: One large entry stops all later time being billed
+  rule: BR-19
+  cluster: Not-to-exceed
+  severity: 2
+  created: '2024-10-14'
+  fix_commit: d5644c39fa881c7a619621f8075b0336ef9116b3
+  files:
+  - src/Billing.Web/Services/ProposalService.cs
+  tests_added: manual
+  spec: null
+  reintroduced_by_fault: true
+  faults:
+  - F19b
+- id: BILL-1119
+  title: Credit line can exceed the invoice line
+  rule: BR-08
+  cluster: Credit notes
+  severity: 3
+  created: '2024-10-29'
+  fix_commit: 68a23b155f244ff77fbee2cd37b515d242a61180
+  files:
+  - src/Billing.Web/Services/CreditNoteService.cs
+  tests_added: manual
+  spec: null
+  reintroduced_by_fault: false
+  faults: []
+- id: BILL-1121
+  title: Printed SEK lines do not add up to the invoice total
+  rule: BR-04
+  cluster: Multi-currency rounding
+  severity: 2
+  created: '2024-11-04'
+  fix_commit: c6f3d353de38b7d7fe2effef1e2b05866debc40d
+  files:
+  - src/Billing.Web/Helpers/RoundingHelper.cs
+  tests_added: manual
+  spec: null
+  reintroduced_by_fault: true
+  faults:
+  - F04b
+- id: BILL-1123
+  title: Short time entries rounded down to the quarter hour
+  rule: BR-18
+  cluster: Quarter hours
+  severity: 3
+  created: '2024-11-12'
+  fix_commit: 8dc2a6a558c0e213294af3795c7e98066d49cf17
+  files:
+  - src/Billing.Web/Services/ProposalService.cs
+  tests_added: manual
+  spec: null
+  reintroduced_by_fault: false
+  faults: []
+- id: BILL-1125
+  title: Credit limit check ignores VAT
+  rule: BR-08
+  cluster: Credit notes
+  severity: 2
+  created: '2024-11-19'
+  fix_commit: c1e49e414c6edebb6b78688c870aaae93ff32170
+  files:
+  - src/Billing.Web/Services/CreditNoteService.cs
+  tests_added: manual
+  spec: null
+  reintroduced_by_fault: false
+  faults: []
+- id: BILL-1131
+  title: Milestone billed on two proposals
+  rule: BR-11
+  cluster: Milestones
+  severity: 2
+  created: '2024-12-05'
+  fix_commit: f6b5e8967f4ac806831b95d06023b3a37e0c926b
+  files:
+  - src/Billing.Web/Services/ProposalService.cs
+  tests_added: manual
+  spec: null
+  reintroduced_by_fault: false
+  faults: []
+- id: BILL-1133
+  title: Saving an exchange rate without a date gives an error page
+  rule: null
+  cluster: Exchange rates
+  severity: 3
+  created: '2024-12-11'
+  fix_commit: c061ef89a8772d7cb93cad37ba82703a35727af4
+  files:
+  - src/Billing.Web/Pages/Admin/ExchangeRates.cshtml.cs
+  tests_added: none
+  spec: null
+  reintroduced_by_fault: false
+  faults: []
+- id: BILL-1135
+  title: Write-up saved without a reason
+  rule: BR-06
+  cluster: Adjustments
+  severity: 3
+  created: '2025-01-08'
+  fix_commit: 81fe42de7f98c4e3bbf4cad364b8ac9789765cfd
+  files:
+  - src/Billing.Web/Services/AdjustmentService.cs
+  tests_added: manual
+  spec: null
+  reintroduced_by_fault: true
+  faults:
+  - F06
+- id: BILL-1136
+  title: Interim billing above the contract value
+  rule: null
+  cluster: Percent complete
+  severity: 3
+  created: '2025-01-10'
+  fix_commit: e4a4f41963c46c3257058a6bea7f8997ad348cfc
+  files:
+  - src/Billing.Web/Helpers/BillingHelper.cs
+  tests_added: manual
+  spec: null
+  reintroduced_by_fault: false
+  faults: []
+- id: BILL-1140
+  title: PO numbers in lower case rejected by the customer's AP
+  rule: BR-17
+  cluster: Purchase orders
+  severity: 4
+  created: '2025-01-22'
+  fix_commit: 98d52b76cea9fa202db6e0cccff960d9c1f76405
+  files:
+  - src/Billing.Web/Helpers/BillingHelper.cs
+  tests_added: none
+  spec: null
+  reintroduced_by_fault: false
+  faults: []
+- id: BILL-1141
+  title: Written-down proposal deferred as below minimum
+  rule: BR-14
+  cluster: Adjustments
+  severity: 3
+  created: '2025-01-24'
+  fix_commit: aab6a551ef72448aef0fa0fe0b3a172583594a1c
+  files:
+  - src/Billing.Web/Services/ProposalService.cs
+  tests_added: manual
+  spec: null
+  reintroduced_by_fault: false
+  faults: []
+- id: BILL-1143
+  title: Invoice amounts not updated to the final exchange rate
+  rule: BR-15
+  cluster: Exchange rates
+  severity: 2
+  created: '2025-02-04'
+  fix_commit: fc8ff6281c35a2b105a60994233e3ca891fed728
+  files:
+  - src/Billing.Web/Services/InvoiceService.cs
+  tests_added: manual
+  spec: null
+  reintroduced_by_fault: false
+  faults: []
+- id: BILL-1146
+  title: PO number can be changed on a final invoice
+  rule: BR-13
+  cluster: Final invoice lock
+  severity: 3
+  created: '2025-02-12'
+  fix_commit: 2b1aa8dcbf03588d2b28cfe6c1adc535a41bc199
+  files:
+  - src/Billing.Web/Services/ProposalService.cs
+  tests_added: manual
+  spec: null
+  reintroduced_by_fault: false
+  faults: []
+- id: BILL-1151
+  title: Empty credit note issued and numbered
+  rule: BR-09
+  cluster: Credit notes
+  severity: 3
+  created: '2025-03-06'
+  fix_commit: 1dd8e5694cc1f649971cdfedcf8b032fbdc00620
+  files:
+  - src/Billing.Web/Services/CreditNoteService.cs
+  tests_added: manual
+  spec: null
+  reintroduced_by_fault: false
+  faults: []
+- id: BILL-1153
+  title: Fixed-price projects listed with unbilled hours
+  rule: null
+  cluster: Project screens
+  severity: 4
+  created: '2025-03-12'
+  fix_commit: 6b6d20d25a91385a359d3a6da352dfc0bb10fa11
+  files:
+  - src/Billing.Web/Pages/Projects/Index.cshtml.cs
+  tests_added: none
+  spec: null
+  reintroduced_by_fault: false
+  faults: []
+- id: BILL-1156
+  title: Exempt invoices lack the exemption wording
+  rule: BR-03
+  cluster: VAT
+  severity: 3
+  created: '2025-03-20'
+  fix_commit: 12f78acc65e88c3f0efa2095cdf7a4d84bbea535
+  files:
+  - src/Billing.Web/Services/TaxService.cs
+  tests_added: manual
+  spec: null
+  reintroduced_by_fault: false
+  faults: []
+- id: BILL-1159
+  title: Write-down of 40% finalised without review
+  rule: BR-07
+  cluster: Write-down approval
+  severity: 2
+  created: '2025-04-03'
+  fix_commit: 0a95c5e980e0dff2df26e238a68642ed6995e213
+  files:
+  - src/Billing.Web/Services/AdjustmentService.cs
+  - src/Billing.Web/Services/InvoiceService.cs
+  tests_added: none
+  spec: null
+  reintroduced_by_fault: false
+  faults: []
+- id: BILL-1161
+  title: Proposal stays awaiting approval after the write-down is removed
+  rule: BR-07
+  cluster: Write-down approval
+  severity: 3
+  created: '2025-04-15'
+  fix_commit: 2a862856d4e02bc0fe27c63de62a4967e4b2fcce
+  files:
+  - src/Billing.Web/Services/AdjustmentService.cs
+  tests_added: manual
+  spec: null
+  reintroduced_by_fault: false
+  faults: []
+- id: BILL-1162
+  title: Project manager can approve write-downs
+  rule: BR-07
+  cluster: Write-down approval
+  severity: 2
+  created: '2025-04-17'
+  fix_commit: 344350a472c4b6d9b6578d28059d06fefe56345b
+  files:
+  - src/Billing.Web/Services/ApprovalService.cs
+  tests_added: manual
+  spec: null
+  reintroduced_by_fault: false
+  faults: []
+- id: BILL-1164
+  title: Approvals list shows 0.00 written down
+  rule: null
+  cluster: Write-down approval
+  severity: 3
+  created: '2025-04-23'
+  fix_commit: c17843bbb35bd6f994975a903af76cbf15c8477e
+  files:
+  - src/Billing.Web/Services/ApprovalService.cs
+  tests_added: none
+  spec: null
+  reintroduced_by_fault: false
+  faults: []
+- id: BILL-1167
+  title: Status shown as PendingApproval
+  rule: null
+  cluster: Labels and messages
+  severity: 4
+  created: '2025-05-02'
+  fix_commit: beabd12b57f430a776cbcd555ed13a1a9bbf4e04
+  files:
+  - src/Billing.Web/Helpers/BillingHelper.cs
+  tests_added: none
+  spec: null
+  reintroduced_by_fault: false
+  faults: []
+- id: BILL-1169
+  title: Second proposal created while the first awaits approval
+  rule: null
+  cluster: Billable time
+  severity: 2
+  created: '2025-05-08'
+  fix_commit: d33a1d20f5a93a5ff85c045a87cc8c75c4066faf
+  files:
+  - src/Billing.Web/Services/ProposalService.cs
+  tests_added: manual
+  spec: null
+  reintroduced_by_fault: false
+  faults: []
+- id: BILL-1171
+  title: No message when a write-down sends the proposal for approval
+  rule: null
+  cluster: Write-down approval
+  severity: 4
+  created: '2025-05-14'
+  fix_commit: 9ed4cb3fb92310d3a9b5131e88020a482d725f81
+  files:
+  - src/Billing.Web/Pages/Proposals/Edit.cshtml.cs
+  tests_added: none
+  spec: null
+  reintroduced_by_fault: false
+  faults: []
+- id: BILL-1177
+  title: Type filter on the invoice list shows everything
+  rule: null
+  cluster: Invoice list
+  severity: 3
+  created: '2025-05-28'
+  fix_commit: 42d6e9eee85cf2abe479c5a3967f13927b8fd9e8
+  files:
+  - src/Billing.Web/Services/InvoiceService.cs
+  tests_added: none
+  spec: null
+  reintroduced_by_fault: false
+  faults: []
+- id: BILL-1180
+  title: Customer with lower-case country code charged VAT
+  rule: BR-03
+  cluster: VAT
+  severity: 3
+  created: '2025-06-05'
+  fix_commit: 965f62104e64459843282f0f06a0c5183fb74c3e
+  files:
+  - src/Billing.Web/Helpers/BillingHelper.cs
+  tests_added: manual
+  spec: null
+  reintroduced_by_fault: false
+  faults: []
+- id: BILL-1183
+  title: Credit note lines in a different order from the invoice
+  rule: null
+  cluster: Credit notes
+  severity: 4
+  created: '2025-06-10'
+  fix_commit: e3203462b7391fc2864b3169024c38cf4d61b6b5
+  files:
+  - src/Billing.Web/Services/CreditNoteService.cs
+  tests_added: none
+  spec: null
+  reintroduced_by_fault: false
+  faults: []
+- id: BILL-1185
+  title: Totals unchanged after write-downs are rejected
+  rule: BR-07
+  cluster: Write-down approval
+  severity: 3
+  created: '2025-06-12'
+  fix_commit: 2e9d9e70f7a043763db0f52f163d5f47f994e335
+  files:
+  - src/Billing.Web/Services/ApprovalService.cs
+  tests_added: manual
+  spec: null
+  reintroduced_by_fault: false
+  faults: []
+- id: BILL-1187
+  title: Yen invoices show decimals
+  rule: BR-04
+  cluster: Multi-currency rounding
+  severity: 2
+  created: '2025-06-16'
+  fix_commit: e91df16b5153ad73796d981c84ebe61869c683e0
+  files:
+  - src/Billing.Web/Helpers/RoundingHelper.cs
+  tests_added: none
+  spec: null
+  reintroduced_by_fault: true
+  faults:
+  - F04c
+- id: BILL-1189
+  title: Approval kept after a further write-down
+  rule: BR-07
+  cluster: Write-down approval
+  severity: 2
+  created: '2025-06-26'
+  fix_commit: 8277e68b9f9eaf62ed8baadc8bd73a2ab37c8d70
+  files:
+  - src/Billing.Web/Services/AdjustmentService.cs
+  tests_added: manual
+  spec: null
+  reintroduced_by_fault: false
+  faults: []
+- id: BILL-1191
+  title: Write-up reason not shown on the proposal
+  rule: BR-06
+  cluster: Adjustments
+  severity: 3
+  created: '2025-07-03'
+  fix_commit: 84222b7a996f5dc722ce5d2437d1d2953a813fd7
+  files:
+  - src/Billing.Web/Pages/Proposals/Edit.cshtml
+  - tests/e2e/specs/proposals/write-up.spec.ts
+  tests_added: automated
+  spec: tests/e2e/specs/proposals/write-up.spec.ts
+  reintroduced_by_fault: false
+  faults: []
+- id: BILL-1193
+  title: Interim billing counts open proposals as billed
+  rule: null
+  cluster: Percent complete
+  severity: 3
+  created: '2025-07-15'
+  fix_commit: cab2fb1839702da982cc1f8c097194c87cafa076
+  files:
+  - src/Billing.Web/Services/PercentCompleteBilling.cs
+  tests_added: manual
+  spec: null
+  reintroduced_by_fault: false
+  faults: []
+- id: BILL-1195
+  title: Invoice list takes a minute to open
+  rule: null
+  cluster: Invoice list
+  severity: 3
+  created: '2025-08-05'
+  fix_commit: 2cbaa7cf8a3bd099de619a41f36f66b7cf030729
+  files:
+  - src/Billing.Web/Pages/Invoices/Index.cshtml
+  tests_added: manual
+  spec: null
+  reintroduced_by_fault: false
+  faults: []
+- id: BILL-1197
+  title: Exchange rate of zero accepted
+  rule: BR-15
+  cluster: Exchange rates
+  severity: 3
+  created: '2025-08-12'
+  fix_commit: 026787893b3111780c9dc3cfbf27d358d333b840
+  files:
+  - src/Billing.Web/Pages/Admin/ExchangeRates.cshtml.cs
+  tests_added: none
+  spec: null
+  reintroduced_by_fault: false
+  faults: []
+- id: BILL-1199
+  title: Credit amounts cleared after a validation error
+  rule: null
+  cluster: Credit notes
+  severity: 4
+  created: '2025-08-20'
+  fix_commit: 4ee3aa24193de004ccfed35469598f716327ed0c
+  files:
+  - src/Billing.Web/Pages/CreditNotes/Create.cshtml
+  tests_added: none
+  spec: null
+  reintroduced_by_fault: false
+  faults: []
+- id: BILL-1201
+  title: Purchase order form runs off the screen
+  rule: null
+  cluster: Page layout
+  severity: 4
+  created: '2025-09-02'
+  fix_commit: dedf1bf21dc1d8d59012521be50ed04c3e4d3d17
+  files:
+  - src/Billing.Web/wwwroot/css/site.css
+  tests_added: none
+  spec: null
+  reintroduced_by_fault: false
+  faults: []
+- id: BILL-1203
+  title: VAT on SEK invoices off by a few öre
+  rule: BR-04
+  cluster: Multi-currency rounding
+  severity: 2
+  created: '2025-09-08'
+  fix_commit: dc8ad2b6d66801c07f78392616a8ce48066b59a0
+  files:
+  - src/Billing.Web/Helpers/RoundingHelper.cs
+  tests_added: none
+  spec: null
+  reintroduced_by_fault: true
+  faults:
+  - F04d
+- id: BILL-1205
+  title: Error page when a project has an unknown tax code
+  rule: BR-03
+  cluster: VAT
+  severity: 3
+  created: '2025-09-23'
+  fix_commit: 379237f0710324e5e2fca070117e1e133bea0cfc
+  files:
+  - src/Billing.Web/Services/TaxService.cs
+  tests_added: none
+  spec: null
+  reintroduced_by_fault: false
+  faults: []
+- id: BILL-1207
+  title: Error page when creating a proposal without a project
+  rule: null
+  cluster: Proposal screens
+  severity: 4
+  created: '2025-10-14'
+  fix_commit: 4217b211b75dbab6e0a4fd16d656e21d84322a03
+  files:
+  - src/Billing.Web/Pages/Proposals/Create.cshtml.cs
+  tests_added: none
+  spec: null
+  reintroduced_by_fault: false
+  faults: []
+- id: BILL-1209
+  title: Expense lines on the invoice have no date
+  rule: BR-12
+  cluster: Expenses
+  severity: 4
+  created: '2025-11-04'
+  fix_commit: e855a9cc0ec0ba44e1b4e10ff37915c84e823489
+  files:
+  - src/Billing.Web/Services/ProposalService.cs
+  tests_added: none
+  spec: null
+  reintroduced_by_fault: false
+  faults: []
+- id: BILL-1212
+  title: Interim billing line shows 37.142857142857% complete
+  rule: null
+  cluster: Percent complete
+  severity: 4
+  created: '2025-11-25'
+  fix_commit: c36647843136284d6f3a8c8994be984c8ee49b7c
+  files:
+  - src/Billing.Web/Services/PercentCompleteBilling.cs
+  tests_added: none
+  spec: null
+  reintroduced_by_fault: false
+  faults: []
+- id: BILL-1214
+  title: Error page for a credit note link to a missing invoice
+  rule: null
+  cluster: Credit notes
+  severity: 4
+  created: '2025-12-09'
+  fix_commit: 641b56e38c881163cdf55178f2289cd088dfda75
+  files:
+  - src/Billing.Web/Pages/CreditNotes/Create.cshtml.cs
+  tests_added: none
+  spec: null
+  reintroduced_by_fault: false
+  faults: []
+- id: BILL-1216
+  title: Home page counts projects with only non-billable time
+  rule: null
+  cluster: Home page
+  severity: 4
+  created: '2026-01-13'
+  fix_commit: 6d38cb27ef3d371f8e8ae358284cdd630d92d3af
+  files:
+  - src/Billing.Web/Pages/Index.cshtml.cs
+  tests_added: none
+  spec: null
+  reintroduced_by_fault: false
+  faults: []
+- id: BILL-1219
+  title: KRW and ISK invoices show decimals
+  rule: BR-04
+  cluster: Multi-currency rounding
+  severity: 3
+  created: '2026-02-09'
+  fix_commit: 5c8a422a2c38365b22de824f46f94c532868b4a6
+  files:
+  - src/Billing.Web/Helpers/RoundingHelper.cs
+  tests_added: manual
+  spec: null
+  reintroduced_by_fault: false
+  faults: []
+- id: BILL-1222
+  title: Labels wrap in the proposal header
+  rule: null
+  cluster: Page layout
+  severity: 4
+  created: '2026-03-03'
+  fix_commit: be89568cd52e15d5f837348141356990ff7208d9
+  files:
+  - src/Billing.Web/wwwroot/css/site.css
+  tests_added: none
+  spec: null
+  reintroduced_by_fault: false
+  faults: []
+- id: BILL-1225
+  title: Interim billing fails with a division error
+  rule: null
+  cluster: Percent complete
+  severity: 3
+  created: '2026-04-07'
+  fix_commit: 16c641987c38aac028ce400de40c648efb547f45
+  files:
+  - src/Billing.Web/Helpers/BillingHelper.cs
+  tests_added: manual
+  spec: null
+  reintroduced_by_fault: false
+  faults: []
+- id: BILL-1228
+  title: EUR offered on the exchange rate page
+  rule: null
+  cluster: Exchange rates
+  severity: 4
+  created: '2026-05-12'
+  fix_commit: 8da03de55f91c252f64f832dd2e6c56888453bfc
+  files:
+  - src/Billing.Web/Pages/Admin/ExchangeRates.cshtml.cs
+  tests_added: none
+  spec: null
+  reintroduced_by_fault: false
+  faults: []
+- id: BILL-1231
+  title: Home page shows the business date as the period end
+  rule: null
+  cluster: Home page
+  severity: 4
+  created: '2026-06-09'
+  fix_commit: 1b5143e3f8349eced9bc24d18697087b4914aba8
+  files:
+  - src/Billing.Web/Pages/Index.cshtml.cs
+  tests_added: none
+  spec: null
+  reintroduced_by_fault: false
+  faults: []
+- id: BILL-1235
+  title: Audit log does not say whether a line was written up or down
+  rule: null
+  cluster: Adjustments
+  severity: 4
+  created: '2026-07-21'
+  fix_commit: f336ddd44a47529bc5cf5826f23370e40b4c54d8
+  files:
+  - src/Billing.Web/Services/AdjustmentService.cs
+  tests_added: none
+  spec: null
+  reintroduced_by_fault: false
+  faults: []
+- id: BILL-1238
+  title: Rate page jumps back to the first currency after saving
+  rule: null
+  cluster: Exchange rates
+  severity: 4
+  created: '2026-08-25'
+  fix_commit: 33e95fe79a6cb697f83f2e2af85138eb3dc512f9
+  files:
+  - src/Billing.Web/Pages/Admin/ExchangeRates.cshtml.cs
+  tests_added: none
+  spec: null
+  reintroduced_by_fault: false
+  faults: []
+- id: BILL-1240
+  title: Customer put on hold without a reason
+  rule: BR-05
+  cluster: Billing holds
+  severity: 3
+  created: '2026-09-15'
+  fix_commit: 2e5c7a6679dbba19a4de312e1526d2bc525c458a
+  files:
+  - src/Billing.Web/Pages/Customers/Edit.cshtml.cs
+  tests_added: manual
+  spec: null
+  reintroduced_by_fault: false
+  faults: []

@@ -1,0 +1,82 @@
+# Test Assurance Studio (use case 2). Runs beside Migration Studio without sharing anything:
+# its own project name, database, volumes and ports.
+name: test-assurance
+
+services:
+  qe-db:
+    image: pgvector/pgvector:pg16
+    environment:
+      POSTGRES_USER: qe
+      POSTGRES_PASSWORD: qe
+      POSTGRES_DB: qe
+    ports:
+      - "5554:5432"
+    volumes:
+      - qe_pgdata:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U qe -d qe"]
+      interval: 3s
+      timeout: 3s
+      retries: 20
+
+  qe-api:
+    build:
+      context: .
+      dockerfile: apps/qe-api/Dockerfile
+    environment:
+      QE_DATABASE_URL: postgresql+psycopg://qe:qe@qe-db:5432/qe
+      QE_LLM_MODE: ${QE_LLM_MODE:-replay}
+      ANTHROPIC_API_KEY: ${ANTHROPIC_API_KEY:-}
+      PYTHONPATH: /workspace:/workspace/apps/qe-api
+    volumes:
+      - .:/workspace
+    command: sh -c "alembic upgrade head && uvicorn app.main:app --host 0.0.0.0 --port 8030 --reload --reload-dir /workspace/apps/qe-api/app --reload-dir /workspace/qe/engines"
+    ports:
+      - "8030:8030"
+    depends_on:
+      qe-db:
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD-SHELL", "python -c \"import urllib.request as u; u.urlopen('http://localhost:8030/healthz')\""]
+      interval: 5s
+      timeout: 3s
+      retries: 20
+
+  qe-web:
+    image: node:22-alpine
+    working_dir: /workspace/apps/qe-web
+    environment:
+      API_PROXY_TARGET: http://qe-api:8030
+      CHOKIDAR_USEPOLLING: "true"
+      CHOKIDAR_INTERVAL: "1500"
+    volumes:
+      - .:/workspace
+      - qe_web_node_modules:/workspace/apps/qe-web/node_modules
+    command: sh -c "npm install --no-audit --no-fund && npm run dev -- --host 0.0.0.0"
+    ports:
+      - "5193:5193"
+    depends_on:
+      qe-api:
+        condition: service_healthy
+
+  # The billing module itself, for people to use. Every lab run starts its own copy instead.
+  module:
+    build:
+      context: .
+      dockerfile: qe/lab/Dockerfile
+    image: qe-lab
+    command: ["--serve", "baseline", "--port", "5280"]
+    ports:
+      - "5280:5280"
+
+  # Runs tests against the module's builds: npm run qe:lab -- --builds baseline --runs 20
+  lab:
+    profiles: ["lab"]
+    image: qe-lab
+    volumes:
+      - ./qe/estate/tests/e2e:/estate/tests/e2e:ro
+      - ./qe/lab/results:/results
+
+volumes:
+  qe_pgdata:
+  qe_web_node_modules:

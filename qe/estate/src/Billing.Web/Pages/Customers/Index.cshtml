@@ -1,0 +1,26 @@
+@page
+@model Kestrel.Billing.Pages.Customers.IndexModel
+@{
+    ViewData["Title"] = "Customers";
+}
+<h1>Customers</h1>
+<table class="grid" id="customers">
+    <thead>
+    <tr><th>Code</th><th>Name</th><th>Currency</th><th>Country</th><th>Payment terms</th><th>Discount</th><th>PO required</th><th>Status</th></tr>
+    </thead>
+    <tbody>
+    @foreach (var c in Model.Customers)
+    {
+        <tr>
+            <td><a href="/Customers/Edit/@c.Id">@c.Code</a></td>
+            <td>@c.Name</td>
+            <td>@c.Currency</td>
+            <td>@c.CountryCode</td>
+            <td>@c.PaymentTermsDays days</td>
+            <td>@(c.DiscountPercent == 0 ? "" : c.DiscountPercent.ToString("0.##") + "%")</td>
+            <td>@(c.PoRequired ? "Yes" : "")</td>
+            <td>@(c.IsOnHold ? "On hold" : "Active")</td>
+        </tr>
+    }
+    </tbody>
+</table>

@@ -1,0 +1,100 @@
+@page "{id:int}"
+@model Kestrel.Billing.Pages.Projects.DetailsModel
+@{
+    ViewData["Title"] = Model.Project.Code;
+}
+<h1>@Model.Project.Code @Model.Project.Name</h1>
+<partial name="_Error" model="Model.Error" />
+<dl class="facts">
+    <dt>Customer</dt><dd><a href="/Customers/Edit/@Model.Project.CustomerId">@BillingHelper.CustomerDisplayName(Model.Project.Customer)</a></dd>
+    <dt>Billing</dt><dd id="billing-type">@(Model.Project.BillingType == BillingType.FixedPrice ? "Fixed price" : "Time and materials")</dd>
+    <dt>Status</dt><dd>@Model.Project.Status</dd>
+    <dt>Tax code</dt><dd>@Model.Project.TaxCode</dd>
+    <dt>Expense markup</dt><dd>@Model.Project.ExpenseMarkupPercent.ToString("0.##")%</dd>
+    <dt>Not-to-exceed</dt><dd>@(Model.Project.NotToExceed.HasValue ? BillingHelper.FormatMoney(Model.Project.NotToExceed.Value, "EUR") : "None")</dd>
+    <dt>Project manager</dt><dd>@Model.Project.ProjectManager</dd>
+</dl>
+
+<form method="post" asp-page-handler="Hold" class="form inline" id="hold-form">
+    <div class="field check">
+        <input id="IsOnHold" name="IsOnHold" type="checkbox" value="true" checked="@Model.Project.IsOnHold" />
+        <label for="IsOnHold">Billing hold</label>
+    </div>
+    <div class="field">
+        <label for="HoldReason">Reason</label>
+        <input id="HoldReason" name="HoldReason" value="@Model.Project.HoldReason" />
+    </div>
+    <button type="submit">Save hold</button>
+</form>
+
+<p><a class="button primary" href="/Proposals/Create?projectId=@Model.Project.Id">Create proposal</a></p>
+
+@if (Model.Project.Rates.Count > 0)
+{
+    <h2>Rate card</h2>
+    <table class="grid" id="rate-card">
+        <thead><tr><th>Role</th><th class="num">Rate (EUR)</th></tr></thead>
+        <tbody>
+        @foreach (var r in Model.Project.Rates.OrderBy(r => r.RoleCode))
+        {
+            <tr><td>@r.RoleCode</td><td class="num">@r.Rate.ToString("0.00")</td></tr>
+        }
+        </tbody>
+    </table>
+}
+
+@if (Model.Project.BillingType == BillingType.FixedPrice)
+{
+    <h2>Milestones</h2>
+    <table class="grid" id="milestones">
+        <thead><tr><th>Milestone</th><th>Planned</th><th class="num">Amount (EUR)</th><th>Status</th><th></th></tr></thead>
+        <tbody>
+        @foreach (var m in Model.Project.Milestones.OrderBy(m => m.PlannedDate))
+        {
+            <tr>
+                <td>@m.Name</td>
+                <td>@m.PlannedDate.ToString("yyyy-MM-dd")</td>
+                <td class="num">@m.Amount.ToString("#,##0.00")</td>
+                <td>@(m.BilledInvoiceId != null ? "Billed" : m.IsComplete ? "Complete " + m.CompletedOn?.ToString("yyyy-MM-dd") : "Open")</td>
+                <td>
+                    @if (!m.IsComplete)
+                    {
+                        <form method="post" asp-page-handler="Complete" asp-route-milestoneId="@m.Id">
+                            <button type="submit">Mark complete</button>
+                        </form>
+                    }
+                </td>
+            </tr>
+        }
+        </tbody>
+    </table>
+}
+
+<h2>Unbilled time</h2>
+<table class="grid" id="unbilled-time">
+    <thead><tr><th>Date</th><th>Employee</th><th>Activity</th><th class="num">Hours</th><th>Billable</th><th>Status</th></tr></thead>
+    <tbody>
+    @foreach (var t in Model.Unbilled)
+    {
+        <tr>
+            <td>@t.Date.ToString("yyyy-MM-dd")</td>
+            <td>@t.Employee.Name</td>
+            <td>@t.ActivityCode</td>
+            <td class="num">@t.Hours.ToString("0.00")</td>
+            <td>@(t.Billable ? "Yes" : "No")</td>
+            <td>@t.Status</td>
+        </tr>
+    }
+    </tbody>
+</table>
+
+<h2>Unbilled expenses</h2>
+<table class="grid" id="unbilled-expenses">
+    <thead><tr><th>Date</th><th>Description</th><th class="num">Cost (EUR)</th><th>Status</th></tr></thead>
+    <tbody>
+    @foreach (var x in Model.Expenses)
+    {
+        <tr><td>@x.Date.ToString("yyyy-MM-dd")</td><td>@x.Description</td><td class="num">@x.Amount.ToString("#,##0.00")</td><td>@x.Status</td></tr>
+    }
+    </tbody>
+</table>
