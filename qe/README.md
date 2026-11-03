@@ -10,7 +10,10 @@ Use case 2. The plan is in [docs/USE_CASE_2_PLAN.md](../docs/USE_CASE_2_PLAN.md)
 | `estate/manual-cases` | 40 manual test cases, Azure DevOps CSV export |
 | `estate/defects` | 120 defects, Azure DevOps bug export, each linked to its fix commit |
 | `history` | The module's three-year Git history: `timeline.yaml` and the tool that builds `history/repo` from it |
+| `estate/test-data` | The test data catalogue: what the seeded test environment holds |
 | `faults` | 34 seeded faults, each tagged to a rule |
+| `generation` | The automation batch the quality engineering lead chose |
+| `generated` | Every generation attempt: candidate tests, their test data and their checks |
 | `lab` | The test lab image: every build of the module plus Playwright, and the run harness |
 | `answer-key` | What the right answers are, written before any agent runs |
 | `engines` | Shared Python: estate reader, coverage, defect history, dead code, the context analysis, agent gateway, audit trail, ontology |
@@ -48,6 +51,22 @@ npm run qe:record
 ```
 
 Records the context agents (case and defect mapping, the hidden-rule finder, risk cards) with Claude. It calls the model only where a recording is missing or its input or prompt has changed, and saves a result only after it passes the same checks as in the app. Needs `ANTHROPIC_API_KEY` in `.env`. Restart `qe-api` afterwards so the workbench replays the new recordings.
+
+```bash
+npm run qe:generate -- 1
+npm run qe:prove -- 1
+npm run qe:generate -- 2
+npm run qe:prove -- 2
+```
+
+Generates tests for the batch in `generation/batch.yaml`, then proves them. Attempt 1 reviews each manual case against the documents, merges duplicates and skips cases an existing test already covers, then writes a test for every source. A validator agent that never sees the test works out each expected value from the documents. The lab runs the whole suite 20 times with the candidates added, and runs the candidates on their rules' seeded faults. Attempt 2 regenerates only the tests that failed a check, with the reasons. Candidates and their checks are in `generated/attempt-<n>`, and lab results in `lab/results/proof`.
+
+```bash
+docker run --rm --entrypoint cat qe-lab /seed/billing.db > qe/estate/test-data/seed.db
+docker compose -f docker-compose.qe.yml exec -w /workspace qe-api python -m qe.tools.export_test_data /workspace/qe/estate/test-data/seed.db
+```
+
+Rewrites the test data catalogue after a change to the seed data.
 
 ```bash
 npm run qe:verify

@@ -1,0 +1,182 @@
+{
+  "input_hash": "0d5de1be5f8d6c25c18efa576c431bb2bd2e37fb487c9cdce087af76667fd2b2",
+  "source": "live_model",
+  "model": "claude-opus-5-5",
+  "duration_ms": 18714,
+  "output": {
+    "checks": [
+      {
+        "check": "Status after create",
+        "expected": "Deferred",
+        "basis": [
+          {
+            "document": "Help page 21-minimum-invoice-amount.md",
+            "find": "When you create a proposal and its value before tax is less than 50.00 EUR, the proposal is saved with the status *Deferred*."
+          },
+          {
+            "document": "Help page 21-minimum-invoice-amount.md",
+            "find": "P-1131 Polar crew app fixes has one approved entry of 0.50 hours by a junior consultant at 85.00 EUR. The proposal is worth 42.50 EUR, so it is deferred."
+          },
+          {
+            "document": "Test data catalogue",
+            "find": "name: Polar crew app fixes"
+          }
+        ]
+      },
+      {
+        "check": "Deferral banner",
+        "expected": "Below the minimum invoice amount of 50.00 EUR. The entries stay unbilled and are picked up by the next billing run.",
+        "basis": [
+          {
+            "document": "Help page 21-minimum-invoice-amount.md",
+            "find": "\"Below the minimum invoice amount of 50.00 EUR. The entries stay unbilled and are picked up by the next billing run.\""
+          }
+        ]
+      },
+      {
+        "check": "Line count",
+        "expected": "1",
+        "basis": [
+          {
+            "document": "Test data catalogue",
+            "find": "name: Polar crew app fixes"
+          },
+          {
+            "document": "Help page 11-billable-time-and-expenses.md",
+            "find": "Each time entry becomes one line."
+          }
+        ]
+      },
+      {
+        "check": "Line 1 date",
+        "expected": "2026-10-09",
+        "basis": [
+          {
+            "document": "Test data catalogue",
+            "find": "- date: '2026-10-09'"
+          },
+          {
+            "document": "Help page 11-billable-time-and-expenses.md",
+            "find": "The **Description** is the date, the employee name and the activity code"
+          }
+        ]
+      },
+      {
+        "check": "Line 1 employee",
+        "expected": "Emma Lindqvist",
+        "basis": [
+          {
+            "document": "Test data catalogue",
+            "find": "employee: Emma Lindqvist"
+          },
+          {
+            "document": "Help page 11-billable-time-and-expenses.md",
+            "find": "The **Description** is the date, the employee name and the activity code"
+          }
+        ]
+      },
+      {
+        "check": "Line 1 quantity",
+        "expected": "0.50",
+        "basis": [
+          {
+            "document": "Test data catalogue",
+            "find": "hours: 0.5"
+          },
+          {
+            "document": "Help page 12-quarter-hour-billing.md",
+            "find": "An entry that is already a whole quarter hour is not changed."
+          }
+        ]
+      },
+      {
+        "check": "Line 1 unit price",
+        "expected": "85.00",
+        "basis": [
+          {
+            "document": "Help page 07-rates.md",
+            "find": "| Junior consultant | JUN | 85.00 |"
+          },
+          {
+            "document": "Test data catalogue",
+            "find": "Emma Lindqvist: JUN"
+          }
+        ]
+      },
+      {
+        "check": "Line 1 amount",
+        "expected": "46.05 (0.50 × 85.00 = 42.50 EUR, converted to USD at the 1 Oct 2026 rate 1.0835 = 46.04875, rounded). The documents do not say explicitly that a deferred proposal is converted, but every proposal line is converted at creation.",
+        "basis": [
+          {
+            "document": "Test data catalogue",
+            "find": "rate: 1.0835"
+          },
+          {
+            "document": "Help page 13-creating-a-proposal.md",
+            "find": "looks up the exchange rate for the invoice date and converts every line,"
+          },
+          {
+            "document": "Help page 18-rounding.md",
+            "find": "rounds the result to the decimal places of the invoice currency. This is the line **Amount**,"
+          }
+        ]
+      },
+      {
+        "check": "Total",
+        "expected": "57.79 USD (subtotal 46.05, tax S 25.5% = 11.74)",
+        "basis": [
+          {
+            "document": "Help page 14-what-a-proposal-contains.md",
+            "find": "**Total**: subtotal plus tax, with the currency."
+          },
+          {
+            "document": "Help page 18-rounding.md",
+            "find": "Polar Marine Oy is invoiced in USD with standard VAT at 25.5%."
+          },
+          {
+            "document": "Help page 15-vat-and-tax-codes.md",
+            "find": "The tax on each line is the rounded line amount times the rate, rounded to the currency's decimal places."
+          }
+        ]
+      },
+      {
+        "check": "Finalise error",
+        "expected": "A deferred proposal cannot be finalised. Its entries are billed in the next run.",
+        "basis": [
+          {
+            "document": "Help page 22-finalising-an-invoice.md",
+            "find": "| Deferred proposal | \"A deferred proposal cannot be finalised. Its entries are billed in the next run.\" |"
+          }
+        ]
+      },
+      {
+        "check": "Status after finalise attempt",
+        "expected": "Deferred",
+        "basis": [
+          {
+            "document": "Help page 22-finalising-an-invoice.md",
+            "find": "If one fails, the invoice is not finalised and the message is shown at the top of the proposal."
+          },
+          {
+            "document": "Help page 21-minimum-invoice-amount.md",
+            "find": "A deferred proposal stays in the **Proposals** list with the status *Deferred*"
+          }
+        ]
+      },
+      {
+        "check": "Delete message",
+        "expected": "Proposal deleted.",
+        "basis": [
+          {
+            "document": "Help page 13-creating-a-proposal.md",
+            "find": "The message \"Proposal deleted.\" confirms it."
+          },
+          {
+            "document": "Help page 21-minimum-invoice-amount.md",
+            "find": "When you no longer need it, open it and select **Delete proposal**."
+          }
+        ]
+      }
+    ]
+  }
+}

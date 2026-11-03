@@ -134,3 +134,90 @@ export const api = {
     }),
   exportContext: () => request<unknown>("/api/context/export"),
 };
+
+export type Basis = { document: string; find: string };
+
+export type IntakeEntry = {
+  case: string;
+  title: string;
+  rule: string | null;
+  outcome: "merged" | "already_automated" | "to_person" | "needs_expected_result" | "ready" | "review";
+  into?: string;
+  by?: string;
+  duplicates: string[];
+  review?: {
+    steps: { step: number; verdict: "agrees" | "disagrees" | "not_checkable"; expected: string; basis: Basis[] }[];
+    summary: string;
+  };
+  agent?: { source: string; model: string | null };
+};
+
+export type CheckResult = { passed: boolean; [key: string]: unknown };
+
+export type Attempt = {
+  id: string;
+  attempt: number;
+  title: string;
+  ready_for_lab: boolean;
+  generated: {
+    path: string;
+    title: string;
+    data: { group: string; key: string; value: string };
+    data_choice: string;
+    scenario: string[];
+    checks: { check: string; value: string }[];
+    code: string;
+  };
+  issues: string[];
+  validation: { check: string; asserted: string; expected: string; basis: Basis[]; agrees: boolean }[];
+  agents: { generator: { source: string; model: string | null }; validator: { source: string; model: string | null } };
+  checks: {
+    conventions: CheckResult & { issues: string[] };
+    expected_results: CheckResult;
+    faults: CheckResult & { ran: boolean; rule_faults?: string[]; caught?: string[]; required?: string[] };
+    stability: CheckResult & { ran: boolean; passed_runs?: number; runs?: number; first_failure?: string | null };
+  };
+  accepted: boolean;
+  problems: string[];
+};
+
+export type GeneratedTest = {
+  id: string;
+  kind: string;
+  ref: string;
+  rule: string;
+  title: string;
+  accepted: boolean;
+  attempts: Attempt[];
+};
+
+export type CoverageAfter = {
+  rules: {
+    rule: string;
+    title: string;
+    critical: boolean;
+    tests: number;
+    caught: number;
+    faults: number;
+    score_before: number | null;
+    score: number | null;
+    covered_before: boolean;
+    covered: boolean;
+  }[];
+  critical_covered: number;
+  critical_rules: number;
+  percent: number;
+  newly_covered: string[];
+};
+
+export type Tests = {
+  batch: { chosen_by: string; manual_cases: number[]; defects: string[]; context: string[] };
+  intake: IntakeEntry[];
+  tests: GeneratedTest[];
+  coverage_before: { critical_covered: number; critical_rules: number; percent: number };
+  coverage_after: CoverageAfter;
+};
+
+export const testsApi = {
+  tests: () => request<Tests>("/api/tests"),
+};

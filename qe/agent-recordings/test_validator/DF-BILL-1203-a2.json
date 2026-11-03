@@ -1,0 +1,154 @@
+{
+  "input_hash": "e129189f2fd14f20e7740a8f23c0ada6f3a5d0c316600efb2e6e46130175409c",
+  "source": "live_model",
+  "model": "claude-opus-5-5",
+  "duration_ms": 21021,
+  "output": {
+    "checks": [
+      {
+        "check": "Proposal currency",
+        "expected": "USD",
+        "basis": [
+          {
+            "document": "Test data catalogue",
+            "find": "name: Polar legacy closeout"
+          },
+          {
+            "document": "Test data catalogue",
+            "find": "name: Polar Marine Oy"
+          },
+          {
+            "document": "Test data catalogue",
+            "find": "currency: USD"
+          },
+          {
+            "document": "Help page 14-what-a-proposal-contains.md",
+            "find": "| **Currency** | The customer's invoice currency. |"
+          }
+        ]
+      },
+      {
+        "check": "Exchange rate",
+        "expected": "1.0835 (the 1 Oct 2026 USD rate). PERIOD_END is not defined in the material. This holds for any period end on or after 9 Oct 2026, because the only entry is dated 2026-10-09, the invoice date defaults to the period end and there is no later USD rate.",
+        "basis": [
+          {
+            "document": "Test data catalogue",
+            "find": "rate: 1.0835"
+          },
+          {
+            "document": "Help page 17-currencies-and-exchange-rates.md",
+            "find": "An invoice uses the latest rate whose **Effective from** date is on or before its **Invoice date**."
+          },
+          {
+            "document": "Help page 14-what-a-proposal-contains.md",
+            "find": "EUR invoices show 1.0000."
+          },
+          {
+            "document": "Help page 02-business-date-and-billing-period.md",
+            "find": "It is set to the period end by default."
+          }
+        ]
+      },
+      {
+        "check": "Line count",
+        "expected": "1",
+        "basis": [
+          {
+            "document": "Test data catalogue",
+            "find": "name: Polar legacy closeout"
+          },
+          {
+            "document": "Test data catalogue",
+            "find": "activity: ADMIN"
+          },
+          {
+            "document": "Help page 11-billable-time-and-expenses.md",
+            "find": "Each time entry becomes one line."
+          },
+          {
+            "document": "Help page 21-minimum-invoice-amount.md",
+            "find": "The minimum does not apply to projects with the status *Closing*."
+          }
+        ]
+      },
+      {
+        "check": "Line 1 amount",
+        "expected": "46.05 (0.50 h × 85.00 EUR = 42.50 EUR × 1.0835 = 46.04875, rounded to 46.05 USD)",
+        "basis": [
+          {
+            "document": "Test data catalogue",
+            "find": "standard_rate: 85"
+          },
+          {
+            "document": "Help page 12-quarter-hour-billing.md",
+            "find": "An entry that is already a whole quarter hour is not changed."
+          },
+          {
+            "document": "Help page 18-rounding.md",
+            "find": "rounds the result to the decimal places of the invoice currency. This is the line **Amount**,"
+          },
+          {
+            "document": "Help page 18-rounding.md",
+            "find": "Amounts exactly halfway are rounded away from zero."
+          }
+        ]
+      },
+      {
+        "check": "Line 1 tax",
+        "expected": "S 25.5% with a tax amount of 11.74 (46.05 × 25.5% = 11.74275)",
+        "basis": [
+          {
+            "document": "Help page 15-vat-and-tax-codes.md",
+            "find": "| S | Standard rate | 25.5% | |"
+          },
+          {
+            "document": "Help page 16-reverse-charge.md",
+            "find": "4. The customer's country is not Finland."
+          },
+          {
+            "document": "Help page 18-rounding.md",
+            "find": "works out the tax on the rounded line amount and rounds that too. This is the line **Tax amount**."
+          },
+          {
+            "document": "Test data catalogue",
+            "find": "tax_code: S"
+          }
+        ]
+      },
+      {
+        "check": "Subtotal",
+        "expected": "46.05",
+        "basis": [
+          {
+            "document": "Help page 18-rounding.md",
+            "find": "**Subtotal** is the sum of the rounded line amounts,"
+          }
+        ]
+      },
+      {
+        "check": "Tax total",
+        "expected": "11.74",
+        "basis": [
+          {
+            "document": "Help page 18-rounding.md",
+            "find": "**Tax** is the sum of the rounded line tax amounts,"
+          }
+        ]
+      },
+      {
+        "check": "Total",
+        "expected": "57.79 USD",
+        "basis": [
+          {
+            "document": "Help page 14-what-a-proposal-contains.md",
+            "find": "**Total**: subtotal plus tax, with the currency."
+          },
+          {
+            "document": "Help page 18-rounding.md",
+            "find": "**Total** is Subtotal plus Tax."
+          }
+        ]
+      }
+    ]
+  }
+}

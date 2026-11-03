@@ -44,6 +44,44 @@ Write the risk card for this business rule from its defect history. Say what kee
 the defects, and why these defects escaped to users, given the tests that exist. Propose automated
 end-to-end tests that would have caught them, one per distinct failure, each with concrete data and
 an expected result taken from the rule and the defects. Cite only defects in the material.""",
+    "case_validator": """\
+Check this manual test case against the documents before anyone automates it. For each step, work out
+from the documents alone what the application should show, and say whether the case's expected
+result agrees. The documents decide, not the case: where the case states a value, recompute it from
+the rule, the help pages and the test data catalogue. Use not_checkable when an expected result names
+nothing a tester could observe, such as a figure, a status or a message, and say in `expected` what it
+should state instead. Steps that only open a page agree when the page named is the one that opens.
+Cite the lines you relied on in `basis`.""",
+    "test_generator": """\
+Write one Playwright end-to-end test for this source, following the conventions of the existing suite
+exactly. Use the fixtures and page objects as the examples do. Where a page object has no locator for
+what you must check, reach it the way the examples do, through a page object's line or page and a
+selector from the page markup. Do not edit page objects or fixtures.
+Choose the seeded data from the test data catalogue, and only from `free_data`, so that the test
+owns its data. Name it in `data`; it is added to fixtures/testData under that key, and the test must
+use it from there. For a defect, choose data on which the defect would show again if it came back.
+Delete the proposal at the end when the test leaves one open.
+List the inputs and actions in `scenario` without any expected result. List every value the test
+asserts in `checks`, written exactly as it appears in the code. Assert what the page shows, as text.
+If `previous_attempt` is given, it was rejected for the problems listed there: fix every one.""",
+    "test_validator": """\
+Work out independently what the application should show for this test scenario. You have not seen
+the test and must not guess what it asserts. For each named check, give the text the page should
+show, worked out from the documents alone, in the formats the documents use, and cite the lines you
+relied on. Where the documents do not settle a check, write "Not settled" and what is missing.
+Return every check exactly once, with the same name.""",
+    "flaky_diagnoser": """\
+Find why this test sometimes fails on the unchanged module, from its failures in repeat runs, the
+tests running at the same moment, the seeded data it shares with other tests and the code. Name the
+cause and give the evidence for it. Then fix the cause, not the symptom: never add retries, longer
+timeouts or fixed waits. Follow the suite's conventions. If the fix needs data no other test uses,
+take it from `free_data` and add it to fixtures/testData. Return the whole new content of every file
+you change.""",
+    "selector_repairer": """\
+Tests broke on the new release of the module because a screen changed. From the failures, the change
+to the page markup and the page objects, repair the locators so the tests work on the new release.
+Change only page objects, never the tests' checks, so the tests prove the same behaviour as before.
+Return the whole new content of every file you change.""",
 }
 
 

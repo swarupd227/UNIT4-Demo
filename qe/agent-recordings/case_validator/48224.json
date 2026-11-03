@@ -1,0 +1,115 @@
+{
+  "input_hash": "92aae57758f20f9f04149f9612b7d5cd08a872dbd7102e0d0246cf88284ff1f8",
+  "source": "live_model",
+  "model": "claude-opus-5-5",
+  "duration_ms": 23503,
+  "output": {
+    "steps": [
+      {
+        "step": 1,
+        "verdict": "agrees",
+        "expected": "The P-1132 project page shows Status: Closing.",
+        "basis": [
+          {
+            "document": "Test data catalogue",
+            "find": "name: Polar legacy closeout"
+          },
+          {
+            "document": "Test data catalogue",
+            "find": "    status: Closing"
+          },
+          {
+            "document": "Help page 06-projects.md",
+            "find": "| **Status** | *Active*, *Closing* or *Closed*. |"
+          }
+        ]
+      },
+      {
+        "step": 2,
+        "verdict": "agrees",
+        "expected": "The New invoice proposal page opens. The business date is 2026-10-30, so Period end defaults to 2026-10-31, and Invoice date defaults to the period end, 2026-10-31.",
+        "basis": [
+          {
+            "document": "Test data catalogue",
+            "find": "business_date: '2026-10-30'"
+          },
+          {
+            "document": "Help page 02-business-date-and-billing-period.md",
+            "find": "When you open **New proposal**, the period end is set to the last day of the month of the business date."
+          },
+          {
+            "document": "Help page 02-business-date-and-billing-period.md",
+            "find": "Each proposal also has an **Invoice date**. It is set to the period end by default."
+          },
+          {
+            "document": "Help page 13-creating-a-proposal.md",
+            "find": "On the **New invoice proposal** page, select the **Project**."
+          }
+        ]
+      },
+      {
+        "step": 3,
+        "verdict": "agrees",
+        "expected": "The project is Closing, so the proposal is created with Status Proposal and no minimum amount message, even though it is worth 42.50 EUR. There is one line: 2026-10-09 Emma Lindqvist - ADMIN, Qty 0.50, Unit price 85.00 (JUN standard rate; Polar Marine Oy has no agreed rates or discount). The amount is 42.50 EUR x 1.0835 (the USD rate effective 2026-10-01) = 46.04875, which rounds to 46.05 USD. Tax is S 25.5%: 46.05 x 25.5% = 11.74275, which rounds to 11.74. Total is 57.79 USD. No reverse charge applies because the customer is in FI.",
+        "basis": [
+          {
+            "document": "Help page 21-minimum-invoice-amount.md",
+            "find": "For example, P-1132 Polar legacy closeout is *Closing*. A proposal for 0.50 hours is created as a normal proposal."
+          },
+          {
+            "document": "Rule register",
+            "find": "A proposal worth less than 50.00 EUR before tax is deferred and its entries stay unbilled, unless the"
+          },
+          {
+            "document": "Test data catalogue",
+            "find": "  Emma Lindqvist: JUN"
+          },
+          {
+            "document": "Help page 07-rates.md",
+            "find": "| Junior consultant | JUN | 85.00 |"
+          },
+          {
+            "document": "Test data catalogue",
+            "find": "  rate: 1.0835"
+          },
+          {
+            "document": "Help page 17-currencies-and-exchange-rates.md",
+            "find": "An invoice uses the latest rate whose **Effective from** date is on or before its **Invoice date**."
+          },
+          {
+            "document": "Help page 18-rounding.md",
+            "find": "Amounts exactly halfway are rounded away from zero."
+          },
+          {
+            "document": "Help page 15-vat-and-tax-codes.md",
+            "find": "| S | Standard rate | 25.5% | |"
+          },
+          {
+            "document": "Help page 11-billable-time-and-expenses.md",
+            "find": "The **Description** is the date, the employee name and the activity code, followed by the entry's comment in brackets if there is one."
+          },
+          {
+            "document": "Test data catalogue",
+            "find": "    name: Polar Marine Oy"
+          }
+        ]
+      },
+      {
+        "step": 4,
+        "verdict": "agrees",
+        "expected": "The proposal is deleted and the message \"Proposal deleted.\" is shown. The documents confirm the message, but they do not say which page is shown after deletion, so the Invoice proposals list as the landing page is not settled by the material.",
+        "basis": [
+          {
+            "document": "Help page 13-creating-a-proposal.md",
+            "find": "The message \"Proposal deleted.\" confirms it."
+          },
+          {
+            "document": "Help page 01-getting-started.md",
+            "find": "When something works, a short confirmation appears in a box at the top of the page, for example \"Proposal deleted.\""
+          }
+        ]
+      }
+    ],
+    "summary": "All four steps agree with the documents, including the recomputed 46.05 + 11.74 = 57.79 USD for the closing project, although the page shown after deletion in step 4 is not documented."
+  }
+}

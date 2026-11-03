@@ -9,7 +9,9 @@ check is not saved, and the script says why.
 
 import json
 import sys
+from collections.abc import Callable
 from pathlib import Path
+from typing import Any
 
 from pydantic import BaseModel
 
@@ -31,8 +33,10 @@ GATE_PERCENT = 80
 
 
 class RecordingGateway:
-    def __init__(self, src: Sources) -> None:
-        self._src = src
+    """Replays what is recorded and current, and records the rest after `check` accepts it."""
+
+    def __init__(self, check: Callable[[AgentRequest, dict[str, Any]], Any]) -> None:
+        self._check = check
         self._replay = ReplayGateway(RECORDINGS)
         self._live = ClaudeGateway(MODEL)
         self.failures: list[str] = []
@@ -45,8 +49,15 @@ class RecordingGateway:
             pass
         print(f"...  {label}", flush=True)
         try:
-            result = self._live.run(request, schema)
-            checked(self._src, request, result.output)
+            try:
+                result = self._live.run(request, schema)
+            except LiveAgentError as error:
+                # One more try for a dropped connection, which is common on a long recording run.
+                if "could not be reached" not in str(error):
+                    raise
+                print(f"     {label}: {error} Trying once more.", flush=True)
+                result = self._live.run(request, schema)
+            self._check(request, result.output)
         except (LiveAgentError, CheckFailed) as error:
             self.failures.append(f"{label}: {error}")
             print(f"FAIL {label}: {error}", flush=True)
@@ -73,7 +84,7 @@ class RecordingGateway:
 
 def main() -> None:
     src = Sources.at(QE_ROOT, HISTORY_REPO, GATE_PERCENT)
-    gateway = RecordingGateway(src)
+    gateway = RecordingGateway(lambda request, output: checked(src, request, output))
     analyse(src, gateway)
     print(f"{len(gateway.failures)} failed" if gateway.failures else "All recordings are current")
     sys.exit(1 if gateway.failures else 0)

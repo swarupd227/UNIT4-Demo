@@ -1,0 +1,262 @@
+{
+  "input_hash": "a87e7f102f104064861d85c43d0c421eda83a1163b677bbcfbdea39e40ffe545",
+  "source": "live_model",
+  "model": "claude-opus-5-5",
+  "duration_ms": 35005,
+  "output": {
+    "checks": [
+      {
+        "check": "Line 1 write-up shown",
+        "expected": "+0.07 in the Adjustment (EUR) column of line 1, with the reason \"Rounding check\" shown under the line description (2026-10-12 Juha Niemi - ANALYSIS)",
+        "basis": [
+          {
+            "document": "Help page 19-write-ups-and-write-downs.md",
+            "find": "column shows the amount with a + or"
+          },
+          {
+            "document": "Help page 14-what-a-proposal-contains.md",
+            "find": "A write-up or write-down reason is shown underneath."
+          },
+          {
+            "document": "Test data catalogue",
+            "find": "name: Polar vessel reporting"
+          }
+        ]
+      },
+      {
+        "check": "Line 2 write-up shown",
+        "expected": "+0.07 in the Adjustment (EUR) column of line 2, with the reason \"Rounding check\" shown under the line description (2026-10-13 Laura Koskinen - CONS)",
+        "basis": [
+          {
+            "document": "Help page 19-write-ups-and-write-downs.md",
+            "find": "column shows the amount with a + or"
+          },
+          {
+            "document": "Help page 14-what-a-proposal-contains.md",
+            "find": "A write-up or write-down reason is shown underneath."
+          }
+        ]
+      },
+      {
+        "check": "Proposal currency",
+        "expected": "USD (assuming projects.polarReporting is P-1130 Polar vessel reporting, customer C220 Polar Marine Oy)",
+        "basis": [
+          {
+            "document": "Test data catalogue",
+            "find": "name: Polar Marine Oy"
+          },
+          {
+            "document": "Test data catalogue",
+            "find": "customer: C220"
+          },
+          {
+            "document": "Help page 14-what-a-proposal-contains.md",
+            "find": "| **Currency** | The customer's invoice currency. |"
+          }
+        ]
+      },
+      {
+        "check": "Exchange rate used",
+        "expected": "1.0835, provided PERIOD_END (and so the invoice date) is on or after 1 Oct 2026; the scenario does not give PERIOD_END, but the default would be 31 Oct 2026 from business date 2026-10-30",
+        "basis": [
+          {
+            "document": "Test data catalogue",
+            "find": "rate: 1.0835"
+          },
+          {
+            "document": "Help page 17-currencies-and-exchange-rates.md",
+            "find": "An invoice uses the latest rate whose **Effective from** date is on or before its **Invoice date**."
+          },
+          {
+            "document": "Help page 02-business-date-and-billing-period.md",
+            "find": "When you open **New proposal**, the period end is set to the last day of the month of the business date."
+          },
+          {
+            "document": "Help page 14-what-a-proposal-contains.md",
+            "find": "EUR invoices show 1.0000."
+          }
+        ]
+      },
+      {
+        "check": "Number of lines",
+        "expected": "3 (the 29 Sep entry is not billable; the 12, 13 and 14 Oct entries are approved and billable), assuming PERIOD_END is on or after 14 Oct 2026",
+        "basis": [
+          {
+            "document": "Help page 11-billable-time-and-expenses.md",
+            "find": "is marked billable,"
+          },
+          {
+            "document": "Test data catalogue",
+            "find": "date: '2026-09-29'"
+          },
+          {
+            "document": "Help page 11-billable-time-and-expenses.md",
+            "find": "Time lines are listed first, in date order."
+          }
+        ]
+      },
+      {
+        "check": "Line 3 is the 14 October entry",
+        "expected": "Yes: 2026-10-14 Laura Koskinen - CONS (Report review)",
+        "basis": [
+          {
+            "document": "Test data catalogue",
+            "find": "date: '2026-10-14'"
+          },
+          {
+            "document": "Test data catalogue",
+            "find": "comment: Report review"
+          },
+          {
+            "document": "Help page 11-billable-time-and-expenses.md",
+            "find": "The **Description** is the date, the employee name and the activity code, followed by the entry's comment in brackets if there is one."
+          }
+        ]
+      },
+      {
+        "check": "Line 3 billed quantity",
+        "expected": "2.25 (2.1 hours rounded up to the next quarter hour)",
+        "basis": [
+          {
+            "document": "Test data catalogue",
+            "find": "hours: 2.1"
+          },
+          {
+            "document": "Help page 12-quarter-hour-billing.md",
+            "find": "Each time entry is rounded **up** to the next quarter hour."
+          }
+        ]
+      },
+      {
+        "check": "Line 1 amount rounded in USD",
+        "expected": "1,300.28 (8.00 h × 150.00 SNR standard rate = 1,200.00 EUR, +0.07 = 1,200.07 EUR × 1.0835 = 1,300.275845)",
+        "basis": [
+          {
+            "document": "Help page 07-rates.md",
+            "find": "| Senior consultant | SNR | 150.00 |"
+          },
+          {
+            "document": "Help page 18-rounding.md",
+            "find": "takes the line's EUR value, including any write-up or write-down,"
+          },
+          {
+            "document": "Help page 18-rounding.md",
+            "find": "rounds the result to the decimal places of the invoice currency. This is the line **Amount**,"
+          }
+        ]
+      },
+      {
+        "check": "Line 2 amount rounded in USD",
+        "expected": "1,040.24 (8.00 h × 120.00 CONS standard rate = 960.00 EUR, +0.07 = 960.07 EUR × 1.0835 = 1,040.235845)",
+        "basis": [
+          {
+            "document": "Help page 07-rates.md",
+            "find": "| Consultant | CONS | 120.00 |"
+          },
+          {
+            "document": "Help page 18-rounding.md",
+            "find": "takes the line's EUR value, including any write-up or write-down,"
+          }
+        ]
+      },
+      {
+        "check": "Line 3 amount rounded in USD",
+        "expected": "292.55 (2.25 h × 120.00 = 270.00 EUR × 1.0835 = 292.545, half rounded away from zero)",
+        "basis": [
+          {
+            "document": "Help page 18-rounding.md",
+            "find": "Amounts exactly halfway are rounded away from zero."
+          },
+          {
+            "document": "Help page 07-rates.md",
+            "find": "| Consultant | CONS | 120.00 |"
+          }
+        ]
+      },
+      {
+        "check": "Line 1 tax on the rounded line",
+        "expected": "331.57 (1,300.28 × 25.5% = 331.5714), tax code S 25.5%",
+        "basis": [
+          {
+            "document": "Help page 18-rounding.md",
+            "find": "works out the tax on the rounded line amount and rounds that too."
+          },
+          {
+            "document": "Help page 15-vat-and-tax-codes.md",
+            "find": "| S | Standard rate | 25.5% | |"
+          },
+          {
+            "document": "Help page 16-reverse-charge.md",
+            "find": "4. The customer's country is not Finland."
+          }
+        ]
+      },
+      {
+        "check": "Line 2 tax on the rounded line",
+        "expected": "265.26 (1,040.24 × 25.5% = 265.2612)",
+        "basis": [
+          {
+            "document": "Help page 18-rounding.md",
+            "find": "works out the tax on the rounded line amount and rounds that too."
+          },
+          {
+            "document": "Help page 15-vat-and-tax-codes.md",
+            "find": "| S | Standard rate | 25.5% | |"
+          }
+        ]
+      },
+      {
+        "check": "Line 3 tax on the rounded line",
+        "expected": "74.60 (292.55 × 25.5% = 74.60025)",
+        "basis": [
+          {
+            "document": "Help page 18-rounding.md",
+            "find": "works out the tax on the rounded line amount and rounds that too."
+          },
+          {
+            "document": "Help page 15-vat-and-tax-codes.md",
+            "find": "| S | Standard rate | 25.5% | |"
+          }
+        ]
+      },
+      {
+        "check": "Subtotal as the sum of the printed lines",
+        "expected": "2,633.07",
+        "basis": [
+          {
+            "document": "Help page 18-rounding.md",
+            "find": "**Subtotal** is the sum of the rounded line amounts,"
+          },
+          {
+            "document": "Help page 00-index.md",
+            "find": "Amounts are written with a full stop for decimals and a comma for thousands"
+          }
+        ]
+      },
+      {
+        "check": "Tax total",
+        "expected": "671.43",
+        "basis": [
+          {
+            "document": "Help page 18-rounding.md",
+            "find": "**Tax** is the sum of the rounded line tax amounts,"
+          }
+        ]
+      },
+      {
+        "check": "Total",
+        "expected": "3,304.50 USD",
+        "basis": [
+          {
+            "document": "Help page 18-rounding.md",
+            "find": "**Total** is Subtotal plus Tax."
+          },
+          {
+            "document": "Help page 14-what-a-proposal-contains.md",
+            "find": "**Total**: subtotal plus tax, with the currency."
+          }
+        ]
+      }
+    ]
+  }
+}

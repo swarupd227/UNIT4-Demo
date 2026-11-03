@@ -1,0 +1,166 @@
+{
+  "input_hash": "3cecd1e74a76a26d2745095c8d85bf5ffc07c59aec6cb97a76a288849c62620a",
+  "source": "live_model",
+  "model": "claude-opus-5-5",
+  "duration_ms": 25703,
+  "output": {
+    "checks": [
+      {
+        "check": "Proposal currency",
+        "expected": "USD. This assumes projects.polarFleet is P-1133 Polar fleet dashboard, whose customer C220 Polar Marine Oy is invoiced in USD.",
+        "basis": [
+          {
+            "document": "Test data catalogue",
+            "find": "    name: Polar fleet dashboard"
+          },
+          {
+            "document": "Test data catalogue",
+            "find": "    name: Polar Marine Oy"
+          },
+          {
+            "document": "Help page 14-what-a-proposal-contains.md",
+            "find": "| **Currency** | The customer's invoice currency. |"
+          }
+        ]
+      },
+      {
+        "check": "Exchange rate used",
+        "expected": "1.0835. This assumes PERIOD_END is the default, 31 Oct 2026. PERIOD_END is not defined in the material, but any October invoice date picks up the USD rate effective from 1 Oct 2026.",
+        "basis": [
+          {
+            "document": "Test data catalogue",
+            "find": "  rate: 1.0835"
+          },
+          {
+            "document": "Help page 17-currencies-and-exchange-rates.md",
+            "find": "An invoice uses the latest rate whose **Effective from** date is on or before its **Invoice date**."
+          },
+          {
+            "document": "Help page 02-business-date-and-billing-period.md",
+            "find": "When you open **New proposal**, the period end is set to the last day of the month of the business date."
+          },
+          {
+            "document": "Test data catalogue",
+            "find": "business_date: '2026-10-30'"
+          }
+        ]
+      },
+      {
+        "check": "Number of lines",
+        "expected": "1. The project has one approved, billable entry of 1 hour by Emma Lindqvist on 2026-10-16, and no expenses or milestones.",
+        "basis": [
+          {
+            "document": "Test data catalogue",
+            "find": "      employee: Emma Lindqvist"
+          },
+          {
+            "document": "Help page 11-billable-time-and-expenses.md",
+            "find": "On a time and materials project, a proposal includes every time entry that:"
+          }
+        ]
+      },
+      {
+        "check": "Line 1 unit price (EUR)",
+        "expected": "85.00. Emma Lindqvist is a junior consultant (JUN). There is no agreed rate and no project rate card, so the standard rate applies.",
+        "basis": [
+          {
+            "document": "Help page 07-rates.md",
+            "find": "| Junior consultant | JUN | 85.00 |"
+          },
+          {
+            "document": "Help page 07-rates.md",
+            "find": "3. **The role's standard rate.**"
+          },
+          {
+            "document": "Test data catalogue",
+            "find": "  Emma Lindqvist: JUN"
+          }
+        ]
+      },
+      {
+        "check": "Line 1 amount rounded in USD",
+        "expected": "92.10. This is 1.00 h × 85.00 EUR = 85.00 EUR, multiplied by 1.0835 to give 92.0975, then rounded to 2 decimal places.",
+        "basis": [
+          {
+            "document": "Help page 18-rounding.md",
+            "find": "3. rounds the result to the decimal places of the invoice currency. This is the line **Amount**,"
+          },
+          {
+            "document": "Help page 12-quarter-hour-billing.md",
+            "find": "An entry that is already a whole quarter hour is not changed."
+          },
+          {
+            "document": "Help page 18-rounding.md",
+            "find": "Amounts exactly halfway are rounded away from zero."
+          }
+        ]
+      },
+      {
+        "check": "Line 1 tax on the rounded line",
+        "expected": "23.49. The code is S 25.5%: 92.10 × 25.5% = 23.4855, rounded to 23.49. Reverse charge does not apply because the customer's country is FI.",
+        "basis": [
+          {
+            "document": "Help page 15-vat-and-tax-codes.md",
+            "find": "The tax on each line is the rounded line amount times the rate, rounded to the currency's decimal places."
+          },
+          {
+            "document": "Test data catalogue",
+            "find": "    rate_percent: 25.5"
+          },
+          {
+            "document": "Help page 16-reverse-charge.md",
+            "find": "4. The customer's country is not Finland."
+          }
+        ]
+      },
+      {
+        "check": "Subtotal",
+        "expected": "92.10",
+        "basis": [
+          {
+            "document": "Help page 18-rounding.md",
+            "find": "- **Subtotal** is the sum of the rounded line amounts,"
+          }
+        ]
+      },
+      {
+        "check": "Tax total",
+        "expected": "23.49",
+        "basis": [
+          {
+            "document": "Help page 18-rounding.md",
+            "find": "- **Tax** is the sum of the rounded line tax amounts,"
+          }
+        ]
+      },
+      {
+        "check": "Total",
+        "expected": "115.59 USD",
+        "basis": [
+          {
+            "document": "Help page 18-rounding.md",
+            "find": "- **Total** is Subtotal plus Tax."
+          },
+          {
+            "document": "Help page 18-rounding.md",
+            "find": "Subtotal 108.48, Tax 27.66, Total 136.14 USD."
+          }
+        ]
+      },
+      {
+        "check": "Delete button gone after deletion",
+        "expected": "Partly settled. The confirmation \"Proposal deleted.\" is shown and the proposal no longer exists, so no **Delete proposal** button is shown for it. Not settled: which page opens after the deletion. The documents do not say.",
+        "basis": [
+          {
+            "document": "Help page 13-creating-a-proposal.md",
+            "find": "The message \"Proposal deleted.\" confirms it."
+          },
+          {
+            "document": "Help page 01-getting-started.md",
+            "find": "When something works, a short confirmation appears in a box at the top of the page, for example \"Proposal deleted.\""
+          }
+        ]
+      }
+    ]
+  }
+}

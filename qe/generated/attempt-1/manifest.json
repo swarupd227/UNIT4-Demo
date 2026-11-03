@@ -1,0 +1,2733 @@
+{
+  "attempt": 1,
+  "candidates": [
+    {
+      "id": "MC-48212",
+      "kind": "manual_case",
+      "ref": "48212",
+      "rule": "BR-04",
+      "attempt": 1,
+      "title": "BR-04 JPY lines are converted and rounded one by one to whole yen, and the total is the sum of the rounded lines @critical",
+      "generated": {
+        "path": "specs/pricing/multi-currency-rounding.spec.ts",
+        "title": "BR-04 JPY lines are converted and rounded one by one to whole yen, and the total is the sum of the rounded lines @critical",
+        "data": {
+          "group": "projects",
+          "key": "sakuraPortal",
+          "value": "P-1070 Sakura supplier portal"
+        },
+        "data_choice": "Sakura invoices in JPY, which has no decimals. One line rounds down (4,871.10) and the other rounds up (142,885.60), so a wrong conversion or rounding would change what the page shows. The total alone would not separate summing rounded lines from rounding the sum (147,756.70 also rounds to 147,757), so the per-line amounts carry the rule.",
+        "scenario": [
+          "Create a proposal for P-1070 Sakura supplier portal with period end and invoice date 2026-10-31",
+          "Read the currency and exchange rate",
+          "Read the number of lines",
+          "Read line 1: date, amount and tax amount",
+          "Read line 2: date, amount and tax amount",
+          "Read the subtotal, tax and total",
+          "Click Delete proposal and accept the confirmation dialog"
+        ],
+        "checks": [
+          {
+            "check": "Currency",
+            "value": "JPY"
+          },
+          {
+            "check": "Exchange rate",
+            "value": "162.3700"
+          },
+          {
+            "check": "Line count",
+            "value": "2"
+          },
+          {
+            "check": "Line 1 date",
+            "value": "2026-10-07"
+          },
+          {
+            "check": "Line 1 amount",
+            "value": "4,871"
+          },
+          {
+            "check": "Line 1 tax amount",
+            "value": "0"
+          },
+          {
+            "check": "Line 2 date",
+            "value": "2026-10-08"
+          },
+          {
+            "check": "Line 2 amount",
+            "value": "142,886"
+          },
+          {
+            "check": "Line 2 tax amount",
+            "value": "0"
+          },
+          {
+            "check": "Subtotal",
+            "value": "147,757"
+          },
+          {
+            "check": "Tax",
+            "value": "0"
+          },
+          {
+            "check": "Total",
+            "value": "147,757 JPY"
+          },
+          {
+            "check": "Delete message",
+            "value": "Proposal deleted."
+          }
+        ],
+        "code": "import { expect, test } from '../../fixtures/billing';\nimport { PERIOD_END, projects } from '../../fixtures/testData';\n\ntest('BR-04 JPY lines are converted and rounded one by one to whole yen, and the total is the sum of the rounded lines @critical', async ({ proposal }) => {\n  await proposal.create(projects.sakuraPortal, PERIOD_END);\n\n  await expect(proposal.page.locator('#proposal-currency')).toHaveText('JPY');\n  await expect(proposal.page.locator('#proposal-rate')).toHaveText('162.3700');\n\n  // The rejected September entry stays out.\n  await expect(proposal.lines).toHaveCount(2);\n\n  // 30.00 EUR x 162.37 = 4,871.10, rounded down to whole yen.\n  await expect(proposal.line(1)).toContainText('2026-10-07');\n  await expect(proposal.amountOf(1)).toHaveText('4,871');\n  await expect(proposal.line(1).locator('.line-tax')).toHaveText('0');\n\n  // 880.00 EUR x 162.37 = 142,885.60, rounded up to whole yen.\n  await expect(proposal.line(2)).toContainText('2026-10-08');\n  await expect(proposal.amountOf(2)).toHaveText('142,886');\n  await expect(proposal.line(2).locator('.line-tax')).toHaveText('0');\n\n  await expect(proposal.subtotal).toHaveText('147,757');\n  await expect(proposal.tax).toHaveText('0');\n  await expect(proposal.total).toHaveText('147,757 JPY');\n\n  proposal.page.once('dialog', (dialog) => dialog.accept());\n  await proposal.page.locator('#delete-proposal').click();\n  await expect(proposal.page.getByRole('status')).toHaveText('Proposal deleted.');\n});\n"
+      },
+      "issues": [],
+      "validation": [
+        {
+          "check": "Currency",
+          "asserted": "JPY",
+          "expected": "JPY",
+          "basis": [
+            {
+              "document": "Test data catalogue",
+              "find": "    customer: C170"
+            },
+            {
+              "document": "Test data catalogue",
+              "find": "    currency: JPY"
+            },
+            {
+              "document": "Help page 14-what-a-proposal-contains.md",
+              "find": "| **Currency** | The customer's invoice currency. |"
+            }
+          ],
+          "agrees": true
+        },
+        {
+          "check": "Exchange rate",
+          "asserted": "162.3700",
+          "expected": "162.3700 (the JPY rate effective 2026-10-01, the latest on or before the 31 Oct 2026 invoice date, is 162.37; four decimal places are inferred from the EUR example 1.0000, as the documents give no format for other rates)",
+          "basis": [
+            {
+              "document": "Test data catalogue",
+              "find": "  rate: 162.37"
+            },
+            {
+              "document": "Help page 17-currencies-and-exchange-rates.md",
+              "find": "An invoice uses the latest rate whose **Effective from** date is on or before its **Invoice date**."
+            },
+            {
+              "document": "Help page 14-what-a-proposal-contains.md",
+              "find": "| **Exchange rate** | The rate from EUR, or *Missing*. EUR invoices show 1.0000. |"
+            }
+          ],
+          "agrees": true
+        },
+        {
+          "check": "Line count",
+          "asserted": "2",
+          "expected": "2 (the rejected entry dated 2026-09-15 is left out)",
+          "basis": [
+            {
+              "document": "Test data catalogue",
+              "find": "      status: Rejected"
+            },
+            {
+              "document": "Help page 11-billable-time-and-expenses.md",
+              "find": "1. has the status *Approved*,"
+            },
+            {
+              "document": "Rule register",
+              "find": "Draft, submitted, rejected and non-billable entries are left out."
+            }
+          ],
+          "agrees": true
+        },
+        {
+          "check": "Line 1 date",
+          "asserted": "2026-10-07",
+          "expected": "2026-10-07",
+          "basis": [
+            {
+              "document": "Test data catalogue",
+              "find": "comment: Supplier call"
+            },
+            {
+              "document": "Help page 11-billable-time-and-expenses.md",
+              "find": "Time lines are listed first, in date order."
+            },
+            {
+              "document": "Help page 11-billable-time-and-expenses.md",
+              "find": "The **Description** is the date, the employee name and the activity code"
+            }
+          ],
+          "agrees": true
+        },
+        {
+          "check": "Line 1 amount",
+          "asserted": "4,871",
+          "expected": "4,871 (0.25 h × 120.00 EUR = 30.00 EUR; × 162.37 = 4,871.1, rounded to whole yen)",
+          "basis": [
+            {
+              "document": "Help page 07-rates.md",
+              "find": "| Consultant | CONS | 120.00 |"
+            },
+            {
+              "document": "Help page 18-rounding.md",
+              "find": "JPY, ISK and KRW have no decimal places and are rounded to whole units."
+            },
+            {
+              "document": "Help page 18-rounding.md",
+              "find": "170,467.5 JPY is rounded to 170,468 JPY"
+            }
+          ],
+          "agrees": true
+        },
+        {
+          "check": "Line 1 tax amount",
+          "asserted": "0",
+          "expected": "0 (tax code Z at 0%; no reverse charge, because the customer is in JP and has no VAT number)",
+          "basis": [
+            {
+              "document": "Test data catalogue",
+              "find": "    tax_code: Z"
+            },
+            {
+              "document": "Help page 15-vat-and-tax-codes.md",
+              "find": "| Z | Outside the scope of Finnish VAT (services to non-EU businesses) | 0% | |"
+            }
+          ],
+          "agrees": true
+        },
+        {
+          "check": "Line 2 date",
+          "asserted": "2026-10-08",
+          "expected": "2026-10-08",
+          "basis": [
+            {
+              "document": "Test data catalogue",
+              "find": "    - date: '2026-10-08'"
+            },
+            {
+              "document": "Help page 11-billable-time-and-expenses.md",
+              "find": "Time lines are listed first, in date order."
+            }
+          ],
+          "agrees": true
+        },
+        {
+          "check": "Line 2 amount",
+          "asserted": "142,886",
+          "expected": "142,886 (8.00 h × 110.00 EUR = 880.00 EUR; × 162.37 = 142,885.6, rounded to whole yen)",
+          "basis": [
+            {
+              "document": "Help page 07-rates.md",
+              "find": "| Developer | DEV | 110.00 |"
+            },
+            {
+              "document": "Test data catalogue",
+              "find": "  Noora Salo: DEV"
+            },
+            {
+              "document": "Help page 18-rounding.md",
+              "find": "3. rounds the result to the decimal places of the invoice currency. This is the line **Amount**,"
+            }
+          ],
+          "agrees": true
+        },
+        {
+          "check": "Line 2 tax amount",
+          "asserted": "0",
+          "expected": "0",
+          "basis": [
+            {
+              "document": "Help page 15-vat-and-tax-codes.md",
+              "find": "The lines carry 0% VAT. No note is added."
+            },
+            {
+              "document": "Help page 18-rounding.md",
+              "find": "4. works out the tax on the rounded line amount and rounds that too. This is the line **Tax amount**."
+            }
+          ],
+          "agrees": true
+        },
+        {
+          "check": "Subtotal",
+          "asserted": "147,757",
+          "expected": "147,757",
+          "basis": [
+            {
+              "document": "Help page 18-rounding.md",
+              "find": "- **Subtotal** is the sum of the rounded line amounts,"
+            }
+          ],
+          "agrees": true
+        },
+        {
+          "check": "Tax",
+          "asserted": "0",
+          "expected": "0",
+          "basis": [
+            {
+              "document": "Help page 18-rounding.md",
+              "find": "- **Tax** is the sum of the rounded line tax amounts,"
+            }
+          ],
+          "agrees": true
+        },
+        {
+          "check": "Total",
+          "asserted": "147,757 JPY",
+          "expected": "147,757 JPY",
+          "basis": [
+            {
+              "document": "Help page 14-what-a-proposal-contains.md",
+              "find": "- **Total**: subtotal plus tax, with the currency."
+            },
+            {
+              "document": "Rule register",
+              "find": "The invoice total is the sum of the rounded lines"
+            }
+          ],
+          "agrees": true
+        },
+        {
+          "check": "Delete message",
+          "asserted": "Proposal deleted.",
+          "expected": "Proposal deleted.",
+          "basis": [
+            {
+              "document": "Help page 13-creating-a-proposal.md",
+              "find": "The message \"Proposal deleted.\" confirms it."
+            }
+          ],
+          "agrees": true
+        }
+      ],
+      "ready_for_lab": true,
+      "agents": {
+        "generator": {
+          "source": "live_model",
+          "model": "claude-opus-5-5",
+          "duration_ms": 26408
+        },
+        "validator": {
+          "source": "live_model",
+          "model": "claude-opus-5-5",
+          "duration_ms": 23451
+        }
+      }
+    },
+    {
+      "id": "MC-48218",
+      "kind": "manual_case",
+      "ref": "48218",
+      "rule": "BR-14",
+      "attempt": 1,
+      "title": "BR-14 a proposal worth less than 50.00 EUR before tax is deferred and cannot be finalised",
+      "generated": {
+        "path": "specs/proposals/minimum-invoice-amount.spec.ts",
+        "title": "BR-14 a proposal worth less than 50.00 EUR before tax is deferred and cannot be finalised",
+        "data": {
+          "group": "projects",
+          "key": "polarCrewApp",
+          "value": "P-1131 Polar crew app fixes"
+        },
+        "data_choice": "P-1131 is an active (not closing) project with a single approved, billable entry of 0.50 h at the junior rate of 85.00 EUR, giving 42.50 EUR before tax. This is below the 50.00 EUR minimum, so the proposal must be deferred. It is in free_data, so the test owns it.",
+        "scenario": [
+          "Create a proposal for P-1131 Polar crew app fixes with period end and invoice date 2026-10-31",
+          "Read the status, the status banner, line 1 and the total",
+          "Click Finalise invoice",
+          "Read the error and the status",
+          "Click Delete proposal and accept the confirm dialog",
+          "Read the status message"
+        ],
+        "checks": [
+          {
+            "check": "Status after create",
+            "value": "Deferred"
+          },
+          {
+            "check": "Deferral banner",
+            "value": "Below the minimum invoice amount of 50.00 EUR. The entries stay unbilled and are picked up by the next billing run."
+          },
+          {
+            "check": "Line count",
+            "value": "1"
+          },
+          {
+            "check": "Line 1 date",
+            "value": "2026-10-09"
+          },
+          {
+            "check": "Line 1 employee",
+            "value": "Emma Lindqvist"
+          },
+          {
+            "check": "Line 1 quantity",
+            "value": "0.50"
+          },
+          {
+            "check": "Line 1 unit price",
+            "value": "85.00"
+          },
+          {
+            "check": "Line 1 amount",
+            "value": "46.05"
+          },
+          {
+            "check": "Total",
+            "value": "57.79 USD"
+          },
+          {
+            "check": "Finalise error",
+            "value": "A deferred proposal cannot be finalised. Its entries are billed in the next run."
+          },
+          {
+            "check": "Status after finalise attempt",
+            "value": "Deferred"
+          },
+          {
+            "check": "Delete message",
+            "value": "Proposal deleted."
+          }
+        ],
+        "code": "import { expect, test } from '../../fixtures/billing';\nimport { PERIOD_END, projects } from '../../fixtures/testData';\n\ntest('BR-14 a proposal worth less than 50.00 EUR before tax is deferred and cannot be finalised', async ({ proposal }) => {\n  await proposal.create(projects.polarCrewApp, PERIOD_END);\n\n  // 0.50 h at 85.00 EUR is 42.50 EUR before tax, below the minimum.\n  await expect(proposal.status).toHaveText('Deferred');\n  await expect(proposal.page.locator('#status-reason')).toHaveText('Below the minimum invoice amount of 50.00 EUR. The entries stay unbilled and are picked up by the next billing run.');\n  await expect(proposal.lines).toHaveCount(1);\n  await expect(proposal.line(1)).toContainText('2026-10-09');\n  await expect(proposal.line(1)).toContainText('Emma Lindqvist');\n  await expect(proposal.line(1).locator('.line-quantity')).toHaveText('0.50');\n  await expect(proposal.unitPriceOf(1)).toHaveText('85.00');\n  await expect(proposal.amountOf(1)).toHaveText('46.05');\n  await expect(proposal.total).toHaveText('57.79 USD');\n\n  await proposal.finalise();\n  await expect(proposal.error).toHaveText('A deferred proposal cannot be finalised. Its entries are billed in the next run.');\n  await expect(proposal.status).toHaveText('Deferred');\n\n  // Leave the entries unbilled for the next run.\n  proposal.page.once('dialog', (dialog) => dialog.accept());\n  await proposal.page.locator('#delete-proposal').click();\n  await expect(proposal.page.getByRole('status')).toHaveText('Proposal deleted.');\n});\n"
+      },
+      "issues": [],
+      "validation": [
+        {
+          "check": "Status after create",
+          "asserted": "Deferred",
+          "expected": "Deferred",
+          "basis": [
+            {
+              "document": "Help page 21-minimum-invoice-amount.md",
+              "find": "When you create a proposal and its value before tax is less than 50.00 EUR, the proposal is saved with the status *Deferred*."
+            },
+            {
+              "document": "Help page 21-minimum-invoice-amount.md",
+              "find": "P-1131 Polar crew app fixes has one approved entry of 0.50 hours by a junior consultant at 85.00 EUR. The proposal is worth 42.50 EUR, so it is deferred."
+            },
+            {
+              "document": "Test data catalogue",
+              "find": "name: Polar crew app fixes"
+            }
+          ],
+          "agrees": true
+        },
+        {
+          "check": "Deferral banner",
+          "asserted": "Below the minimum invoice amount of 50.00 EUR. The entries stay unbilled and are picked up by the next billing run.",
+          "expected": "Below the minimum invoice amount of 50.00 EUR. The entries stay unbilled and are picked up by the next billing run.",
+          "basis": [
+            {
+              "document": "Help page 21-minimum-invoice-amount.md",
+              "find": "\"Below the minimum invoice amount of 50.00 EUR. The entries stay unbilled and are picked up by the next billing run.\""
+            }
+          ],
+          "agrees": true
+        },
+        {
+          "check": "Line count",
+          "asserted": "1",
+          "expected": "1",
+          "basis": [
+            {
+              "document": "Test data catalogue",
+              "find": "name: Polar crew app fixes"
+            },
+            {
+              "document": "Help page 11-billable-time-and-expenses.md",
+              "find": "Each time entry becomes one line."
+            }
+          ],
+          "agrees": true
+        },
+        {
+          "check": "Line 1 date",
+          "asserted": "2026-10-09",
+          "expected": "2026-10-09",
+          "basis": [
+            {
+              "document": "Test data catalogue",
+              "find": "- date: '2026-10-09'"
+            },
+            {
+              "document": "Help page 11-billable-time-and-expenses.md",
+              "find": "The **Description** is the date, the employee name and the activity code"
+            }
+          ],
+          "agrees": true
+        },
+        {
+          "check": "Line 1 employee",
+          "asserted": "Emma Lindqvist",
+          "expected": "Emma Lindqvist",
+          "basis": [
+            {
+              "document": "Test data catalogue",
+              "find": "employee: Emma Lindqvist"
+            },
+            {
+              "document": "Help page 11-billable-time-and-expenses.md",
+              "find": "The **Description** is the date, the employee name and the activity code"
+            }
+          ],
+          "agrees": true
+        },
+        {
+          "check": "Line 1 quantity",
+          "asserted": "0.50",
+          "expected": "0.50",
+          "basis": [
+            {
+              "document": "Test data catalogue",
+              "find": "hours: 0.5"
+            },
+            {
+              "document": "Help page 12-quarter-hour-billing.md",
+              "find": "An entry that is already a whole quarter hour is not changed."
+            }
+          ],
+          "agrees": true
+        },
+        {
+          "check": "Line 1 unit price",
+          "asserted": "85.00",
+          "expected": "85.00",
+          "basis": [
+            {
+              "document": "Help page 07-rates.md",
+              "find": "| Junior consultant | JUN | 85.00 |"
+            },
+            {
+              "document": "Test data catalogue",
+              "find": "Emma Lindqvist: JUN"
+            }
+          ],
+          "agrees": true
+        },
+        {
+          "check": "Line 1 amount",
+          "asserted": "46.05",
+          "expected": "46.05 (0.50 × 85.00 = 42.50 EUR, converted to USD at the 1 Oct 2026 rate 1.0835 = 46.04875, rounded). The documents do not say explicitly that a deferred proposal is converted, but every proposal line is converted at creation.",
+          "basis": [
+            {
+              "document": "Test data catalogue",
+              "find": "rate: 1.0835"
+            },
+            {
+              "document": "Help page 13-creating-a-proposal.md",
+              "find": "looks up the exchange rate for the invoice date and converts every line,"
+            },
+            {
+              "document": "Help page 18-rounding.md",
+              "find": "rounds the result to the decimal places of the invoice currency. This is the line **Amount**,"
+            }
+          ],
+          "agrees": true
+        },
+        {
+          "check": "Total",
+          "asserted": "57.79 USD",
+          "expected": "57.79 USD (subtotal 46.05, tax S 25.5% = 11.74)",
+          "basis": [
+            {
+              "document": "Help page 14-what-a-proposal-contains.md",
+              "find": "**Total**: subtotal plus tax, with the currency."
+            },
+            {
+              "document": "Help page 18-rounding.md",
+              "find": "Polar Marine Oy is invoiced in USD with standard VAT at 25.5%."
+            },
+            {
+              "document": "Help page 15-vat-and-tax-codes.md",
+              "find": "The tax on each line is the rounded line amount times the rate, rounded to the currency's decimal places."
+            }
+          ],
+          "agrees": true
+        },
+        {
+          "check": "Finalise error",
+          "asserted": "A deferred proposal cannot be finalised. Its entries are billed in the next run.",
+          "expected": "A deferred proposal cannot be finalised. Its entries are billed in the next run.",
+          "basis": [
+            {
+              "document": "Help page 22-finalising-an-invoice.md",
+              "find": "| Deferred proposal | \"A deferred proposal cannot be finalised. Its entries are billed in the next run.\" |"
+            }
+          ],
+          "agrees": true
+        },
+        {
+          "check": "Status after finalise attempt",
+          "asserted": "Deferred",
+          "expected": "Deferred",
+          "basis": [
+            {
+              "document": "Help page 22-finalising-an-invoice.md",
+              "find": "If one fails, the invoice is not finalised and the message is shown at the top of the proposal."
+            },
+            {
+              "document": "Help page 21-minimum-invoice-amount.md",
+              "find": "A deferred proposal stays in the **Proposals** list with the status *Deferred*"
+            }
+          ],
+          "agrees": true
+        },
+        {
+          "check": "Delete message",
+          "asserted": "Proposal deleted.",
+          "expected": "Proposal deleted.",
+          "basis": [
+            {
+              "document": "Help page 13-creating-a-proposal.md",
+              "find": "The message \"Proposal deleted.\" confirms it."
+            },
+            {
+              "document": "Help page 21-minimum-invoice-amount.md",
+              "find": "When you no longer need it, open it and select **Delete proposal**."
+            }
+          ],
+          "agrees": true
+        }
+      ],
+      "ready_for_lab": true,
+      "agents": {
+        "generator": {
+          "source": "live_model",
+          "model": "claude-opus-5-5",
+          "duration_ms": 20113
+        },
+        "validator": {
+          "source": "live_model",
+          "model": "claude-opus-5-5",
+          "duration_ms": 18714
+        }
+      }
+    },
+    {
+      "id": "MC-48219",
+      "kind": "manual_case",
+      "ref": "48219",
+      "rule": "BR-04",
+      "attempt": 1,
+      "title": "BR-04 lines are converted to the customer\\",
+      "generated": {
+        "path": "specs/pricing/multi-currency-rounding.spec.ts",
+        "title": "BR-04 lines are converted to the customer's currency and rounded one by one, half away from zero, with tax worked out on the rounded line @critical",
+        "data": {
+          "group": "projects",
+          "key": "norrskenGrid",
+          "value": "P-1020 Norrsken grid analytics"
+        },
+        "data_choice": "P-1020 bills to a SEK customer at 11.47 with tax S. It has two 0.25 h senior entries of 37.50 EUR, each converting to exactly 430.125 SEK, so half away from zero (430.13) differs from banker's rounding (430.12), and the rounded lines sum to 11,183.26 where rounding the total would give 11,183.25. Line 3 tax of 2,632.365 also lands on a half. Caveats: these figures are worked out from the catalogue, not observed. The material does not say whether a Swedish business customer with a VAT number still gets tax S 25.5%. Source 48219's P-1130 figures (line 3 as 270.00 EUR) do not match the catalogue (2.1 h x 120 = 252.00 EUR), and with catalogue data P-1130 would not expose either defect, so engineers should confirm both points.",
+        "scenario": [
+          "Create a proposal for projects.norrskenGrid with period end and invoice date PERIOD_END (2026-10-31)",
+          "Read the currency, exchange rate, line count, line amounts, line tax amounts, subtotal, tax and total",
+          "Click Delete proposal and accept the confirmation dialog"
+        ],
+        "checks": [
+          {
+            "check": "Currency",
+            "value": "SEK"
+          },
+          {
+            "check": "Exchange rate",
+            "value": "11.4700"
+          },
+          {
+            "check": "Line count",
+            "value": "3"
+          },
+          {
+            "check": "Line 1 amount",
+            "value": "430.13"
+          },
+          {
+            "check": "Line 2 amount",
+            "value": "430.13"
+          },
+          {
+            "check": "Line 3 amount",
+            "value": "10,323.00"
+          },
+          {
+            "check": "Line 1 tax",
+            "value": "109.68"
+          },
+          {
+            "check": "Line 2 tax",
+            "value": "109.68"
+          },
+          {
+            "check": "Line 3 tax",
+            "value": "2,632.37"
+          },
+          {
+            "check": "Subtotal",
+            "value": "11,183.26"
+          },
+          {
+            "check": "Tax total",
+            "value": "2,851.73"
+          },
+          {
+            "check": "Total",
+            "value": "14,034.99 SEK"
+          },
+          {
+            "check": "Deletion message",
+            "value": "Proposal deleted."
+          }
+        ],
+        "code": "import { expect, test } from '../../fixtures/billing';\nimport { PERIOD_END, projects } from '../../fixtures/testData';\n\ntest('BR-04 lines are converted to the customer\\'s currency and rounded one by one, half away from zero, with tax worked out on the rounded line @critical', async ({ proposal, page }) => {\n  await proposal.create(projects.norrskenGrid, PERIOD_END);\n\n  await expect(page.locator('#proposal-currency')).toHaveText('SEK');\n  await expect(page.locator('#proposal-rate')).toHaveText('11.4700');\n  await expect(proposal.lines).toHaveCount(3);\n\n  // 37.50 EUR x 11.47 = 430.125 SEK on each short call, rounded half away from zero.\n  await expect(proposal.amountOf(1)).toHaveText('430.13');\n  await expect(proposal.amountOf(2)).toHaveText('430.13');\n  await expect(proposal.amountOf(3)).toHaveText('10,323.00');\n\n  // Tax at 25.5% on the rounded line; 10,323.00 x 25.5% = 2,632.365.\n  await expect(proposal.line(1).locator('.line-tax')).toHaveText('109.68');\n  await expect(proposal.line(2).locator('.line-tax')).toHaveText('109.68');\n  await expect(proposal.line(3).locator('.line-tax')).toHaveText('2,632.37');\n\n  // Rounding the unrounded sum instead would give 11,183.25.\n  await expect(proposal.subtotal).toHaveText('11,183.26');\n  await expect(proposal.tax).toHaveText('2,851.73');\n  await expect(proposal.total).toHaveText('14,034.99 SEK');\n\n  page.once('dialog', (dialog) => dialog.accept());\n  await page.locator('#delete-proposal').click();\n  await expect(page.getByRole('status')).toHaveText('Proposal deleted.');\n});\n"
+      },
+      "issues": [
+        "Title must end with @critical exactly when the rule is critical.",
+        "specs/pricing/multi-currency-rounding.spec.ts is already another test's file; one file holds one test."
+      ],
+      "validation": [
+        {
+          "check": "Currency",
+          "asserted": "SEK",
+          "expected": "SEK. Note: the scenario names projects.norrskenGrid (P-1020 Norrsken grid analytics), but manual test 48219 selects P-1130 Polar vessel reporting (USD). All values below are for P-1020, as the scenario names it; engineers should resolve which project is intended.",
+          "basis": [
+            {
+              "document": "Test data catalogue",
+              "find": "name: Norrsken grid analytics"
+            },
+            {
+              "document": "Test data catalogue",
+              "find": "name: Norrsken Energi AB"
+            },
+            {
+              "document": "Test data catalogue",
+              "find": "currency: SEK"
+            },
+            {
+              "document": "Help page 14-what-a-proposal-contains.md",
+              "find": "| **Currency** | The customer's invoice currency. |"
+            }
+          ],
+          "agrees": true
+        },
+        {
+          "check": "Exchange rate",
+          "asserted": "11.4700",
+          "expected": "11.4700 (the SEK rate effective from 2026-10-01 is the latest one on or before the 31 Oct 2026 invoice date)",
+          "basis": [
+            {
+              "document": "Test data catalogue",
+              "find": "rate: 11.47"
+            },
+            {
+              "document": "Help page 17-currencies-and-exchange-rates.md",
+              "find": "An invoice uses the latest rate whose **Effective from** date is on or before its **Invoice date**."
+            },
+            {
+              "document": "Help page 14-what-a-proposal-contains.md",
+              "find": "EUR invoices show 1.0000."
+            }
+          ],
+          "agrees": true
+        },
+        {
+          "check": "Line count",
+          "asserted": "3",
+          "expected": "3 (three approved, billable time entries dated 2026-10-01, 2026-10-02 and 2026-10-05; no expenses)",
+          "basis": [
+            {
+              "document": "Help page 11-billable-time-and-expenses.md",
+              "find": "Each time entry becomes one line."
+            },
+            {
+              "document": "Rule register",
+              "find": "A proposal includes time entries that are approved, marked billable, not yet billed and dated on or"
+            },
+            {
+              "document": "Help page 12-quarter-hour-billing.md",
+              "find": "On P-1020 Norrsken grid analytics, Sara Holm recorded two calls with the grid operator, each of 0.25 hours."
+            }
+          ],
+          "agrees": true
+        },
+        {
+          "check": "Line 1 amount",
+          "asserted": "430.13",
+          "expected": "430.13 (0.25 h × 150.00 EUR, the SNR standard rate, = 37.50 EUR; × 11.47 = 430.125, rounded half away from zero)",
+          "basis": [
+            {
+              "document": "Test data catalogue",
+              "find": "standard_rate: 150"
+            },
+            {
+              "document": "Help page 07-rates.md",
+              "find": "3. **The role's standard rate.**"
+            },
+            {
+              "document": "Help page 18-rounding.md",
+              "find": "Amounts exactly halfway are rounded away from zero."
+            }
+          ],
+          "agrees": true
+        },
+        {
+          "check": "Line 2 amount",
+          "asserted": "430.13",
+          "expected": "430.13 (0.25 h × 150.00 EUR = 37.50 EUR; × 11.47 = 430.125, rounded to 430.13)",
+          "basis": [
+            {
+              "document": "Test data catalogue",
+              "find": "standard_rate: 150"
+            },
+            {
+              "document": "Help page 18-rounding.md",
+              "find": "3. rounds the result to the decimal places of the invoice currency. This is the line **Amount**,"
+            }
+          ],
+          "agrees": true
+        },
+        {
+          "check": "Line 3 amount",
+          "asserted": "10,323.00",
+          "expected": "10,323.00 (7.50 h × 120.00 EUR, the CONS standard rate, = 900.00 EUR; × 11.47)",
+          "basis": [
+            {
+              "document": "Test data catalogue",
+              "find": "standard_rate: 120"
+            },
+            {
+              "document": "Help page 18-rounding.md",
+              "find": "2. multiplies it by the exchange rate,"
+            }
+          ],
+          "agrees": true
+        },
+        {
+          "check": "Line 1 tax",
+          "asserted": "109.68",
+          "expected": "0.00 (reverse charge, RC 0%). Note that RC does not appear in the seeded tax_codes list, although the help says it is set automatically.",
+          "basis": [
+            {
+              "document": "Help page 16-reverse-charge.md",
+              "find": "| Norrsken Energi AB | SE | SE556677889901 | Reverse charge, *RC* 0% |"
+            },
+            {
+              "document": "Help page 16-reverse-charge.md",
+              "find": "- every line gets the tax code *RC* at 0%,"
+            }
+          ],
+          "agrees": false
+        },
+        {
+          "check": "Line 2 tax",
+          "asserted": "109.68",
+          "expected": "0.00 (RC 0%)",
+          "basis": [
+            {
+              "document": "Help page 16-reverse-charge.md",
+              "find": "- every line gets the tax code *RC* at 0%,"
+            }
+          ],
+          "agrees": false
+        },
+        {
+          "check": "Line 3 tax",
+          "asserted": "2,632.37",
+          "expected": "0.00 (RC 0%)",
+          "basis": [
+            {
+              "document": "Help page 16-reverse-charge.md",
+              "find": "- every line gets the tax code *RC* at 0%,"
+            }
+          ],
+          "agrees": false
+        },
+        {
+          "check": "Subtotal",
+          "asserted": "11,183.26",
+          "expected": "11,183.26",
+          "basis": [
+            {
+              "document": "Help page 18-rounding.md",
+              "find": "- **Subtotal** is the sum of the rounded line amounts,"
+            }
+          ],
+          "agrees": true
+        },
+        {
+          "check": "Tax total",
+          "asserted": "2,851.73",
+          "expected": "0.00",
+          "basis": [
+            {
+              "document": "Help page 18-rounding.md",
+              "find": "- **Tax** is the sum of the rounded line tax amounts,"
+            }
+          ],
+          "agrees": false
+        },
+        {
+          "check": "Total",
+          "asserted": "14,034.99 SEK",
+          "expected": "11,183.26 SEK",
+          "basis": [
+            {
+              "document": "Help page 14-what-a-proposal-contains.md",
+              "find": "- **Total**: subtotal plus tax, with the currency."
+            },
+            {
+              "document": "Help page 18-rounding.md",
+              "find": "- **Total** is Subtotal plus Tax."
+            }
+          ],
+          "agrees": false
+        },
+        {
+          "check": "Deletion message",
+          "asserted": "Proposal deleted.",
+          "expected": "Proposal deleted.",
+          "basis": [
+            {
+              "document": "Help page 13-creating-a-proposal.md",
+              "find": "The message \"Proposal deleted.\" confirms it."
+            }
+          ],
+          "agrees": true
+        }
+      ],
+      "ready_for_lab": false,
+      "agents": {
+        "generator": {
+          "source": "live_model",
+          "model": "claude-opus-5-5",
+          "duration_ms": 35777
+        },
+        "validator": {
+          "source": "live_model",
+          "model": "claude-opus-5-5",
+          "duration_ms": 23392
+        }
+      }
+    },
+    {
+      "id": "MC-48222",
+      "kind": "manual_case",
+      "ref": "48222",
+      "rule": "BR-15",
+      "attempt": 1,
+      "title": "BR-15 a CHF invoice cannot be finalised while no exchange rate exists on or before its invoice date @critical",
+      "generated": {
+        "path": "specs/invoicing/missing-exchange-rate.spec.ts",
+        "title": "BR-15 a CHF invoice cannot be finalised while no exchange rate exists on or before its invoice date @critical",
+        "data": {
+          "group": "projects",
+          "key": "alpineMes",
+          "value": "P-1090 Alpine MES upgrade"
+        },
+        "data_choice": "P-1090 is billed to Alpine Precision AG in CHF, and the only seeded CHF rate takes effect from 2026-11-01, after the 2026-10-31 invoice date. So no rate is effective on or before the invoice date. Its single approved, billable 6-hour architect entry gives one predictable line.",
+        "scenario": [
+          "Open New proposal",
+          "Select project P-1090 Alpine MES upgrade, set Period end 2026-10-31 and Invoice date 2026-10-31, and click Create proposal",
+          "Click Finalise invoice",
+          "Click Delete proposal and accept the confirmation dialog"
+        ],
+        "checks": [
+          {
+            "check": "Missing rate banner",
+            "value": "No exchange rate to CHF for 31 Oct 2026 yet. Amounts are shown in EUR until the rate is entered."
+          },
+          {
+            "check": "Exchange rate",
+            "value": "Missing"
+          },
+          {
+            "check": "Line 1 quantity",
+            "value": "6.00"
+          },
+          {
+            "check": "Line 1 unit price",
+            "value": "185.00"
+          },
+          {
+            "check": "Line 1 amount",
+            "value": "1,110.00"
+          },
+          {
+            "check": "Finalise error",
+            "value": "No exchange rate from EUR to CHF on or before 31 Oct 2026. Add the rate before finalising."
+          },
+          {
+            "check": "Status after finalise attempt",
+            "value": "Proposal"
+          },
+          {
+            "check": "Invoice number after finalise attempt",
+            "value": "Assigned when finalised"
+          },
+          {
+            "check": "Deletion message",
+            "value": "Proposal deleted."
+          }
+        ],
+        "code": "import { expect, test } from '../../fixtures/billing';\nimport { PERIOD_END, projects } from '../../fixtures/testData';\n\ntest('BR-15 a CHF invoice cannot be finalised while no exchange rate exists on or before its invoice date @critical', async ({ proposal }) => {\n  // The only CHF rate is effective from 2026-11-01, after the invoice date.\n  await proposal.create(projects.alpineMes, PERIOD_END);\n\n  await expect(proposal.page.locator('#rate-missing')).toHaveText('No exchange rate to CHF for 31 Oct 2026 yet. Amounts are shown in EUR until the rate is entered.');\n  await expect(proposal.page.locator('#proposal-rate')).toHaveText('Missing');\n  await expect(proposal.line(1).locator('.line-quantity')).toHaveText('6.00');\n  await expect(proposal.unitPriceOf(1)).toHaveText('185.00');\n  await expect(proposal.amountOf(1)).toHaveText('1,110.00');\n\n  await proposal.finalise();\n  await expect(proposal.error).toHaveText('No exchange rate from EUR to CHF on or before 31 Oct 2026. Add the rate before finalising.');\n  await expect(proposal.status).toHaveText('Proposal');\n  await expect(proposal.number).toHaveText('Assigned when finalised');\n\n  // Delete the proposal so its entries go back to unbilled.\n  proposal.page.once('dialog', (dialog) => dialog.accept());\n  await proposal.page.locator('#delete-proposal').click();\n  await expect(proposal.page.getByRole('status')).toHaveText('Proposal deleted.');\n});\n"
+      },
+      "issues": [],
+      "validation": [
+        {
+          "check": "Missing rate banner",
+          "asserted": "No exchange rate to CHF for 31 Oct 2026 yet. Amounts are shown in EUR until the rate is entered.",
+          "expected": "No exchange rate to CHF for 31 Oct 2026 yet. Amounts are shown in EUR until the rate is entered.",
+          "basis": [
+            {
+              "document": "Help page 17-currencies-and-exchange-rates.md",
+              "find": "\"No exchange rate to CHF for 31 Oct 2026 yet. Amounts are shown in EUR until the rate is entered.\""
+            },
+            {
+              "document": "Test data catalogue",
+              "find": "currency: CHF"
+            },
+            {
+              "document": "Test data catalogue",
+              "find": "effective: '2026-11-01'"
+            },
+            {
+              "document": "Test data catalogue",
+              "find": "name: Alpine Precision AG"
+            }
+          ],
+          "agrees": true
+        },
+        {
+          "check": "Exchange rate",
+          "asserted": "Missing",
+          "expected": "Missing",
+          "basis": [
+            {
+              "document": "Help page 14-what-a-proposal-contains.md",
+              "find": "| **Exchange rate** | The rate from EUR, or *Missing*. EUR invoices show 1.0000. |"
+            },
+            {
+              "document": "Help page 17-currencies-and-exchange-rates.md",
+              "find": "If there is no rate on or before the invoice date, the proposal is still created. The **Exchange rate** shows *Missing*"
+            }
+          ],
+          "agrees": true
+        },
+        {
+          "check": "Line 1 quantity",
+          "asserted": "6.00",
+          "expected": "6.00",
+          "basis": [
+            {
+              "document": "Test data catalogue",
+              "find": "employee: Aino Makela"
+            },
+            {
+              "document": "Help page 12-quarter-hour-billing.md",
+              "find": "An entry that is already a whole quarter hour is not changed."
+            },
+            {
+              "document": "Help page 14-what-a-proposal-contains.md",
+              "find": "| **Qty** | Hours for time lines, 1.00 for others. |"
+            }
+          ],
+          "agrees": true
+        },
+        {
+          "check": "Line 1 unit price",
+          "asserted": "185.00",
+          "expected": "185.00",
+          "basis": [
+            {
+              "document": "Help page 07-rates.md",
+              "find": "| Solution architect | ARCH | 185.00 |"
+            },
+            {
+              "document": "Test data catalogue",
+              "find": "Aino Makela: ARCH"
+            },
+            {
+              "document": "Help page 07-rates.md",
+              "find": "3. **The role's standard rate.**"
+            }
+          ],
+          "agrees": true
+        },
+        {
+          "check": "Line 1 amount",
+          "asserted": "1,110.00",
+          "expected": "1,110.00 (the EUR value, 6.00 × 185.00, because the CHF rate is missing)",
+          "basis": [
+            {
+              "document": "Help page 17-currencies-and-exchange-rates.md",
+              "find": "The amounts on the proposal are then the EUR values."
+            },
+            {
+              "document": "Help page 00-index.md",
+              "find": "Amounts are written with a full stop for decimals and a comma for thousands, for example 1,050.00 EUR."
+            },
+            {
+              "document": "Help page 12-quarter-hour-billing.md",
+              "find": "The amount of the line is the billed hours times the hourly rate, less any agreement discount."
+            }
+          ],
+          "agrees": true
+        },
+        {
+          "check": "Finalise error",
+          "asserted": "No exchange rate from EUR to CHF on or before 31 Oct 2026. Add the rate before finalising.",
+          "expected": "No exchange rate from EUR to CHF on or before 31 Oct 2026. Add the rate before finalising.",
+          "basis": [
+            {
+              "document": "Help page 22-finalising-an-invoice.md",
+              "find": "| No exchange rate | \"No exchange rate from EUR to CHF on or before 31 Oct 2026. Add the rate before finalising.\" |"
+            },
+            {
+              "document": "Help page 17-currencies-and-exchange-rates.md",
+              "find": "A rate effective from a later date, for example 1 Nov 2026, does not help an invoice dated 31 Oct 2026."
+            }
+          ],
+          "agrees": true
+        },
+        {
+          "check": "Status after finalise attempt",
+          "asserted": "Proposal",
+          "expected": "Proposal",
+          "basis": [
+            {
+              "document": "Help page 22-finalising-an-invoice.md",
+              "find": "If one fails, the invoice is not finalised and the message is shown at the top of the proposal."
+            },
+            {
+              "document": "Help page 14-what-a-proposal-contains.md",
+              "find": "| **Status** | *Proposal*, or *Deferred*. |"
+            }
+          ],
+          "agrees": true
+        },
+        {
+          "check": "Invoice number after finalise attempt",
+          "asserted": "Assigned when finalised",
+          "expected": "Assigned when finalised",
+          "basis": [
+            {
+              "document": "Help page 23-invoice-numbers-and-due-dates.md",
+              "find": "a finalise that fails, for example because the PO number is missing, does not use a number."
+            },
+            {
+              "document": "Help page 14-what-a-proposal-contains.md",
+              "find": "| **Invoice number** | \"Assigned when finalised\". |"
+            }
+          ],
+          "agrees": true
+        },
+        {
+          "check": "Deletion message",
+          "asserted": "Proposal deleted.",
+          "expected": "Proposal deleted.",
+          "basis": [
+            {
+              "document": "Help page 13-creating-a-proposal.md",
+              "find": "The message \"Proposal deleted.\" confirms it."
+            }
+          ],
+          "agrees": true
+        }
+      ],
+      "ready_for_lab": true,
+      "agents": {
+        "generator": {
+          "source": "live_model",
+          "model": "claude-opus-5-5",
+          "duration_ms": 17550
+        },
+        "validator": {
+          "source": "live_model",
+          "model": "claude-opus-5-5",
+          "duration_ms": 13614
+        }
+      }
+    },
+    {
+      "id": "MC-48224",
+      "kind": "manual_case",
+      "ref": "48224",
+      "rule": "BR-14",
+      "attempt": 1,
+      "title": "BR-14 a closing project is billed even when the proposal is below the minimum amount",
+      "generated": {
+        "path": "specs/proposals/minimum-amount-closing-project.spec.ts",
+        "title": "BR-14 a closing project is billed even when the proposal is below the minimum amount",
+        "data": {
+          "group": "projects",
+          "key": "polarCloseout",
+          "value": "P-1132 Polar legacy closeout"
+        },
+        "data_choice": "P-1132 is the only free project with status Closing. Its single approved, billable entry of 0.50 h at 85.00 comes to 46.05 USD before tax, which is under the 50.00 EUR minimum, so the closing exception decides whether it is billed.",
+        "scenario": [
+          "Create a proposal for P-1132 Polar legacy closeout with period end and invoice date 2026-10-31",
+          "Click Delete proposal and accept the confirmation dialog"
+        ],
+        "checks": [
+          {
+            "check": "Proposal status",
+            "value": "Proposal"
+          },
+          {
+            "check": "Number of lines",
+            "value": "1"
+          },
+          {
+            "check": "Line 1 date",
+            "value": "2026-10-09"
+          },
+          {
+            "check": "Line 1 employee",
+            "value": "Emma Lindqvist"
+          },
+          {
+            "check": "Line 1 quantity",
+            "value": "0.50"
+          },
+          {
+            "check": "Line 1 unit price",
+            "value": "85.00"
+          },
+          {
+            "check": "Line 1 amount",
+            "value": "46.05"
+          },
+          {
+            "check": "Line 1 tax amount",
+            "value": "11.74"
+          },
+          {
+            "check": "Proposal total",
+            "value": "57.79 USD"
+          },
+          {
+            "check": "Delete message",
+            "value": "Proposal deleted."
+          }
+        ],
+        "code": "import { expect, test } from '../../fixtures/billing';\nimport { PERIOD_END, projects } from '../../fixtures/testData';\n\ntest('BR-14 a closing project is billed even when the proposal is below the minimum amount', async ({ proposal, page }) => {\n  await proposal.create(projects.polarCloseout, PERIOD_END);\n\n  // 0.50 h at 85.00 is under the minimum, but the project is closing, so it is not deferred.\n  await expect(proposal.status).toHaveText('Proposal');\n  await expect(proposal.lines).toHaveCount(1);\n  await expect(proposal.line(1)).toContainText('2026-10-09');\n  await expect(proposal.line(1)).toContainText('Emma Lindqvist');\n  await expect(proposal.line(1).locator('.line-quantity')).toHaveText('0.50');\n  await expect(proposal.unitPriceOf(1)).toHaveText('85.00');\n  await expect(proposal.amountOf(1)).toHaveText('46.05');\n  await expect(proposal.line(1).locator('.line-tax')).toHaveText('11.74');\n  await expect(proposal.total).toHaveText('57.79 USD');\n\n  page.once('dialog', (dialog) => dialog.accept());\n  await page.locator('#delete-proposal').click();\n  await expect(page.getByRole('status')).toHaveText('Proposal deleted.');\n});\n"
+      },
+      "issues": [],
+      "validation": [
+        {
+          "check": "Proposal status",
+          "asserted": "Proposal",
+          "expected": "Proposal",
+          "basis": [
+            {
+              "document": "Help page 21-minimum-invoice-amount.md",
+              "find": "The minimum does not apply to projects with the status *Closing*."
+            },
+            {
+              "document": "Help page 21-minimum-invoice-amount.md",
+              "find": "For example, P-1132 Polar legacy closeout is *Closing*. A proposal for 0.50 hours is created as a normal proposal."
+            },
+            {
+              "document": "Test data catalogue",
+              "find": "name: Polar legacy closeout"
+            },
+            {
+              "document": "Help page 14-what-a-proposal-contains.md",
+              "find": "| **Status** | *Proposal*, or *Deferred*. |"
+            }
+          ],
+          "agrees": true
+        },
+        {
+          "check": "Number of lines",
+          "asserted": "1",
+          "expected": "1",
+          "basis": [
+            {
+              "document": "Help page 11-billable-time-and-expenses.md",
+              "find": "Each time entry becomes one line."
+            },
+            {
+              "document": "Test data catalogue",
+              "find": "activity: ADMIN"
+            },
+            {
+              "document": "Help page 11-billable-time-and-expenses.md",
+              "find": "4. is dated on or before the proposal's **Period end**."
+            }
+          ],
+          "agrees": true
+        },
+        {
+          "check": "Line 1 date",
+          "asserted": "2026-10-09",
+          "expected": "2026-10-09",
+          "basis": [
+            {
+              "document": "Test data catalogue",
+              "find": "date: '2026-10-09'"
+            },
+            {
+              "document": "Help page 11-billable-time-and-expenses.md",
+              "find": "The **Description** is the date, the employee name and the activity code"
+            }
+          ],
+          "agrees": true
+        },
+        {
+          "check": "Line 1 employee",
+          "asserted": "Emma Lindqvist",
+          "expected": "Emma Lindqvist",
+          "basis": [
+            {
+              "document": "Test data catalogue",
+              "find": "employee: Emma Lindqvist"
+            },
+            {
+              "document": "Help page 11-billable-time-and-expenses.md",
+              "find": "\"2026-10-01 Sara Holm - CONS (Call with grid operator)\""
+            }
+          ],
+          "agrees": true
+        },
+        {
+          "check": "Line 1 quantity",
+          "asserted": "0.50",
+          "expected": "0.50",
+          "basis": [
+            {
+              "document": "Test data catalogue",
+              "find": "hours: 0.5"
+            },
+            {
+              "document": "Help page 12-quarter-hour-billing.md",
+              "find": "An entry that is already a whole quarter hour is not changed."
+            }
+          ],
+          "agrees": true
+        },
+        {
+          "check": "Line 1 unit price",
+          "asserted": "85.00",
+          "expected": "85.00",
+          "basis": [
+            {
+              "document": "Help page 07-rates.md",
+              "find": "| Junior consultant | JUN | 85.00 |"
+            },
+            {
+              "document": "Test data catalogue",
+              "find": "Emma Lindqvist: JUN"
+            },
+            {
+              "document": "Help page 07-rates.md",
+              "find": "3. **The role's standard rate.**"
+            }
+          ],
+          "agrees": true
+        },
+        {
+          "check": "Line 1 amount",
+          "asserted": "46.05",
+          "expected": "46.05",
+          "basis": [
+            {
+              "document": "Test data catalogue",
+              "find": "rate: 1.0835"
+            },
+            {
+              "document": "Help page 17-currencies-and-exchange-rates.md",
+              "find": "An invoice uses the latest rate whose **Effective from** date is on or before its **Invoice date**."
+            },
+            {
+              "document": "Help page 18-rounding.md",
+              "find": "3. rounds the result to the decimal places of the invoice currency. This is the line **Amount**,"
+            },
+            {
+              "document": "Help page 18-rounding.md",
+              "find": "Polar Marine Oy is invoiced in USD with standard VAT at 25.5%."
+            }
+          ],
+          "agrees": true
+        },
+        {
+          "check": "Line 1 tax amount",
+          "asserted": "11.74",
+          "expected": "11.74",
+          "basis": [
+            {
+              "document": "Help page 18-rounding.md",
+              "find": "4. works out the tax on the rounded line amount and rounds that too. This is the line **Tax amount**."
+            },
+            {
+              "document": "Help page 16-reverse-charge.md",
+              "find": "4. The customer's country is not Finland."
+            },
+            {
+              "document": "Help page 15-vat-and-tax-codes.md",
+              "find": "| S | Standard rate | 25.5% | |"
+            }
+          ],
+          "agrees": true
+        },
+        {
+          "check": "Proposal total",
+          "asserted": "57.79 USD",
+          "expected": "57.79 USD",
+          "basis": [
+            {
+              "document": "Help page 14-what-a-proposal-contains.md",
+              "find": "- **Total**: subtotal plus tax, with the currency."
+            },
+            {
+              "document": "Help page 18-rounding.md",
+              "find": "- **Total** is Subtotal plus Tax."
+            }
+          ],
+          "agrees": true
+        },
+        {
+          "check": "Delete message",
+          "asserted": "Proposal deleted.",
+          "expected": "Proposal deleted.",
+          "basis": [
+            {
+              "document": "Help page 13-creating-a-proposal.md",
+              "find": "The message \"Proposal deleted.\" confirms it."
+            }
+          ],
+          "agrees": true
+        }
+      ],
+      "ready_for_lab": true,
+      "agents": {
+        "generator": {
+          "source": "live_model",
+          "model": "claude-opus-5-5",
+          "duration_ms": 20849
+        },
+        "validator": {
+          "source": "live_model",
+          "model": "claude-opus-5-5",
+          "duration_ms": 18062
+        }
+      }
+    },
+    {
+      "id": "DF-BILL-1046",
+      "kind": "defect",
+      "ref": "BILL-1046",
+      "rule": "BR-04",
+      "attempt": 1,
+      "title": "BR-04 SEK line amounts at exactly half an öre round half away from zero @critical",
+      "generated": {
+        "path": "specs/pricing/multi-currency-rounding.spec.ts",
+        "title": "BR-04 SEK line amounts at exactly half an öre round half away from zero @critical",
+        "data": {
+          "group": "projects",
+          "key": "norrskenSubstation",
+          "value": "P-1021 Norrsken substation study"
+        },
+        "data_choice": "P-1021 bills a SEK customer (C120) at the October rate of 11.47, so EUR line amounts of 139.50 and 325.50 convert to exactly 1,600.065 and 3,733.485 SEK. In both cases the digit before the 5 is even, so banker's rounding (the BILL-1046 defect) would show 1,600.06 and 3,733.48 instead of 1,600.07 and 3,733.49. Note that the material does not confirm that a line's amount is (hours × rate + adjustment) converted at the invoice-date rate; engineers should check this before relying on the expected values.",
+        "scenario": [
+          "Create a proposal for P-1021 Norrsken substation study with period end and invoice date 2026-10-31",
+          "Write line 1 up by 0.75 EUR with reason 'Rounding check', taking it from 138.75 to 139.50 EUR",
+          "Write line 2 up by 1.75 EUR with reason 'Rounding check', taking it from 323.75 to 325.50 EUR",
+          "Read the exchange rate, the line adjustments, the line amounts and the subtotal",
+          "Delete the proposal and accept the confirmation"
+        ],
+        "checks": [
+          {
+            "check": "Exchange rate",
+            "value": "11.4700"
+          },
+          {
+            "check": "Line 1 entry date",
+            "value": "2026-10-06"
+          },
+          {
+            "check": "Line 2 entry date",
+            "value": "2026-10-20"
+          },
+          {
+            "check": "Line 1 adjustment",
+            "value": "+0.75"
+          },
+          {
+            "check": "Line 2 adjustment",
+            "value": "+1.75"
+          },
+          {
+            "check": "Line 1 amount",
+            "value": "1,600.07"
+          },
+          {
+            "check": "Line 2 amount",
+            "value": "3,733.49"
+          },
+          {
+            "check": "Subtotal",
+            "value": "5,333.56"
+          }
+        ],
+        "code": "import { expect, test } from '../../fixtures/billing';\nimport { PERIOD_END, projects } from '../../fixtures/testData';\n\ntest('BR-04 SEK line amounts at exactly half an öre round half away from zero @critical', async ({ proposal, page }) => {\n  await proposal.create(projects.norrskenSubstation, PERIOD_END);\n  await expect(page.locator('#proposal-rate')).toHaveText('11.4700');\n  await expect(proposal.line(1)).toContainText('2026-10-06');\n  await expect(proposal.line(2)).toContainText('2026-10-20');\n\n  // 139.50 EUR x 11.47 = 1,600.065 SEK and 325.50 EUR x 11.47 = 3,733.485 SEK.\n  // Banker's rounding would give 1,600.06 and 3,733.48.\n  await proposal.adjust(1, '0.75', 'Rounding check');\n  await expect(proposal.line(1).locator('.line-adjustment')).toHaveText('+0.75');\n  await proposal.adjust(2, '1.75', 'Rounding check');\n  await expect(proposal.line(2).locator('.line-adjustment')).toHaveText('+1.75');\n\n  await expect(proposal.amountOf(1)).toHaveText('1,600.07');\n  await expect(proposal.amountOf(2)).toHaveText('3,733.49');\n  await expect(proposal.subtotal).toHaveText('5,333.56');\n\n  page.once('dialog', (dialog) => dialog.accept());\n  await page.locator('#delete-proposal').click();\n  await expect(page.getByRole('status')).toBeVisible();\n});\n"
+      },
+      "issues": [
+        "specs/pricing/multi-currency-rounding.spec.ts is already another test's file; one file holds one test."
+      ],
+      "validation": [
+        {
+          "check": "Exchange rate",
+          "asserted": "11.4700",
+          "expected": "11.4700 (the SEK rate effective from 1 Oct 2026, the latest on or before the invoice date of 31 Oct 2026). The four-decimal display is inferred from the EUR example of 1.0000; the material does not show a SEK rate on a proposal.",
+          "basis": [
+            {
+              "document": "Test data catalogue",
+              "find": "customer: C120"
+            },
+            {
+              "document": "Test data catalogue",
+              "find": "name: Norrsken Energi AB"
+            },
+            {
+              "document": "Test data catalogue",
+              "find": "rate: 11.47"
+            },
+            {
+              "document": "Help page 17-currencies-and-exchange-rates.md",
+              "find": "An invoice uses the latest rate whose **Effective from** date is on or before its **Invoice date**."
+            },
+            {
+              "document": "Help page 14-what-a-proposal-contains.md",
+              "find": "EUR invoices show 1.0000."
+            }
+          ],
+          "agrees": true
+        },
+        {
+          "check": "Line 1 entry date",
+          "asserted": "2026-10-06",
+          "expected": "2026-10-06",
+          "basis": [
+            {
+              "document": "Test data catalogue",
+              "find": "date: '2026-10-06'"
+            },
+            {
+              "document": "Help page 11-billable-time-and-expenses.md",
+              "find": "Each time entry becomes one line. The **Description** is the date"
+            },
+            {
+              "document": "Help page 11-billable-time-and-expenses.md",
+              "find": "Time lines are listed first, in date order."
+            }
+          ],
+          "agrees": true
+        },
+        {
+          "check": "Line 2 entry date",
+          "asserted": "2026-10-20",
+          "expected": "2026-10-20",
+          "basis": [
+            {
+              "document": "Test data catalogue",
+              "find": "date: '2026-10-20'"
+            },
+            {
+              "document": "Help page 11-billable-time-and-expenses.md",
+              "find": "Time lines are listed first, in date order."
+            }
+          ],
+          "agrees": true
+        },
+        {
+          "check": "Line 1 adjustment",
+          "asserted": "+0.75",
+          "expected": "+0.75",
+          "basis": [
+            {
+              "document": "Help page 19-write-ups-and-write-downs.md",
+              "find": "column shows the amount with a + or"
+            },
+            {
+              "document": "Help page 17-currencies-and-exchange-rates.md",
+              "find": "The **Unit price (EUR)** and **Adjustment (EUR)** columns on a proposal always stay in EUR."
+            }
+          ],
+          "agrees": true
+        },
+        {
+          "check": "Line 2 adjustment",
+          "asserted": "+1.75",
+          "expected": "+1.75",
+          "basis": [
+            {
+              "document": "Help page 19-write-ups-and-write-downs.md",
+              "find": "column shows the amount with a + or"
+            },
+            {
+              "document": "Help page 17-currencies-and-exchange-rates.md",
+              "find": "The **Unit price (EUR)** and **Adjustment (EUR)** columns on a proposal always stay in EUR."
+            }
+          ],
+          "agrees": true
+        },
+        {
+          "check": "Line 1 amount",
+          "asserted": "1,600.07",
+          "expected": "1,600.07 (0.75 h × 185.00 = 138.75 EUR, +0.75 = 139.50 EUR, × 11.47 = 1,600.065 SEK, rounded half away from zero)",
+          "basis": [
+            {
+              "document": "Test data catalogue",
+              "find": "hours: 0.75"
+            },
+            {
+              "document": "Test data catalogue",
+              "find": "standard_rate: 185"
+            },
+            {
+              "document": "Help page 18-rounding.md",
+              "find": "takes the line's EUR value, including any write-up or write-down,"
+            },
+            {
+              "document": "Help page 18-rounding.md",
+              "find": "Amounts exactly halfway are rounded away from zero."
+            }
+          ],
+          "agrees": true
+        },
+        {
+          "check": "Line 2 amount",
+          "asserted": "3,733.49",
+          "expected": "3,733.49 (1.75 h × 185.00 = 323.75 EUR, +1.75 = 325.50 EUR, × 11.47 = 3,733.485 SEK, rounded half away from zero)",
+          "basis": [
+            {
+              "document": "Test data catalogue",
+              "find": "hours: 1.75"
+            },
+            {
+              "document": "Test data catalogue",
+              "find": "standard_rate: 185"
+            },
+            {
+              "document": "Help page 18-rounding.md",
+              "find": "Amounts exactly halfway are rounded away from zero."
+            }
+          ],
+          "agrees": true
+        },
+        {
+          "check": "Subtotal",
+          "asserted": "5,333.56",
+          "expected": "5,333.56 (1,600.07 + 3,733.49)",
+          "basis": [
+            {
+              "document": "Help page 18-rounding.md",
+              "find": "**Subtotal** is the sum of the rounded line amounts,"
+            },
+            {
+              "document": "Help page 18-rounding.md",
+              "find": "The totals are never converted or rounded separately."
+            }
+          ],
+          "agrees": true
+        }
+      ],
+      "ready_for_lab": false,
+      "agents": {
+        "generator": {
+          "source": "live_model",
+          "model": "claude-opus-5-5",
+          "duration_ms": 52966
+        },
+        "validator": {
+          "source": "live_model",
+          "model": "claude-opus-5-5",
+          "duration_ms": 20348
+        }
+      }
+    },
+    {
+      "id": "DF-BILL-1121",
+      "kind": "defect",
+      "ref": "BILL-1121",
+      "rule": "BR-04",
+      "attempt": 1,
+      "title": "BR-04 a converted line is rounded in the customer\\",
+      "generated": {
+        "path": "specs/pricing/multi-currency-rounding.spec.ts",
+        "title": "BR-04 a converted line is rounded in the customer's currency before tax and totals are worked out @critical",
+        "data": {
+          "group": "projects",
+          "key": "polarFleet",
+          "value": "P-1133 Polar fleet dashboard"
+        },
+        "data_choice": "P-1133 bills one approved hour of junior consultant time (85.00 EUR) to Polar Marine Oy in USD at 1.0835, giving 92.0975 USD. Before the BILL-1121 fix the line was not rounded, so tax at 25.5% on the unrounded line would show 23.48 and the total 115.58 USD; rounding the line first gives 92.10, tax 23.49 and total 115.59 USD. The free data has no project with several fractional converted lines, so this test cannot reproduce the multi-line SEK drift in the defect itself; it catches the defect through the tax and total instead.",
+        "scenario": [
+          "Create a proposal for projects.polarFleet with period end PERIOD_END and the invoice date left at the period end",
+          "Read the currency, exchange rate, line count, line 1 unit price, amount and tax, and the subtotal, tax and total",
+          "Accept the confirmation dialog and delete the proposal"
+        ],
+        "checks": [
+          {
+            "check": "Proposal currency",
+            "value": "USD"
+          },
+          {
+            "check": "Exchange rate used",
+            "value": "1.0835"
+          },
+          {
+            "check": "Number of lines",
+            "value": "1"
+          },
+          {
+            "check": "Line 1 unit price (EUR)",
+            "value": "85.00"
+          },
+          {
+            "check": "Line 1 amount rounded in USD",
+            "value": "92.10"
+          },
+          {
+            "check": "Line 1 tax on the rounded line",
+            "value": "23.49"
+          },
+          {
+            "check": "Subtotal",
+            "value": "92.10"
+          },
+          {
+            "check": "Tax total",
+            "value": "23.49"
+          },
+          {
+            "check": "Total",
+            "value": "115.59 USD"
+          },
+          {
+            "check": "Delete button gone after deletion",
+            "value": "0"
+          }
+        ],
+        "code": "import { expect, test } from '../../fixtures/billing';\nimport { PERIOD_END, projects } from '../../fixtures/testData';\n\ntest('BR-04 a converted line is rounded in the customer\\'s currency before tax and totals are worked out @critical', async ({ proposal, page }) => {\n  await proposal.create(projects.polarFleet, PERIOD_END);\n\n  // 1.00 h at 85.00 EUR x 1.0835 = 92.0975 USD. Unrounded, the tax would be 23.48 and the total 115.58 USD.\n  await expect(page.locator('#proposal-currency')).toHaveText('USD');\n  await expect(page.locator('#proposal-rate')).toHaveText('1.0835');\n  await expect(proposal.lines).toHaveCount(1);\n  await expect(proposal.unitPriceOf(1)).toHaveText('85.00');\n  await expect(proposal.amountOf(1)).toHaveText('92.10');\n  await expect(proposal.line(1).locator('.line-tax')).toHaveText('23.49');\n  await expect(proposal.subtotal).toHaveText('92.10');\n  await expect(proposal.tax).toHaveText('23.49');\n  await expect(proposal.total).toHaveText('115.59 USD');\n\n  page.once('dialog', (dialog) => dialog.accept());\n  await page.locator('#delete-proposal').click();\n  await expect(page.locator('#delete-proposal')).toHaveCount(0);\n});\n"
+      },
+      "issues": [
+        "Title must end with @critical exactly when the rule is critical.",
+        "specs/pricing/multi-currency-rounding.spec.ts is already another test's file; one file holds one test."
+      ],
+      "validation": [
+        {
+          "check": "Proposal currency",
+          "asserted": "USD",
+          "expected": "USD. This assumes projects.polarFleet is P-1133 Polar fleet dashboard, whose customer C220 Polar Marine Oy is invoiced in USD.",
+          "basis": [
+            {
+              "document": "Test data catalogue",
+              "find": "    name: Polar fleet dashboard"
+            },
+            {
+              "document": "Test data catalogue",
+              "find": "    name: Polar Marine Oy"
+            },
+            {
+              "document": "Help page 14-what-a-proposal-contains.md",
+              "find": "| **Currency** | The customer's invoice currency. |"
+            }
+          ],
+          "agrees": true
+        },
+        {
+          "check": "Exchange rate used",
+          "asserted": "1.0835",
+          "expected": "1.0835. This assumes PERIOD_END is the default, 31 Oct 2026. PERIOD_END is not defined in the material, but any October invoice date picks up the USD rate effective from 1 Oct 2026.",
+          "basis": [
+            {
+              "document": "Test data catalogue",
+              "find": "  rate: 1.0835"
+            },
+            {
+              "document": "Help page 17-currencies-and-exchange-rates.md",
+              "find": "An invoice uses the latest rate whose **Effective from** date is on or before its **Invoice date**."
+            },
+            {
+              "document": "Help page 02-business-date-and-billing-period.md",
+              "find": "When you open **New proposal**, the period end is set to the last day of the month of the business date."
+            },
+            {
+              "document": "Test data catalogue",
+              "find": "business_date: '2026-10-30'"
+            }
+          ],
+          "agrees": true
+        },
+        {
+          "check": "Number of lines",
+          "asserted": "1",
+          "expected": "1. The project has one approved, billable entry of 1 hour by Emma Lindqvist on 2026-10-16, and no expenses or milestones.",
+          "basis": [
+            {
+              "document": "Test data catalogue",
+              "find": "      employee: Emma Lindqvist"
+            },
+            {
+              "document": "Help page 11-billable-time-and-expenses.md",
+              "find": "On a time and materials project, a proposal includes every time entry that:"
+            }
+          ],
+          "agrees": true
+        },
+        {
+          "check": "Line 1 unit price (EUR)",
+          "asserted": "85.00",
+          "expected": "85.00. Emma Lindqvist is a junior consultant (JUN). There is no agreed rate and no project rate card, so the standard rate applies.",
+          "basis": [
+            {
+              "document": "Help page 07-rates.md",
+              "find": "| Junior consultant | JUN | 85.00 |"
+            },
+            {
+              "document": "Help page 07-rates.md",
+              "find": "3. **The role's standard rate.**"
+            },
+            {
+              "document": "Test data catalogue",
+              "find": "  Emma Lindqvist: JUN"
+            }
+          ],
+          "agrees": true
+        },
+        {
+          "check": "Line 1 amount rounded in USD",
+          "asserted": "92.10",
+          "expected": "92.10. This is 1.00 h × 85.00 EUR = 85.00 EUR, multiplied by 1.0835 to give 92.0975, then rounded to 2 decimal places.",
+          "basis": [
+            {
+              "document": "Help page 18-rounding.md",
+              "find": "3. rounds the result to the decimal places of the invoice currency. This is the line **Amount**,"
+            },
+            {
+              "document": "Help page 12-quarter-hour-billing.md",
+              "find": "An entry that is already a whole quarter hour is not changed."
+            },
+            {
+              "document": "Help page 18-rounding.md",
+              "find": "Amounts exactly halfway are rounded away from zero."
+            }
+          ],
+          "agrees": true
+        },
+        {
+          "check": "Line 1 tax on the rounded line",
+          "asserted": "23.49",
+          "expected": "23.49. The code is S 25.5%: 92.10 × 25.5% = 23.4855, rounded to 23.49. Reverse charge does not apply because the customer's country is FI.",
+          "basis": [
+            {
+              "document": "Help page 15-vat-and-tax-codes.md",
+              "find": "The tax on each line is the rounded line amount times the rate, rounded to the currency's decimal places."
+            },
+            {
+              "document": "Test data catalogue",
+              "find": "    rate_percent: 25.5"
+            },
+            {
+              "document": "Help page 16-reverse-charge.md",
+              "find": "4. The customer's country is not Finland."
+            }
+          ],
+          "agrees": true
+        },
+        {
+          "check": "Subtotal",
+          "asserted": "92.10",
+          "expected": "92.10",
+          "basis": [
+            {
+              "document": "Help page 18-rounding.md",
+              "find": "- **Subtotal** is the sum of the rounded line amounts,"
+            }
+          ],
+          "agrees": true
+        },
+        {
+          "check": "Tax total",
+          "asserted": "23.49",
+          "expected": "23.49",
+          "basis": [
+            {
+              "document": "Help page 18-rounding.md",
+              "find": "- **Tax** is the sum of the rounded line tax amounts,"
+            }
+          ],
+          "agrees": true
+        },
+        {
+          "check": "Total",
+          "asserted": "115.59 USD",
+          "expected": "115.59 USD",
+          "basis": [
+            {
+              "document": "Help page 18-rounding.md",
+              "find": "- **Total** is Subtotal plus Tax."
+            },
+            {
+              "document": "Help page 18-rounding.md",
+              "find": "Subtotal 108.48, Tax 27.66, Total 136.14 USD."
+            }
+          ],
+          "agrees": true
+        },
+        {
+          "check": "Delete button gone after deletion",
+          "asserted": "0",
+          "expected": "Partly settled. The confirmation \"Proposal deleted.\" is shown and the proposal no longer exists, so no **Delete proposal** button is shown for it. Not settled: which page opens after the deletion. The documents do not say.",
+          "basis": [
+            {
+              "document": "Help page 13-creating-a-proposal.md",
+              "find": "The message \"Proposal deleted.\" confirms it."
+            },
+            {
+              "document": "Help page 01-getting-started.md",
+              "find": "When something works, a short confirmation appears in a box at the top of the page, for example \"Proposal deleted.\""
+            }
+          ],
+          "agrees": false
+        }
+      ],
+      "ready_for_lab": false,
+      "agents": {
+        "generator": {
+          "source": "live_model",
+          "model": "claude-opus-5-5",
+          "duration_ms": 38067
+        },
+        "validator": {
+          "source": "live_model",
+          "model": "claude-opus-5-5",
+          "duration_ms": 25703
+        }
+      }
+    },
+    {
+      "id": "DF-BILL-1187",
+      "kind": "defect",
+      "ref": "BILL-1187",
+      "rule": "BR-04",
+      "attempt": 1,
+      "title": "BR-04 a yen proposal shows whole yen on its lines, tax and total @critical",
+      "generated": {
+        "path": "specs/pricing/zero-decimal-currencies.spec.ts",
+        "title": "BR-04 a yen proposal shows whole yen on its lines, tax and total @critical",
+        "data": {
+          "group": "projects",
+          "key": "sakuraDashboard",
+          "value": "P-1071 Sakura quality dashboard"
+        },
+        "data_choice": "P-1071 bills Sakura Components KK (C170) in JPY. Its single approved hour at 120.00 EUR converts at the October rate of 162.37 to 19,484.40 JPY, so the defect would show a fractional 19,484.40 again if MinorUnits went back to 2 for yen.",
+        "scenario": [
+          "Create a proposal for projects.sakuraDashboard with period end and invoice date PERIOD_END (2026-10-31), as Anna Virtanen, billing clerk",
+          "Read the currency, exchange rate, line 1 unit price, line 1 amount, line 1 tax amount, subtotal, tax and total from the proposal page",
+          "Accept the confirmation dialog and click Delete proposal"
+        ],
+        "checks": [
+          {
+            "check": "Number of proposal lines",
+            "value": "1"
+          },
+          {
+            "check": "Proposal currency",
+            "value": "JPY"
+          },
+          {
+            "check": "Exchange rate used",
+            "value": "162.3700"
+          },
+          {
+            "check": "Line 1 unit price in EUR",
+            "value": "120.00"
+          },
+          {
+            "check": "Line 1 amount in whole yen",
+            "value": "19,484"
+          },
+          {
+            "check": "Line 1 tax amount",
+            "value": "0"
+          },
+          {
+            "check": "Subtotal in whole yen",
+            "value": "19,484"
+          },
+          {
+            "check": "Tax total",
+            "value": "0"
+          },
+          {
+            "check": "Total in whole yen",
+            "value": "19,484 JPY"
+          },
+          {
+            "check": "Delete button gone after deletion",
+            "value": "0"
+          }
+        ],
+        "code": "import { expect, test } from '../../fixtures/billing';\nimport { PERIOD_END, projects } from '../../fixtures/testData';\n\ntest('BR-04 a yen proposal shows whole yen on its lines, tax and total @critical', async ({ proposal, page }) => {\n  await proposal.create(projects.sakuraDashboard, PERIOD_END);\n\n  // One hour at 120.00 EUR times 162.37 is 19,484.40 JPY; yen has no decimals, so the line rounds to 19,484.\n  await expect(proposal.lines).toHaveCount(1);\n  await expect(page.locator('#proposal-currency')).toHaveText('JPY');\n  await expect(page.locator('#proposal-rate')).toHaveText('162.3700');\n  await expect(proposal.unitPriceOf(1)).toHaveText('120.00');\n  await expect(proposal.amountOf(1)).toHaveText('19,484');\n  await expect(proposal.line(1).locator('.line-tax')).toHaveText('0');\n  await expect(proposal.subtotal).toHaveText('19,484');\n  await expect(proposal.tax).toHaveText('0');\n  await expect(proposal.total).toHaveText('19,484 JPY');\n\n  // Leave nothing open: the entries go back to unbilled.\n  page.once('dialog', (dialog) => dialog.accept());\n  await page.locator('#delete-proposal').click();\n  await expect(page.locator('#delete-proposal')).toHaveCount(0);\n});\n"
+      },
+      "issues": [],
+      "validation": [
+        {
+          "check": "Number of proposal lines",
+          "asserted": "1",
+          "expected": "1",
+          "basis": [
+            {
+              "document": "Test data catalogue",
+              "find": "name: Sakura quality dashboard"
+            },
+            {
+              "document": "Test data catalogue",
+              "find": "comment: Defect triage with supplier"
+            },
+            {
+              "document": "Help page 11-billable-time-and-expenses.md",
+              "find": "Each time entry becomes one line."
+            }
+          ],
+          "agrees": true
+        },
+        {
+          "check": "Proposal currency",
+          "asserted": "JPY",
+          "expected": "JPY",
+          "basis": [
+            {
+              "document": "Test data catalogue",
+              "find": "name: Sakura Components KK"
+            },
+            {
+              "document": "Help page 14-what-a-proposal-contains.md",
+              "find": "| **Currency** | The customer's invoice currency. |"
+            }
+          ],
+          "agrees": true
+        },
+        {
+          "check": "Exchange rate used",
+          "asserted": "162.3700",
+          "expected": "162.3700 (the 1 Oct 2026 JPY rate of 162.37). The four-decimal display is inferred from the 1.0000 shown for EUR invoices.",
+          "basis": [
+            {
+              "document": "Test data catalogue",
+              "find": "rate: 162.37"
+            },
+            {
+              "document": "Help page 17-currencies-and-exchange-rates.md",
+              "find": "An invoice uses the latest rate whose **Effective from** date is on or before its **Invoice date**."
+            },
+            {
+              "document": "Help page 14-what-a-proposal-contains.md",
+              "find": "EUR invoices show 1.0000."
+            }
+          ],
+          "agrees": true
+        },
+        {
+          "check": "Line 1 unit price in EUR",
+          "asserted": "120.00",
+          "expected": "120.00",
+          "basis": [
+            {
+              "document": "Test data catalogue",
+              "find": "standard_rate: 120"
+            },
+            {
+              "document": "Help page 07-rates.md",
+              "find": "| Consultant | CONS | 120.00 |"
+            },
+            {
+              "document": "Help page 07-rates.md",
+              "find": "3. **The role's standard rate.**"
+            }
+          ],
+          "agrees": true
+        },
+        {
+          "check": "Line 1 amount in whole yen",
+          "asserted": "19,484",
+          "expected": "19,484 (1.00 hour × 120.00 EUR = 120.00 EUR × 162.37 = 19,484.4, rounded to whole yen)",
+          "basis": [
+            {
+              "document": "Help page 18-rounding.md",
+              "find": "JPY, ISK and KRW have no decimal places and are rounded to whole units."
+            },
+            {
+              "document": "Help page 18-rounding.md",
+              "find": "rounds the result to the decimal places of the invoice currency. This is the line **Amount**,"
+            },
+            {
+              "document": "Test data catalogue",
+              "find": "rate: 162.37"
+            }
+          ],
+          "agrees": true
+        },
+        {
+          "check": "Line 1 tax amount",
+          "asserted": "0",
+          "expected": "0 (tax code Z at 0%, shown as Z 0%)",
+          "basis": [
+            {
+              "document": "Help page 15-vat-and-tax-codes.md",
+              "find": "| Z | Outside the scope of Finnish VAT (services to non-EU businesses) | 0% | |"
+            },
+            {
+              "document": "Help page 15-vat-and-tax-codes.md",
+              "find": "The tax on each line is the rounded line amount times the rate, rounded to the currency's decimal places."
+            }
+          ],
+          "agrees": true
+        },
+        {
+          "check": "Subtotal in whole yen",
+          "asserted": "19,484",
+          "expected": "19,484",
+          "basis": [
+            {
+              "document": "Help page 18-rounding.md",
+              "find": "**Subtotal** is the sum of the rounded line amounts,"
+            }
+          ],
+          "agrees": true
+        },
+        {
+          "check": "Tax total",
+          "asserted": "0",
+          "expected": "0",
+          "basis": [
+            {
+              "document": "Help page 18-rounding.md",
+              "find": "**Tax** is the sum of the rounded line tax amounts,"
+            },
+            {
+              "document": "Help page 15-vat-and-tax-codes.md",
+              "find": "The lines carry 0% VAT. No note is added."
+            }
+          ],
+          "agrees": true
+        },
+        {
+          "check": "Total in whole yen",
+          "asserted": "19,484 JPY",
+          "expected": "19,484 JPY",
+          "basis": [
+            {
+              "document": "Help page 18-rounding.md",
+              "find": "**Total** is Subtotal plus Tax."
+            },
+            {
+              "document": "Help page 14-what-a-proposal-contains.md",
+              "find": "- **Total**: subtotal plus tax, with the currency."
+            }
+          ],
+          "agrees": true
+        },
+        {
+          "check": "Delete button gone after deletion",
+          "asserted": "0",
+          "expected": "Not settled: the documents say the message \"Proposal deleted.\" confirms deletion and the entries return to unbilled, but they do not say which page is shown afterwards or state that the Delete proposal button is no longer displayed.",
+          "basis": [
+            {
+              "document": "Help page 13-creating-a-proposal.md",
+              "find": "The message \"Proposal deleted.\" confirms it."
+            }
+          ],
+          "agrees": false
+        }
+      ],
+      "ready_for_lab": false,
+      "agents": {
+        "generator": {
+          "source": "live_model",
+          "model": "claude-opus-5-5",
+          "duration_ms": 31533
+        },
+        "validator": {
+          "source": "live_model",
+          "model": "claude-opus-5-5",
+          "duration_ms": 19505
+        }
+      }
+    },
+    {
+      "id": "DF-BILL-1203",
+      "kind": "defect",
+      "ref": "BILL-1203",
+      "rule": "BR-04",
+      "attempt": 1,
+      "title": "BR-04 each line is converted and rounded to the customer\\",
+      "generated": {
+        "path": "specs/pricing/multi-currency-rounding.spec.ts",
+        "title": "BR-04 each line is converted and rounded to the customer's currency before its tax is worked out @critical",
+        "data": {
+          "group": "projects",
+          "key": "polarReporting",
+          "value": "P-1130 Polar vessel reporting"
+        },
+        "data_choice": "P-1130 is the only free project billed in a foreign currency (USD at 1.0835, standard VAT 25.5%), and its 2.1-hour line converts to an unrounded 273.042 USD. On my arithmetic the old and the fixed tax formulas both give 69.63 on every line, so this data may not catch BILL-1203 if it came back, and the one-line-per-entry layout is assumed from BR-01; reviewers should confirm both, or seed data like the risk card's 1.00 EUR at 10.015.",
+        "scenario": [
+          "Create a proposal for projects.polarReporting with period end PERIOD_END and the default invoice date",
+          "Read the currency, exchange rate, each line's amount and tax, and the subtotal, tax and total",
+          "Accept the confirmation and delete the proposal"
+        ],
+        "checks": [
+          {
+            "check": "Proposal currency",
+            "value": "USD"
+          },
+          {
+            "check": "Exchange rate",
+            "value": "1.0835"
+          },
+          {
+            "check": "Line count",
+            "value": "3"
+          },
+          {
+            "check": "Line 1 amount",
+            "value": "1,300.20"
+          },
+          {
+            "check": "Line 1 tax",
+            "value": "331.55"
+          },
+          {
+            "check": "Line 2 amount",
+            "value": "1,040.16"
+          },
+          {
+            "check": "Line 2 tax",
+            "value": "265.24"
+          },
+          {
+            "check": "Line 3 amount",
+            "value": "273.04"
+          },
+          {
+            "check": "Line 3 tax",
+            "value": "69.63"
+          },
+          {
+            "check": "Subtotal",
+            "value": "2,613.40"
+          },
+          {
+            "check": "Tax total",
+            "value": "666.42"
+          },
+          {
+            "check": "Total",
+            "value": "3,279.82 USD"
+          }
+        ],
+        "code": "import { expect, test } from '../../fixtures/billing';\nimport { PERIOD_END, projects } from '../../fixtures/testData';\n\ntest('BR-04 each line is converted and rounded to the customer\\'s currency before its tax is worked out @critical', async ({ proposal }) => {\n  await proposal.create(projects.polarReporting, PERIOD_END);\n\n  await expect(proposal.page.locator('#proposal-currency')).toHaveText('USD');\n  await expect(proposal.page.locator('#proposal-rate')).toHaveText('1.0835');\n  await expect(proposal.lines).toHaveCount(3);\n\n  await expect(proposal.amountOf(1)).toHaveText('1,300.20');\n  await expect(proposal.line(1).locator('.line-tax')).toHaveText('331.55');\n  await expect(proposal.amountOf(2)).toHaveText('1,040.16');\n  await expect(proposal.line(2).locator('.line-tax')).toHaveText('265.24');\n\n  // 252.00 EUR at 1.0835 is 273.042 USD; the line is rounded first and VAT is worked out on 273.04.\n  await expect(proposal.amountOf(3)).toHaveText('273.04');\n  await expect(proposal.line(3).locator('.line-tax')).toHaveText('69.63');\n\n  // The total is the sum of the rounded lines and their tax.\n  await expect(proposal.subtotal).toHaveText('2,613.40');\n  await expect(proposal.tax).toHaveText('666.42');\n  await expect(proposal.total).toHaveText('3,279.82 USD');\n\n  proposal.page.once('dialog', (dialog) => dialog.accept());\n  await proposal.page.locator('#delete-proposal').click();\n});\n"
+      },
+      "issues": [
+        "Title must end with @critical exactly when the rule is critical.",
+        "specs/pricing/multi-currency-rounding.spec.ts is already another test's file; one file holds one test."
+      ],
+      "validation": [
+        {
+          "check": "Proposal currency",
+          "asserted": "USD",
+          "expected": "USD",
+          "basis": [
+            {
+              "document": "Test data catalogue",
+              "find": "name: Polar vessel reporting"
+            },
+            {
+              "document": "Test data catalogue",
+              "find": "customer: C220"
+            },
+            {
+              "document": "Test data catalogue",
+              "find": "name: Polar Marine Oy"
+            },
+            {
+              "document": "Help page 14-what-a-proposal-contains.md",
+              "find": "| **Currency** | The customer's invoice currency. |"
+            }
+          ],
+          "agrees": true
+        },
+        {
+          "check": "Exchange rate",
+          "asserted": "1.0835",
+          "expected": "1.0835 (the USD rate effective from 1 Oct 2026, assuming the invoice date, which defaults to PERIOD_END, is on or after 1 Oct 2026)",
+          "basis": [
+            {
+              "document": "Test data catalogue",
+              "find": "rate: 1.0835"
+            },
+            {
+              "document": "Test data catalogue",
+              "find": "effective: '2026-10-01'"
+            },
+            {
+              "document": "Help page 17-currencies-and-exchange-rates.md",
+              "find": "An invoice uses the latest rate whose **Effective from** date is on or before its **Invoice date**."
+            },
+            {
+              "document": "Help page 02-business-date-and-billing-period.md",
+              "find": "Each proposal also has an **Invoice date**. It is set to the period end by default."
+            }
+          ],
+          "agrees": true
+        },
+        {
+          "check": "Line count",
+          "asserted": "3",
+          "expected": "3, assuming PERIOD_END is on or after 14 Oct 2026 (for example the default 31 Oct 2026). PERIOD_END is not defined in the material, so an earlier value would give fewer lines. The 29 Sep 2026 entry is not billable and is left out.",
+          "basis": [
+            {
+              "document": "Test data catalogue",
+              "find": "business_date: '2026-10-30'"
+            },
+            {
+              "document": "Test data catalogue",
+              "find": "billable: false"
+            },
+            {
+              "document": "Help page 11-billable-time-and-expenses.md",
+              "find": "is dated on or before the proposal's **Period end**."
+            },
+            {
+              "document": "Rule register",
+              "find": "A proposal includes time entries that are approved, marked billable, not yet billed and dated on or"
+            }
+          ],
+          "agrees": true
+        },
+        {
+          "check": "Line 1 amount",
+          "asserted": "1,300.20",
+          "expected": "1,300.20 (12 Oct 2026, Juha Niemi, SNR, 8.00 h at the 150.00 EUR standard rate = 1,200.00 EUR x 1.0835)",
+          "basis": [
+            {
+              "document": "Test data catalogue",
+              "find": "Juha Niemi: SNR"
+            },
+            {
+              "document": "Test data catalogue",
+              "find": "standard_rate: 150"
+            },
+            {
+              "document": "Help page 07-rates.md",
+              "find": "3. **The role's standard rate.**"
+            },
+            {
+              "document": "Help page 18-rounding.md",
+              "find": "3. rounds the result to the decimal places of the invoice currency. This is the line **Amount**,"
+            }
+          ],
+          "agrees": true
+        },
+        {
+          "check": "Line 1 tax",
+          "asserted": "331.55",
+          "expected": "331.55 (S 25.5% on 1,300.20 = 331.551)",
+          "basis": [
+            {
+              "document": "Test data catalogue",
+              "find": "tax_code: S"
+            },
+            {
+              "document": "Help page 15-vat-and-tax-codes.md",
+              "find": "| S | Standard rate | 25.5% | |"
+            },
+            {
+              "document": "Help page 18-rounding.md",
+              "find": "4. works out the tax on the rounded line amount and rounds that too. This is the line **Tax amount**."
+            }
+          ],
+          "agrees": true
+        },
+        {
+          "check": "Line 2 amount",
+          "asserted": "1,040.16",
+          "expected": "1,040.16 (13 Oct 2026, Laura Koskinen, CONS, 8.00 h at 120.00 EUR = 960.00 EUR x 1.0835)",
+          "basis": [
+            {
+              "document": "Test data catalogue",
+              "find": "Laura Koskinen: CONS"
+            },
+            {
+              "document": "Test data catalogue",
+              "find": "standard_rate: 120"
+            },
+            {
+              "document": "Help page 17-currencies-and-exchange-rates.md",
+              "find": "Each line is converted from EUR and rounded on its own."
+            }
+          ],
+          "agrees": true
+        },
+        {
+          "check": "Line 2 tax",
+          "asserted": "265.24",
+          "expected": "265.24 (25.5% of 1,040.16 = 265.2408)",
+          "basis": [
+            {
+              "document": "Help page 15-vat-and-tax-codes.md",
+              "find": "The tax on each line is the rounded line amount times the rate, rounded to the currency's decimal places."
+            }
+          ],
+          "agrees": true
+        },
+        {
+          "check": "Line 3 amount",
+          "asserted": "273.04",
+          "expected": "292.55 (14 Oct 2026, Laura Koskinen, 2.1 h rounded up to 2.25 h at 120.00 EUR = 270.00 EUR x 1.0835 = 292.545, rounded half away from zero)",
+          "basis": [
+            {
+              "document": "Test data catalogue",
+              "find": "hours: 2.1"
+            },
+            {
+              "document": "Help page 12-quarter-hour-billing.md",
+              "find": "Each time entry is rounded **up** to the next quarter hour."
+            },
+            {
+              "document": "Help page 18-rounding.md",
+              "find": "Amounts exactly halfway are rounded away from zero."
+            }
+          ],
+          "agrees": false
+        },
+        {
+          "check": "Line 3 tax",
+          "asserted": "69.63",
+          "expected": "74.60 (25.5% of 292.55 = 74.60025)",
+          "basis": [
+            {
+              "document": "Help page 18-rounding.md",
+              "find": "4. works out the tax on the rounded line amount and rounds that too. This is the line **Tax amount**."
+            },
+            {
+              "document": "Rule register",
+              "find": "half away from zero. Tax is worked out on the rounded line."
+            }
+          ],
+          "agrees": false
+        },
+        {
+          "check": "Subtotal",
+          "asserted": "2,613.40",
+          "expected": "2,632.91",
+          "basis": [
+            {
+              "document": "Help page 18-rounding.md",
+              "find": "**Subtotal** is the sum of the rounded line amounts,"
+            },
+            {
+              "document": "Help page 00-index.md",
+              "find": "Amounts are written with a full stop for decimals and a comma for thousands"
+            }
+          ],
+          "agrees": false
+        },
+        {
+          "check": "Tax total",
+          "asserted": "666.42",
+          "expected": "671.39",
+          "basis": [
+            {
+              "document": "Help page 18-rounding.md",
+              "find": "**Tax** is the sum of the rounded line tax amounts,"
+            }
+          ],
+          "agrees": false
+        },
+        {
+          "check": "Total",
+          "asserted": "3,279.82 USD",
+          "expected": "3,304.30 USD",
+          "basis": [
+            {
+              "document": "Help page 18-rounding.md",
+              "find": "**Total** is Subtotal plus Tax."
+            },
+            {
+              "document": "Help page 14-what-a-proposal-contains.md",
+              "find": "**Total**: subtotal plus tax, with the currency."
+            }
+          ],
+          "agrees": false
+        }
+      ],
+      "ready_for_lab": false,
+      "agents": {
+        "generator": {
+          "source": "live_model",
+          "model": "claude-opus-5-5",
+          "duration_ms": 27998
+        },
+        "validator": {
+          "source": "live_model",
+          "model": "claude-opus-5-5",
+          "duration_ms": 27033
+        }
+      }
+    },
+    {
+      "id": "CX-HIDDEN-01",
+      "kind": "hidden_rule",
+      "ref": "HIDDEN-01",
+      "rule": "BR-07",
+      "attempt": 1,
+      "title": "BR-07 write-downs over 10% of a proposal wait for a billing manager\\",
+      "generated": {
+        "path": "specs/proposals/write-down-approval.spec.ts",
+        "title": "BR-07 write-downs over 10% of a proposal wait for a billing manager's approval before it can be finalised @critical",
+        "data": {
+          "group": "projects",
+          "key": "atlasLoyalty",
+          "value": "P-1051 Atlas loyalty programme"
+        },
+        "data_choice": "P-1051 is free, in EUR with no agreed or project rates, and has two approved, billable entries (8 h SNR at 150 and 6 h CONS at 120), so its value before adjustments is 1,920.00 and 10% is exactly 192.00. A -200 write-down is just over the limit, and -192 sits on it, which catches the approval coming back at or below 10%. This assumes 'value before adjustments' means the subtotal before tax, as the proposed test on P-1001 implies.",
+        "scenario": [
+          "Create a proposal for P-1051 Atlas loyalty programme with period end 2026-10-31",
+          "Write line 1 down by -200 with the reason 'Loyalty workshop overran, agreed with customer'",
+          "Click Finalise invoice",
+          "Write line 1 down by -192 with the reason 'Loyalty workshop overran, agreed with customer'",
+          "Delete the proposal and accept the confirmation"
+        ],
+        "checks": [
+          {
+            "check": "Proposal value before adjustments",
+            "value": "1,920.00"
+          },
+          {
+            "check": "Message after the write-down over 10%",
+            "value": "Adjustment saved. The proposal now needs a billing manager\\'s approval."
+          },
+          {
+            "check": "Line 1 adjustment over 10%",
+            "value": "-200.00"
+          },
+          {
+            "check": "Line 1 reason",
+            "value": "Loyalty workshop overran"
+          },
+          {
+            "check": "Status over 10%",
+            "value": "Awaiting approval"
+          },
+          {
+            "check": "Finalise refused",
+            "value": "Write-downs on this proposal are waiting for a billing manager\\'s approval."
+          },
+          {
+            "check": "Still a proposal with no number",
+            "value": "Assigned when finalised"
+          },
+          {
+            "check": "Line 1 adjustment at 10%",
+            "value": "-192.00"
+          },
+          {
+            "check": "Status at exactly 10%",
+            "value": "Proposal"
+          },
+          {
+            "check": "Delete button gone after deletion",
+            "value": "0"
+          }
+        ],
+        "code": "import { expect, test } from '../../fixtures/billing';\nimport { PERIOD_END, projects } from '../../fixtures/testData';\n\ntest('BR-07 write-downs over 10% of a proposal wait for a billing manager\\'s approval before it can be finalised @critical', async ({ proposal, page }) => {\n  await proposal.create(projects.atlasLoyalty, PERIOD_END);\n  await expect(proposal.subtotal).toHaveText('1,920.00');\n\n  // 200.00 is just over 10% of 1,920.00.\n  await proposal.adjust(1, '-200', 'Loyalty workshop overran, agreed with customer');\n  await expect(page.getByRole('status')).toHaveText('Adjustment saved. The proposal now needs a billing manager\\'s approval.');\n  await expect(proposal.line(1).locator('.line-adjustment')).toHaveText('-200.00');\n  await expect(proposal.line(1)).toContainText('Loyalty workshop overran');\n  await expect(proposal.status).toHaveText('Awaiting approval');\n\n  await proposal.finalise();\n  await expect(proposal.error).toHaveText('Write-downs on this proposal are waiting for a billing manager\\'s approval.');\n  await expect(proposal.status).toHaveText('Awaiting approval');\n  await expect(proposal.number).toHaveText('Assigned when finalised');\n\n  // 192.00 is exactly 10%, which needs no approval.\n  await proposal.adjust(1, '-192', 'Loyalty workshop overran, agreed with customer');\n  await expect(proposal.line(1).locator('.line-adjustment')).toHaveText('-192.00');\n  await expect(proposal.status).toHaveText('Proposal');\n\n  page.once('dialog', (dialog) => dialog.accept());\n  await page.locator('#delete-proposal').click();\n  await expect(page.locator('#delete-proposal')).toHaveCount(0);\n});\n"
+      },
+      "issues": [
+        "Title must end with @critical exactly when the rule is critical."
+      ],
+      "validation": [
+        {
+          "check": "Proposal value before adjustments",
+          "asserted": "1,920.00",
+          "expected": "Subtotal 1,920.00 and Total 1,920.00 EUR. Line 1 is 8.00 hours at 150.00 = 1,200.00 and line 2 is 6.00 hours at 120.00 = 720.00. Tax is 0.00 because the reverse charge (RC 0%) applies.",
+          "basis": [
+            {
+              "document": "Test data catalogue",
+              "find": "name: Atlas loyalty programme"
+            },
+            {
+              "document": "Test data catalogue",
+              "find": "name: Atlas Retail GmbH"
+            },
+            {
+              "document": "Help page 07-rates.md",
+              "find": "| Senior consultant | SNR | 150.00 |"
+            },
+            {
+              "document": "Help page 07-rates.md",
+              "find": "| Consultant | CONS | 120.00 |"
+            },
+            {
+              "document": "Help page 16-reverse-charge.md",
+              "find": "| Atlas Retail GmbH | DE | DE811234567 | Reverse charge, *RC* 0% |"
+            },
+            {
+              "document": "Help page 11-billable-time-and-expenses.md",
+              "find": "Time lines are listed first, in date order."
+            }
+          ],
+          "agrees": true
+        },
+        {
+          "check": "Message after the write-down over 10%",
+          "asserted": "Adjustment saved. The proposal now needs a billing manager\\'s approval.",
+          "expected": "Adjustment saved. The proposal now needs a billing manager's approval.",
+          "basis": [
+            {
+              "document": "Approved context HIDDEN-01",
+              "find": "? \"Adjustment saved. The proposal now needs a billing manager's approval.\""
+            },
+            {
+              "document": "Approved context HIDDEN-01",
+              "find": "if (before > 0 && writeDowns / before > WD_LIMIT)"
+            }
+          ],
+          "agrees": true
+        },
+        {
+          "check": "Line 1 adjustment over 10%",
+          "asserted": "-200.00",
+          "expected": "−200.00 (a write-down of 200.00 EUR, shown with a minus sign in the Adjustment (EUR) column). This is 10.4% of 1,920.00.",
+          "basis": [
+            {
+              "document": "Help page 19-write-ups-and-write-downs.md",
+              "find": "The **Adjustment (EUR)** column shows the amount with a + or − sign"
+            }
+          ],
+          "agrees": true
+        },
+        {
+          "check": "Line 1 reason",
+          "asserted": "Loyalty workshop overran",
+          "expected": "Loyalty workshop overran, agreed with customer (shown under the description of line 1)",
+          "basis": [
+            {
+              "document": "Help page 19-write-ups-and-write-downs.md",
+              "find": "the reason appears under the line description"
+            }
+          ],
+          "agrees": true
+        },
+        {
+          "check": "Status over 10%",
+          "asserted": "Awaiting approval",
+          "expected": "Awaiting approval",
+          "basis": [
+            {
+              "document": "Approved context HIDDEN-01",
+              "find": "it goes to Awaiting approval and cannot be finalised until a billing manager approves it"
+            },
+            {
+              "document": "Approved context HIDDEN-01",
+              "find": "invoice.Status = InvoiceStatus.PendingApproval;"
+            }
+          ],
+          "agrees": true
+        },
+        {
+          "check": "Finalise refused",
+          "asserted": "Write-downs on this proposal are waiting for a billing manager\\'s approval.",
+          "expected": "Write-downs on this proposal are waiting for a billing manager's approval.",
+          "basis": [
+            {
+              "document": "Approved context HIDDEN-01",
+              "find": "throw new BillingException(\"Write-downs on this proposal are waiting for a billing manager's approval.\");"
+            }
+          ],
+          "agrees": true
+        },
+        {
+          "check": "Still a proposal with no number",
+          "asserted": "Assigned when finalised",
+          "expected": "Invoice number: Assigned when finalised (the page is still the invoice proposal, with no INV- number).",
+          "basis": [
+            {
+              "document": "Help page 23-invoice-numbers-and-due-dates.md",
+              "find": "a finalise that fails, for example because the PO number is missing, does not use a number."
+            },
+            {
+              "document": "Help page 14-what-a-proposal-contains.md",
+              "find": "| **Invoice number** | \"Assigned when finalised\". |"
+            }
+          ],
+          "agrees": false
+        },
+        {
+          "check": "Line 1 adjustment at 10%",
+          "asserted": "-192.00",
+          "expected": "−192.00 (this replaces the earlier −200.00 and is exactly 10% of 1,920.00).",
+          "basis": [
+            {
+              "document": "Help page 19-write-ups-and-write-downs.md",
+              "find": "A new adjustment **replaces** the previous one."
+            },
+            {
+              "document": "Approved context HIDDEN-01",
+              "find": "private const decimal WD_LIMIT = 0.10m;"
+            }
+          ],
+          "agrees": true
+        },
+        {
+          "check": "Status at exactly 10%",
+          "asserted": "Proposal",
+          "expected": "Proposal",
+          "basis": [
+            {
+              "document": "Approved context HIDDEN-01",
+              "find": "one that brings them back to 10% or below returns the proposal to Proposal without approval"
+            },
+            {
+              "document": "Approved context HIDDEN-01",
+              "find": "else if (invoice.Status == InvoiceStatus.PendingApproval)"
+            }
+          ],
+          "agrees": true
+        },
+        {
+          "check": "Delete button gone after deletion",
+          "asserted": "0",
+          "expected": "The message \"Proposal deleted.\" is shown and no Delete proposal button is shown. The documents do not settle which page is shown after the deletion.",
+          "basis": [
+            {
+              "document": "Help page 13-creating-a-proposal.md",
+              "find": "The message \"Proposal deleted.\" confirms it."
+            }
+          ],
+          "agrees": false
+        }
+      ],
+      "ready_for_lab": false,
+      "agents": {
+        "generator": {
+          "source": "live_model",
+          "model": "claude-opus-5-5",
+          "duration_ms": 29609
+        },
+        "validator": {
+          "source": "live_model",
+          "model": "claude-opus-5-5",
+          "duration_ms": 21107
+        }
+      }
+    }
+  ]
+}

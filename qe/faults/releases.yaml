@@ -1,0 +1,11 @@
+# Changes in the next release of the billing module that are not faults: the module still works, but
+# tests that find elements by the old wording break. The lab builds each one beside the faulted builds,
+# and the maintenance measure times how long a broken selector takes to repair.
+#
+# Same format as faults.yaml. Builds are named after the release.
+releases:
+  - id: release-4.9
+    description: The adjustment field on a proposal line is relabelled for screen readers and the new help text
+    file: Billing.Web/Pages/Proposals/Edit.cshtml
+    find: 'aria-label="Adjustment for line @l.Sequence"'
+    replace: 'aria-label="Write-up or write-down for line @l.Sequence"'

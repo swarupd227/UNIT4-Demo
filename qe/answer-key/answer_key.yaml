@@ -57,8 +57,11 @@ planted:
     absent_from: [help pages, manual cases, automated tests, rule register statement]
     expected: Hidden rule entry; test proposed; engineer confirms the rule
   T3:
-    what: The first generated midpoint-rounding test uses amounts with no midpoint, so it passes with F04a
-    expected: Rejected by the fault check, then regenerated
+    what: >-
+      A generated test that passes every other check but protects nothing. Planned as a midpoint test
+      without a midpoint; as recorded, it was the first test for case 48224 (closing project below
+      the minimum), which still passed with the minimum lowered to 5 EUR (F14).
+    expected: Rejected by the fault check, then regenerated and accepted
   T4:
     what: Manual case 48207 expects rounding on the total; help page 18 and BR-04 say per line
     expected: Sent to a person; no test until resolved
@@ -73,6 +76,12 @@ planted:
   T9:
     what: BILL-1187 and BILL-1203 were fixed without any test
     expected: Shown on the risk card; tests proposed (they are F04c and F04d)
+  # Found by the case validator in Phase 3, not planted. Release 4.8 moved finalising onto a ledger
+  # posting page, and the "Invoice INV-... finalised." message now shows there. Eight manual cases
+  # still expect it on the invoice page (manual_cases.yaml marks them drift: posting_message).
+  posting_message_drift:
+    what: Eight manual cases expect the finalise message on the invoice page instead of the posting page
+    expected: Sent to a person when reviewed; the cases need updating
   T10:
     what: Services/PercentCompleteBilling.cs and BillingHelper.PercentCompleteAmount are not reachable from any page
     expected: Listed as dead code; no test proposed

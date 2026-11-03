@@ -83,6 +83,12 @@ Each phase ends with a gate: a working build and passing checks, then your revie
 | **5. Screens and evidence** | Area card, coverage map, risk card, generated tests, proof chain, flaky triage, pull request with full evidence, gap list and pack, scorecard with the RFP measures | Full journey works end to end. Scenes load in under 2 seconds. No critical accessibility issues |
 | **6. Stage readiness** | Presenter console, fallback recordings, rehearsal test, demo video, product-wording review | A clean rehearsal run, and a 3 to 4 minute video in the Artizent format |
 
+Phase 3 as built:
+- **Batch:** 9 manual cases, the 4 untested rounding defects from the BR-04 risk card, and the approved hidden rule.
+- **Intake:** T4 goes to a person and T5 asks for a result. For T8, 48229 merges into 48208, and the existing BR-12 test already covers both, so no new test is written and both cases can be retired.
+- **Generated tests:** one per remaining source, 10 in all.
+- **Test data:** a project allows only one open proposal, so each test must own its project. Four October projects were added to the seed: P-1021, P-1051, P-1071 and P-1133. Without them, F04d (tax on the unrounded line) could not show on any seeded data.
+
 Biggest risk: **Phase 1.** The module has to feel like real legacy code and behave deterministically under faults, while staying fast enough for 20 runs per test. Build speed matters too: test runs are pre-computed, but one live fault run must finish in seconds.
 
 ## 6. What needs people

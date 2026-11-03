@@ -1,0 +1,1010 @@
+# Test data catalogue: the seeded test environment, as loaded on every reset.
+# Written by qe/tools/export_test_data.py from the lab's seed database. Do not edit by hand.
+business_date: '2026-10-30'
+company:
+  name: Kestrel Consulting Oy
+  currency: EUR
+  country: FI
+roles:
+  ARCH:
+    name: Solution architect
+    standard_rate: 185
+  CONS:
+    name: Consultant
+    standard_rate: 120
+  DEV:
+    name: Developer
+    standard_rate: 110
+  JUN:
+    name: Junior consultant
+    standard_rate: 85
+  MGR:
+    name: Project manager
+    standard_rate: 165
+  SNR:
+    name: Senior consultant
+    standard_rate: 150
+employees:
+  Aino Makela: ARCH
+  Juha Niemi: SNR
+  Laura Koskinen: CONS
+  Petri Heikkinen: DEV
+  Emma Lindqvist: JUN
+  Oskari Rantanen: MGR
+  Sara Holm: SNR
+  Ville Korhonen: CONS
+  Noora Salo: DEV
+  Henrik Dahl: CONS
+  Elina Virta: JUN
+  Timo Lehto: SNR
+tax_codes:
+  E:
+    description: health and social care services
+    rate_percent: 0
+    exempt: true
+  R1:
+    description: Reduced rate
+    rate_percent: 14
+    exempt: false
+  R2:
+    description: Reduced rate
+    rate_percent: 10
+    exempt: false
+  S:
+    description: Standard rate
+    rate_percent: 25.5
+    exempt: false
+  Z:
+    description: Outside the scope of Finnish VAT (services to non-EU businesses)
+    rate_percent: 0
+    exempt: false
+exchange_rates_from_eur:
+- currency: CHF
+  effective: '2026-11-01'
+  rate: 0.9312
+- currency: GBP
+  effective: '2026-09-01'
+  rate: 0.8571
+- currency: GBP
+  effective: '2026-10-01'
+  rate: 0.8642
+- currency: JPY
+  effective: '2026-09-01'
+  rate: 161.77
+- currency: JPY
+  effective: '2026-10-01'
+  rate: 162.37
+- currency: NOK
+  effective: '2026-09-01'
+  rate: 11.66
+- currency: NOK
+  effective: '2026-10-01'
+  rate: 11.683
+- currency: SEK
+  effective: '2026-09-01'
+  rate: 11.4012
+- currency: SEK
+  effective: '2026-10-01'
+  rate: 11.47
+- currency: USD
+  effective: '2026-09-01'
+  rate: 1.0831
+- currency: USD
+  effective: '2026-10-01'
+  rate: 1.0835
+customers:
+  C100:
+    name: Halden Group Oy
+    currency: EUR
+    country: FI
+    vat_number: FI12345678
+    business: true
+    payment_terms_days: 30
+    agreement_discount_percent: 0
+    po_required: false
+    on_hold: null
+    agreed_rates:
+      SNR: 140
+      ARCH: 175
+  C110:
+    name: Brightwater Utilities Ltd
+    currency: GBP
+    country: GB
+    vat_number: GB123456789
+    business: true
+    payment_terms_days: 45
+    agreement_discount_percent: 0
+    po_required: false
+    on_hold: null
+    agreed_rates: {}
+  C120:
+    name: Norrsken Energi AB
+    currency: SEK
+    country: SE
+    vat_number: SE556677889901
+    business: true
+    payment_terms_days: 30
+    agreement_discount_percent: 0
+    po_required: true
+    on_hold: null
+    agreed_rates: {}
+  C130:
+    name: Vestfold Shipping AS
+    currency: NOK
+    country: 'NO'
+    vat_number: NO987654321MVA
+    business: true
+    payment_terms_days: 30
+    agreement_discount_percent: 0
+    po_required: false
+    on_hold: null
+    agreed_rates: {}
+  C140:
+    name: Meridian Health Services Oy
+    currency: EUR
+    country: FI
+    vat_number: FI23456789
+    business: true
+    payment_terms_days: 14
+    agreement_discount_percent: 0
+    po_required: false
+    on_hold: null
+    agreed_rates: {}
+  C150:
+    name: Atlas Retail GmbH
+    currency: EUR
+    country: DE
+    vat_number: DE811234567
+    business: true
+    payment_terms_days: 30
+    agreement_discount_percent: 0
+    po_required: false
+    on_hold: null
+    agreed_rates: {}
+  C160:
+    name: Lumo Design GmbH
+    currency: EUR
+    country: DE
+    vat_number: null
+    business: true
+    payment_terms_days: 30
+    agreement_discount_percent: 0
+    po_required: false
+    on_hold: null
+    agreed_rates: {}
+  C170:
+    name: Sakura Components KK
+    currency: JPY
+    country: JP
+    vat_number: null
+    business: true
+    payment_terms_days: 60
+    agreement_discount_percent: 0
+    po_required: false
+    on_hold: null
+    agreed_rates: {}
+  C180:
+    name: Pacific Freight Inc
+    currency: USD
+    country: US
+    vat_number: null
+    business: true
+    payment_terms_days: 30
+    agreement_discount_percent: 0
+    po_required: false
+    on_hold: null
+    agreed_rates: {}
+  C190:
+    name: Alpine Precision AG
+    currency: CHF
+    country: CH
+    vat_number: CHE-123.456.789
+    business: true
+    payment_terms_days: 30
+    agreement_discount_percent: 0
+    po_required: false
+    on_hold: null
+    agreed_rates: {}
+  C200:
+    name: Koivula Municipality
+    currency: EUR
+    country: FI
+    vat_number: null
+    business: false
+    payment_terms_days: 21
+    agreement_discount_percent: 0
+    po_required: true
+    on_hold: null
+    agreed_rates: {}
+  C210:
+    name: Ostra Logistics Oy
+    currency: EUR
+    country: FI
+    vat_number: FI34567890
+    business: true
+    payment_terms_days: 30
+    agreement_discount_percent: 0
+    po_required: false
+    on_hold: Disputed invoices, see case 4471.
+    agreed_rates: {}
+  C220:
+    name: Polar Marine Oy
+    currency: USD
+    country: FI
+    vat_number: FI45678901
+    business: true
+    payment_terms_days: 30
+    agreement_discount_percent: 0
+    po_required: false
+    on_hold: null
+    agreed_rates: {}
+projects:
+  P-1001:
+    name: Halden ERP rollout
+    customer: C100
+    billing_type: Time and materials
+    status: Active
+    tax_code: S
+    expense_markup_percent: 10
+    not_to_exceed_eur: null
+    on_hold: null
+    project_rates: {}
+    unbilled_time:
+    - date: '2026-10-05'
+      employee: Laura Koskinen
+      role: CONS
+      hours: 7.5
+      activity: CONS
+      comment: null
+      status: Approved
+      billable: true
+    - date: '2026-10-12'
+      employee: Juha Niemi
+      role: SNR
+      hours: 6
+      activity: WORKSHOP
+      comment: null
+      status: Approved
+      billable: true
+    - date: '2026-10-20'
+      employee: Laura Koskinen
+      role: CONS
+      hours: 4
+      activity: CONS
+      comment: null
+      status: Draft
+      billable: true
+    - date: '2026-10-29'
+      employee: Juha Niemi
+      role: SNR
+      hours: 3
+      activity: CONS
+      comment: null
+      status: Submitted
+      billable: true
+    - date: '2026-10-30'
+      employee: Oskari Rantanen
+      role: MGR
+      hours: 2
+      activity: ADMIN
+      comment: null
+      status: Approved
+      billable: false
+    - date: '2026-10-31'
+      employee: Juha Niemi
+      role: SNR
+      hours: 1.5
+      activity: CONS
+      comment: Cutover check
+      status: Approved
+      billable: true
+    - date: '2026-11-02'
+      employee: Laura Koskinen
+      role: CONS
+      hours: 5
+      activity: CONS
+      comment: null
+      status: Approved
+      billable: true
+    unbilled_expenses: []
+    milestones: []
+  P-1002:
+    name: Halden data platform
+    customer: C100
+    billing_type: Time and materials
+    status: Active
+    tax_code: S
+    expense_markup_percent: 0
+    not_to_exceed_eur: null
+    on_hold: null
+    project_rates: {}
+    unbilled_time:
+    - date: '2026-10-06'
+      employee: Petri Heikkinen
+      role: DEV
+      hours: 8
+      activity: BUILD
+      comment: null
+      status: Approved
+      billable: true
+    - date: '2026-10-15'
+      employee: Ville Korhonen
+      role: CONS
+      hours: 6
+      activity: CONS
+      comment: null
+      status: Approved
+      billable: true
+    unbilled_expenses:
+    - date: '2026-10-15'
+      description: Train Helsinki - Tampere return
+      cost: 120
+      status: Approved
+      billable: 1
+    milestones: []
+  P-1003:
+    name: Halden support retainer
+    customer: C100
+    billing_type: Time and materials
+    status: Active
+    tax_code: S
+    expense_markup_percent: 0
+    not_to_exceed_eur: null
+    on_hold: null
+    project_rates:
+      SNR: 155
+      MGR: 170
+    unbilled_time:
+    - date: '2026-10-07'
+      employee: Sara Holm
+      role: SNR
+      hours: 4
+      activity: CONS
+      comment: null
+      status: Approved
+      billable: true
+    - date: '2026-10-08'
+      employee: Oskari Rantanen
+      role: MGR
+      hours: 2
+      activity: ADMIN
+      comment: null
+      status: Approved
+      billable: true
+    - date: '2026-10-09'
+      employee: Emma Lindqvist
+      role: JUN
+      hours: 8
+      activity: TEST
+      comment: null
+      status: Approved
+      billable: true
+    unbilled_expenses: []
+    milestones: []
+  P-1010:
+    name: Brightwater asset survey
+    customer: C110
+    billing_type: Time and materials
+    status: Active
+    tax_code: Z
+    expense_markup_percent: 0
+    not_to_exceed_eur: null
+    on_hold: null
+    project_rates: {}
+    unbilled_time:
+    - date: '2026-09-25'
+      employee: Henrik Dahl
+      role: CONS
+      hours: 7.5
+      activity: CONS
+      comment: null
+      status: Approved
+      billable: false
+    - date: '2026-10-13'
+      employee: Henrik Dahl
+      role: CONS
+      hours: 7
+      activity: ANALYSIS
+      comment: null
+      status: Approved
+      billable: true
+    unbilled_expenses: []
+    milestones: []
+  P-1011:
+    name: Brightwater network study
+    customer: C110
+    billing_type: Time and materials
+    status: Active
+    tax_code: Z
+    expense_markup_percent: 0
+    not_to_exceed_eur: null
+    on_hold: Scope change under review.
+    project_rates: {}
+    unbilled_time:
+    - date: '2026-10-14'
+      employee: Henrik Dahl
+      role: CONS
+      hours: 6
+      activity: ANALYSIS
+      comment: null
+      status: Approved
+      billable: true
+    unbilled_expenses: []
+    milestones: []
+  P-1020:
+    name: Norrsken grid analytics
+    customer: C120
+    billing_type: Time and materials
+    status: Active
+    tax_code: S
+    expense_markup_percent: 0
+    not_to_exceed_eur: null
+    on_hold: null
+    project_rates: {}
+    unbilled_time:
+    - date: '2026-10-01'
+      employee: Sara Holm
+      role: SNR
+      hours: 0.25
+      activity: CONS
+      comment: Call with grid operator
+      status: Approved
+      billable: true
+    - date: '2026-10-02'
+      employee: Sara Holm
+      role: SNR
+      hours: 0.25
+      activity: CONS
+      comment: Call with grid operator
+      status: Approved
+      billable: true
+    - date: '2026-10-05'
+      employee: Laura Koskinen
+      role: CONS
+      hours: 7.5
+      activity: ANALYSIS
+      comment: null
+      status: Approved
+      billable: true
+    unbilled_expenses: []
+    milestones: []
+  P-1021:
+    name: Norrsken substation study
+    customer: C120
+    billing_type: Time and materials
+    status: Active
+    tax_code: S
+    expense_markup_percent: 0
+    not_to_exceed_eur: null
+    on_hold: null
+    project_rates: {}
+    unbilled_time:
+    - date: '2026-10-06'
+      employee: Aino Makela
+      role: ARCH
+      hours: 0.75
+      activity: CONS
+      comment: Substation data review
+      status: Approved
+      billable: true
+    - date: '2026-10-20'
+      employee: Aino Makela
+      role: ARCH
+      hours: 1.75
+      activity: ANALYSIS
+      comment: null
+      status: Approved
+      billable: true
+    unbilled_expenses: []
+    milestones: []
+  P-1030:
+    name: Vestfold fleet optimisation
+    customer: C130
+    billing_type: Time and materials
+    status: Active
+    tax_code: Z
+    expense_markup_percent: 15
+    not_to_exceed_eur: null
+    on_hold: null
+    project_rates: {}
+    unbilled_time:
+    - date: '2026-10-22'
+      employee: Timo Lehto
+      role: SNR
+      hours: 6
+      activity: WORKSHOP
+      comment: null
+      status: Approved
+      billable: true
+    unbilled_expenses: []
+    milestones: []
+  P-1040:
+    name: Meridian clinical scheduling
+    customer: C140
+    billing_type: Time and materials
+    status: Active
+    tax_code: E
+    expense_markup_percent: 12
+    not_to_exceed_eur: null
+    on_hold: null
+    project_rates: {}
+    unbilled_time:
+    - date: '2026-09-18'
+      employee: Ville Korhonen
+      role: CONS
+      hours: 6
+      activity: ANALYSIS
+      comment: null
+      status: Rejected
+      billable: true
+    - date: '2026-10-21'
+      employee: Ville Korhonen
+      role: CONS
+      hours: 6
+      activity: CONS
+      comment: null
+      status: Approved
+      billable: true
+    unbilled_expenses:
+    - date: '2026-10-21'
+      description: Hotel Oulu, two nights
+      cost: 250
+      status: Approved
+      billable: 1
+    milestones: []
+  P-1050:
+    name: Atlas store analytics
+    customer: C150
+    billing_type: Time and materials
+    status: Active
+    tax_code: S
+    expense_markup_percent: 0
+    not_to_exceed_eur: null
+    on_hold: null
+    project_rates: {}
+    unbilled_time:
+    - date: '2026-10-14'
+      employee: Noora Salo
+      role: DEV
+      hours: 5
+      activity: BUILD
+      comment: null
+      status: Approved
+      billable: true
+    unbilled_expenses: []
+    milestones: []
+  P-1051:
+    name: Atlas loyalty programme
+    customer: C150
+    billing_type: Time and materials
+    status: Active
+    tax_code: S
+    expense_markup_percent: 0
+    not_to_exceed_eur: null
+    on_hold: null
+    project_rates: {}
+    unbilled_time:
+    - date: '2026-10-13'
+      employee: Sara Holm
+      role: SNR
+      hours: 8
+      activity: WORKSHOP
+      comment: null
+      status: Approved
+      billable: true
+    - date: '2026-10-14'
+      employee: Laura Koskinen
+      role: CONS
+      hours: 6
+      activity: CONS
+      comment: null
+      status: Approved
+      billable: true
+    unbilled_expenses: []
+    milestones: []
+  P-1060:
+    name: Lumo brand system
+    customer: C160
+    billing_type: Time and materials
+    status: Active
+    tax_code: S
+    expense_markup_percent: 0
+    not_to_exceed_eur: null
+    on_hold: null
+    project_rates: {}
+    unbilled_time:
+    - date: '2026-10-19'
+      employee: Laura Koskinen
+      role: CONS
+      hours: 3
+      activity: CONS
+      comment: null
+      status: Approved
+      billable: true
+    unbilled_expenses: []
+    milestones: []
+  P-1070:
+    name: Sakura supplier portal
+    customer: C170
+    billing_type: Time and materials
+    status: Active
+    tax_code: Z
+    expense_markup_percent: 0
+    not_to_exceed_eur: null
+    on_hold: null
+    project_rates: {}
+    unbilled_time:
+    - date: '2026-09-15'
+      employee: Laura Koskinen
+      role: CONS
+      hours: 2
+      activity: TEST
+      comment: null
+      status: Rejected
+      billable: true
+    - date: '2026-10-07'
+      employee: Laura Koskinen
+      role: CONS
+      hours: 0.25
+      activity: CONS
+      comment: Supplier call
+      status: Approved
+      billable: true
+    - date: '2026-10-08'
+      employee: Noora Salo
+      role: DEV
+      hours: 8
+      activity: BUILD
+      comment: null
+      status: Approved
+      billable: true
+    unbilled_expenses: []
+    milestones: []
+  P-1071:
+    name: Sakura quality dashboard
+    customer: C170
+    billing_type: Time and materials
+    status: Active
+    tax_code: Z
+    expense_markup_percent: 0
+    not_to_exceed_eur: null
+    on_hold: null
+    project_rates: {}
+    unbilled_time:
+    - date: '2026-10-15'
+      employee: Laura Koskinen
+      role: CONS
+      hours: 1
+      activity: CONS
+      comment: Defect triage with supplier
+      status: Approved
+      billable: true
+    unbilled_expenses: []
+    milestones: []
+  P-1080:
+    name: Pacific freight tracking
+    customer: C180
+    billing_type: Fixed price
+    status: Active
+    tax_code: Z
+    expense_markup_percent: 0
+    not_to_exceed_eur: null
+    on_hold: null
+    project_rates: {}
+    unbilled_time:
+    - date: '2026-09-04'
+      employee: Noora Salo
+      role: DEV
+      hours: 7.5
+      activity: WORKSHOP
+      comment: null
+      status: Approved
+      billable: true
+    - date: '2026-09-04'
+      employee: Petri Heikkinen
+      role: DEV
+      hours: 7.5
+      activity: CONS
+      comment: null
+      status: Approved
+      billable: true
+    - date: '2026-09-08'
+      employee: Aino Makela
+      role: ARCH
+      hours: 3.5
+      activity: BUILD
+      comment: null
+      status: Approved
+      billable: true
+    - date: '2026-09-23'
+      employee: Aino Makela
+      role: ARCH
+      hours: 2
+      activity: BUILD
+      comment: null
+      status: Approved
+      billable: true
+    - date: '2026-09-24'
+      employee: Noora Salo
+      role: DEV
+      hours: 4
+      activity: CONS
+      comment: null
+      status: Approved
+      billable: true
+    - date: '2026-10-12'
+      employee: Petri Heikkinen
+      role: DEV
+      hours: 8
+      activity: BUILD
+      comment: null
+      status: Approved
+      billable: true
+    - date: '2026-10-13'
+      employee: Noora Salo
+      role: DEV
+      hours: 8
+      activity: BUILD
+      comment: null
+      status: Approved
+      billable: true
+    unbilled_expenses: []
+    milestones:
+    - name: Discovery
+      amount: 12000
+      planned: '2026-06-30'
+      complete: 1
+      completed_on: '2026-06-26'
+      billed: 1
+    - name: Solution design
+      amount: 18000
+      planned: '2026-10-15'
+      complete: 1
+      completed_on: '2026-10-16'
+      billed: 0
+    - name: Build and test
+      amount: 30000
+      planned: '2026-12-18'
+      complete: 0
+      completed_on: null
+      billed: 0
+    - name: Go-live support
+      amount: 10000
+      planned: '2027-02-26'
+      complete: 0
+      completed_on: null
+      billed: 0
+  P-1081:
+    name: Pacific customs integration
+    customer: C180
+    billing_type: Time and materials
+    status: Active
+    tax_code: Z
+    expense_markup_percent: 0
+    not_to_exceed_eur: null
+    on_hold: null
+    project_rates:
+      ARCH: 195
+    unbilled_time:
+    - date: '2026-10-26'
+      employee: Aino Makela
+      role: ARCH
+      hours: 4
+      activity: ANALYSIS
+      comment: null
+      status: Approved
+      billable: true
+    unbilled_expenses: []
+    milestones: []
+  P-1090:
+    name: Alpine MES upgrade
+    customer: C190
+    billing_type: Time and materials
+    status: Active
+    tax_code: Z
+    expense_markup_percent: 0
+    not_to_exceed_eur: null
+    on_hold: null
+    project_rates: {}
+    unbilled_time:
+    - date: '2026-10-20'
+      employee: Aino Makela
+      role: ARCH
+      hours: 6
+      activity: WORKSHOP
+      comment: null
+      status: Approved
+      billable: true
+    unbilled_expenses: []
+    milestones: []
+  P-1100:
+    name: Koivula citizen services
+    customer: C200
+    billing_type: Time and materials
+    status: Active
+    tax_code: S
+    expense_markup_percent: 0
+    not_to_exceed_eur: 20000
+    on_hold: null
+    project_rates: {}
+    unbilled_time:
+    - date: '2026-10-06'
+      employee: Laura Koskinen
+      role: CONS
+      hours: 7.5
+      activity: CONS
+      comment: null
+      status: Approved
+      billable: true
+    - date: '2026-10-07'
+      employee: Juha Niemi
+      role: SNR
+      hours: 6
+      activity: CONS
+      comment: null
+      status: Approved
+      billable: true
+    - date: '2026-10-08'
+      employee: Aino Makela
+      role: ARCH
+      hours: 2
+      activity: ANALYSIS
+      comment: null
+      status: Approved
+      billable: true
+    unbilled_expenses: []
+    milestones: []
+  P-1101:
+    name: Koivula permit system
+    customer: C200
+    billing_type: Fixed price
+    status: Active
+    tax_code: S
+    expense_markup_percent: 0
+    not_to_exceed_eur: null
+    on_hold: null
+    project_rates: {}
+    unbilled_time: []
+    unbilled_expenses: []
+    milestones:
+    - name: Requirements sign-off
+      amount: 8000
+      planned: '2026-09-30'
+      complete: 1
+      completed_on: '2026-10-09'
+      billed: 0
+    - name: Pilot release
+      amount: 14000
+      planned: '2026-12-11'
+      complete: 0
+      completed_on: null
+      billed: 0
+  P-1120:
+    name: Ostra warehouse WMS
+    customer: C210
+    billing_type: Time and materials
+    status: Active
+    tax_code: S
+    expense_markup_percent: 0
+    not_to_exceed_eur: null
+    on_hold: null
+    project_rates: {}
+    unbilled_time:
+    - date: '2026-10-09'
+      employee: Ville Korhonen
+      role: CONS
+      hours: 7.5
+      activity: CONS
+      comment: null
+      status: Approved
+      billable: true
+    unbilled_expenses: []
+    milestones: []
+  P-1130:
+    name: Polar vessel reporting
+    customer: C220
+    billing_type: Time and materials
+    status: Active
+    tax_code: S
+    expense_markup_percent: 0
+    not_to_exceed_eur: null
+    on_hold: null
+    project_rates: {}
+    unbilled_time:
+    - date: '2026-09-29'
+      employee: Juha Niemi
+      role: SNR
+      hours: 8
+      activity: WORKSHOP
+      comment: null
+      status: Approved
+      billable: false
+    - date: '2026-10-12'
+      employee: Juha Niemi
+      role: SNR
+      hours: 8
+      activity: ANALYSIS
+      comment: null
+      status: Approved
+      billable: true
+    - date: '2026-10-13'
+      employee: Laura Koskinen
+      role: CONS
+      hours: 8
+      activity: CONS
+      comment: null
+      status: Approved
+      billable: true
+    - date: '2026-10-14'
+      employee: Laura Koskinen
+      role: CONS
+      hours: 2.1
+      activity: CONS
+      comment: Report review
+      status: Approved
+      billable: true
+    unbilled_expenses: []
+    milestones: []
+  P-1131:
+    name: Polar crew app fixes
+    customer: C220
+    billing_type: Time and materials
+    status: Active
+    tax_code: S
+    expense_markup_percent: 0
+    not_to_exceed_eur: null
+    on_hold: null
+    project_rates: {}
+    unbilled_time:
+    - date: '2026-10-09'
+      employee: Emma Lindqvist
+      role: JUN
+      hours: 0.5
+      activity: TEST
+      comment: null
+      status: Approved
+      billable: true
+    unbilled_expenses: []
+    milestones: []
+  P-1132:
+    name: Polar legacy closeout
+    customer: C220
+    billing_type: Time and materials
+    status: Closing
+    tax_code: S
+    expense_markup_percent: 0
+    not_to_exceed_eur: null
+    on_hold: null
+    project_rates: {}
+    unbilled_time:
+    - date: '2026-10-09'
+      employee: Emma Lindqvist
+      role: JUN
+      hours: 0.5
+      activity: ADMIN
+      comment: null
+      status: Approved
+      billable: true
+    unbilled_expenses: []
+    milestones: []
+  P-1133:
+    name: Polar fleet dashboard
+    customer: C220
+    billing_type: Time and materials
+    status: Active
+    tax_code: S
+    expense_markup_percent: 0
+    not_to_exceed_eur: null
+    on_hold: null
+    project_rates: {}
+    unbilled_time:
+    - date: '2026-10-16'
+      employee: Emma Lindqvist
+      role: JUN
+      hours: 1
+      activity: TEST
+      comment: null
+      status: Approved
+      billable: true
+    unbilled_expenses: []
+    milestones: []

@@ -1,7 +1,7 @@
-"""Builds the billing module once as it is and once per seeded fault.
+"""Builds the billing module once as it is, once per seeded fault and once per upcoming release.
 
-Each fault is applied to its own copy of the source, so a build is exactly one fault away from
-the baseline. Output: /builds/baseline and /builds/<fault id>, each a published app.
+Each change is applied to its own copy of the source, so a build is exactly one change away from
+the baseline. Output: /builds/baseline and /builds/<id>, each a published app.
 """
 
 import shutil
@@ -51,8 +51,9 @@ def publish(name: str, root: Path) -> str:
 
 def main() -> None:
     faults = yaml.safe_load(Path("/work/faults/faults.yaml").read_text(encoding="utf-8"))["faults"]
+    releases = yaml.safe_load(Path("/work/faults/releases.yaml").read_text(encoding="utf-8"))["releases"]
     jobs = [("baseline", SOURCE)]
-    for fault in faults:
+    for fault in faults + releases:
         root = VARIANTS / fault["id"]
         shutil.copytree(SOURCE, root, ignore=shutil.ignore_patterns("bin", "obj"))
         apply(fault, root)

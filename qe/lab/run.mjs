@@ -4,7 +4,8 @@
 //   node run.mjs --builds all --workers 1 --confirm 5   the fault check: a catch must fail on 5 fresh runs
 //   node run.mjs --serve baseline --port 5280            serve one build for people to use
 //
-// Options: --tests <dir> (default /estate/tests/e2e), --grep <pattern>, --workers <n>, --out <file.jsonl>
+// Options: --tests <dir> (default /estate/tests/e2e), --overlay <dir> (candidate files laid over the
+// suite), --grep <pattern>, --workers <n>, --out <file.jsonl>
 import { spawn } from 'node:child_process';
 import { copyFileSync, cpSync, existsSync, mkdirSync, readdirSync, readFileSync, rmSync, symlinkSync, appendFileSync } from 'node:fs';
 import { join } from 'node:path';
@@ -52,6 +53,8 @@ function suiteCopy(name) {
   const dir = `/tmp/suites/${name}`;
   rmSync(dir, { recursive: true, force: true });
   cpSync(tests, dir, { recursive: true, filter: (src) => !src.includes('node_modules') && !src.includes('test-results') });
+  // Candidate tests and their test data, laid out like the suite, go over the copy.
+  if (args.overlay) cpSync(args.overlay, dir, { recursive: true, filter: (src) => !src.endsWith('manifest.json') });
   symlinkSync('/lab/tests/node_modules', join(dir, 'node_modules'));
   return dir;
 }
@@ -70,6 +73,9 @@ function collect(report) {
           status: { expected: 'passed', unexpected: 'failed', flaky: 'flaky', skipped: 'skipped' }[t.status] ?? t.status,
           attempts: results.length,
           durationMs: results.reduce((sum, r) => sum + (r.duration ?? 0), 0),
+          // When and where the last attempt ran, so overlapping tests can be found afterwards.
+          started: last?.startTime ?? null,
+          worker: last?.workerIndex ?? null,
           error: error ? error.replace(/\u001b\[[0-9;]*m/g, '').split('\n').slice(0, 6).join('\n') : null,
           trace: results.flatMap((r) => r.attachments ?? []).find((a) => a.name === 'trace')?.path ?? null,
         });
@@ -152,7 +158,7 @@ async function main() {
 
   const available = readdirSync(BUILDS).sort();
   const builds = !args.builds || args.builds === 'all'
-    ? available.filter((b) => b !== 'baseline' || !args.builds)
+    ? available.filter((b) => (b !== 'baseline' || !args.builds) && !b.startsWith('release-'))
     : args.builds.split(',');
   for (const b of builds) if (!existsSync(join(BUILDS, b))) throw new Error(`no build called ${b}`);
 

@@ -22,4 +22,8 @@ qe/history/repo/
 qe/lab/results/*
 !qe/lab/results/baseline-20.jsonl
 !qe/lab/results/fault-check.jsonl
+!qe/lab/results/proof/
+!qe/lab/results/maintenance/
+qe/estate/test-data/*.db
 *.tsbuildinfo
+qe/generated/*.log

@@ -1,0 +1,150 @@
+{
+  "input_hash": "b5d38defe8146d495ce458a564e000d346a7e25a6aa5538cde85fb9c02e5a2af",
+  "source": "live_model",
+  "model": "claude-opus-5-5",
+  "duration_ms": 20348,
+  "output": {
+    "checks": [
+      {
+        "check": "Exchange rate",
+        "expected": "11.4700 (the SEK rate effective from 1 Oct 2026, the latest on or before the invoice date of 31 Oct 2026). The four-decimal display is inferred from the EUR example of 1.0000; the material does not show a SEK rate on a proposal.",
+        "basis": [
+          {
+            "document": "Test data catalogue",
+            "find": "customer: C120"
+          },
+          {
+            "document": "Test data catalogue",
+            "find": "name: Norrsken Energi AB"
+          },
+          {
+            "document": "Test data catalogue",
+            "find": "rate: 11.47"
+          },
+          {
+            "document": "Help page 17-currencies-and-exchange-rates.md",
+            "find": "An invoice uses the latest rate whose **Effective from** date is on or before its **Invoice date**."
+          },
+          {
+            "document": "Help page 14-what-a-proposal-contains.md",
+            "find": "EUR invoices show 1.0000."
+          }
+        ]
+      },
+      {
+        "check": "Line 1 entry date",
+        "expected": "2026-10-06",
+        "basis": [
+          {
+            "document": "Test data catalogue",
+            "find": "date: '2026-10-06'"
+          },
+          {
+            "document": "Help page 11-billable-time-and-expenses.md",
+            "find": "Each time entry becomes one line. The **Description** is the date"
+          },
+          {
+            "document": "Help page 11-billable-time-and-expenses.md",
+            "find": "Time lines are listed first, in date order."
+          }
+        ]
+      },
+      {
+        "check": "Line 2 entry date",
+        "expected": "2026-10-20",
+        "basis": [
+          {
+            "document": "Test data catalogue",
+            "find": "date: '2026-10-20'"
+          },
+          {
+            "document": "Help page 11-billable-time-and-expenses.md",
+            "find": "Time lines are listed first, in date order."
+          }
+        ]
+      },
+      {
+        "check": "Line 1 adjustment",
+        "expected": "+0.75",
+        "basis": [
+          {
+            "document": "Help page 19-write-ups-and-write-downs.md",
+            "find": "column shows the amount with a + or"
+          },
+          {
+            "document": "Help page 17-currencies-and-exchange-rates.md",
+            "find": "The **Unit price (EUR)** and **Adjustment (EUR)** columns on a proposal always stay in EUR."
+          }
+        ]
+      },
+      {
+        "check": "Line 2 adjustment",
+        "expected": "+1.75",
+        "basis": [
+          {
+            "document": "Help page 19-write-ups-and-write-downs.md",
+            "find": "column shows the amount with a + or"
+          },
+          {
+            "document": "Help page 17-currencies-and-exchange-rates.md",
+            "find": "The **Unit price (EUR)** and **Adjustment (EUR)** columns on a proposal always stay in EUR."
+          }
+        ]
+      },
+      {
+        "check": "Line 1 amount",
+        "expected": "1,600.07 (0.75 h × 185.00 = 138.75 EUR, +0.75 = 139.50 EUR, × 11.47 = 1,600.065 SEK, rounded half away from zero)",
+        "basis": [
+          {
+            "document": "Test data catalogue",
+            "find": "hours: 0.75"
+          },
+          {
+            "document": "Test data catalogue",
+            "find": "standard_rate: 185"
+          },
+          {
+            "document": "Help page 18-rounding.md",
+            "find": "takes the line's EUR value, including any write-up or write-down,"
+          },
+          {
+            "document": "Help page 18-rounding.md",
+            "find": "Amounts exactly halfway are rounded away from zero."
+          }
+        ]
+      },
+      {
+        "check": "Line 2 amount",
+        "expected": "3,733.49 (1.75 h × 185.00 = 323.75 EUR, +1.75 = 325.50 EUR, × 11.47 = 3,733.485 SEK, rounded half away from zero)",
+        "basis": [
+          {
+            "document": "Test data catalogue",
+            "find": "hours: 1.75"
+          },
+          {
+            "document": "Test data catalogue",
+            "find": "standard_rate: 185"
+          },
+          {
+            "document": "Help page 18-rounding.md",
+            "find": "Amounts exactly halfway are rounded away from zero."
+          }
+        ]
+      },
+      {
+        "check": "Subtotal",
+        "expected": "5,333.56 (1,600.07 + 3,733.49)",
+        "basis": [
+          {
+            "document": "Help page 18-rounding.md",
+            "find": "**Subtotal** is the sum of the rounded line amounts,"
+          },
+          {
+            "document": "Help page 18-rounding.md",
+            "find": "The totals are never converted or rounded separately."
+          }
+        ]
+      }
+    ]
+  }
+}

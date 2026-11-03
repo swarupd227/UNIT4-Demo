@@ -22,6 +22,10 @@
     "qe:lab": "docker compose -f docker-compose.qe.yml run --rm lab",
     "qe:verify": "docker compose -f docker-compose.qe.yml run --rm --no-deps qe-api sh -c \"cd /workspace && python -m qe.tools.verify --lab\"",
     "qe:test:api": "docker compose -f docker-compose.qe.yml run --rm qe-api pytest",
-    "qe:record": "docker compose -f docker-compose.qe.yml exec -w /workspace qe-api python -m qe.engines.agents.record"
+    "qe:record": "docker compose -f docker-compose.qe.yml exec -w /workspace qe-api python -m qe.engines.agents.record",
+    "qe:generate": "docker compose -f docker-compose.qe.yml exec -w /workspace qe-api python -m qe.engines.agents.generate",
+    "qe:prove": "node qe/lab/prove.mjs",
+    "qe:maintain": "docker compose -f docker-compose.qe.yml exec -w /workspace qe-api python -m qe.engines.agents.maintain",
+    "qe:maintain-lab": "node qe/lab/maintain.mjs"
   }
 }

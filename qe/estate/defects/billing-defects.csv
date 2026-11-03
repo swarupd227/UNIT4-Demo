@@ -3,402 +3,402 @@ ID,Work Item Type,Title,State,Severity,Priority,Created Date,Closed Date,Area Pa
 2. Create a proposal for October with the approved hotel expense of 250.00 EUR.
 3. Look at the expense line.
 Expected: 280.00
-Actual: 3,250.00",The markup was stored as a fraction (0.12) in 4.0 and the migration converted it to a percentage (12). ExpenseWithMarkup still multiplied by the value directly. It now divides by 100.,191de5f36c58be8c219891c2b1b33f8018aa2295,Manual test case updated
+Actual: 3,250.00",The markup was stored as a fraction (0.12) in 4.0 and the migration converted it to a percentage (12). ExpenseWithMarkup still multiplied by the value directly. It now divides by 100.,275e283c8c58731832d241ade72cf167ea986a21,Manual test case updated
 1003,Bug,No VAT on invoices to Finnish customers,Closed,1 - Critical,1,11/8/2023 9:24:00 AM,11/8/2023 12:58:00 PM,Finance\Project Billing,4.0.0,Hanna Koskinen,Tuomas Aalto,"1. Create a proposal for any Finnish business customer with a VAT number (for example Halden, P-1001).
 2. Look at the tax column.
 Expected: S 24%
-Actual: RC with 0.00 tax and the reverse charge note","IsReverseCharge treated every EU business customer with a VAT number as reverse charged, including customers in Finland. It now also checks that the customer's country differs from the company's.",88ce9dd551acdc4e5dee03d03258dd67650da1ee,Manual test case updated
+Actual: RC with 0.00 tax and the reverse charge note","IsReverseCharge treated every EU business customer with a VAT number as reverse charged, including customers in Finland. It now also checks that the customer's country differs from the company's.",9e4ff322363a16695a110ea14363c7df35afdf9c,Manual test case updated
 1004,Bug,Due date one day earlier than the payment terms,Closed,3 - Medium,2,11/13/2023 10:28:00 AM,11/14/2023 12:41:00 PM,Finance\Project Billing,4.0.0,Lars Eriksson,Tuomas Aalto,"1. Finalise an invoice dated 31 Oct for a customer with 30 day terms.
 Expected: due 30 Nov
-Actual: due 29 Nov","DueDate subtracted a day from the terms (carried over from the 4.0 report logic, which counted the invoice date as day one).",76163507909fb4cdac70ab59a650044376c41b90,
+Actual: due 29 Nov","DueDate subtracted a day from the terms (carried over from the 4.0 report logic, which counted the invoice date as day one).",ed0a77128940b7b89ad8ef403c49eb82a5dbd7ab,
 1006,Bug,Amounts shown without thousand separators,Closed,4 - Low,3,11/16/2023 9:51:00 AM,11/17/2023 11:29:00 AM,Finance\Project Billing,4.0.0,Anna Virtanen,Jonas Berg,"1. Open any invoice over 1,000 EUR.
 Expected: 2,447.25 EUR
-Actual: 2447.25 EUR","FormatMoney and FormatAmount now use the #,##0.00 pattern.",b51d5e67397fc2b8db3998815c8db8ece5cf777d,
+Actual: 2447.25 EUR","FormatMoney and FormatAmount now use the #,##0.00 pattern.",d193a81db2546a793660b2d65278e380c9667c04,
 1007,Bug,Non-billable internal time appears on customer invoices,Closed,2 - High,1,11/20/2023 8:39:00 AM,11/21/2023 2:38:00 PM,Finance\Project Billing,4.0.0,Sofia Berg,Mikael Strand,"1. On P-1001, record 2 h of internal time with Billable unticked and approve it.
 2. Create a proposal for the period.
 Expected: the internal time is not on the proposal
-Actual: it is billed at the consultant's rate",The time entry query in CreateProposal did not filter on Billable. Added the condition.,ccc3f61ee99cea0c3ed4ab8e7fac15985da20551,Manual test case updated
+Actual: it is billed at the consultant's rate",The time entry query in CreateProposal did not filter on Billable. Added the condition.,c8457d19c202266d61f08e5f5b5e87055e01c183,Manual test case updated
 1009,Bug,Credit note numbers not padded like invoice numbers,Closed,3 - Medium,2,11/23/2023 10:09:00 AM,11/24/2023 1:00:00 PM,Finance\Project Billing,4.0.0,Lars Eriksson,Mikael Strand,"1. Issue a credit note.
 Expected: CN-000004
-Actual: CN-4",The credit note branch in NumberingService did not format the number. Both sequences now use six digits.,b17e7a420b256f1ad4fa5a5c43500b31634f83e9,Manual test case updated
+Actual: CN-4",The credit note branch in NumberingService did not format the number. Both sequences now use six digits.,69b1d81b30c100158d4ab68a12c5ae22c3d0acf8,Manual test case updated
 1010,Bug,Error when crediting an invoice migrated from 4.0,Closed,2 - High,1,11/28/2023 9:03:00 AM,11/29/2023 11:37:00 AM,Finance\Project Billing,4.0.0,Lars Eriksson,Mikael Strand,"1. Open invoice INV-000112 (migrated from TFS, EUR, no exchange rate stored).
 2. Create credit note, enter 100.00 on line 1, give a reason and issue.
 Expected: credit note issued
-Actual: error page (Nullable object must have a value)",Invoices migrated from 4.0 have no exchange rate. The credit line now keeps the amount as the company-currency value when the rate is missing or zero.,10429293ae8aa9b654998da62aea8db595f0f12e,Manual test case updated
+Actual: error page (Nullable object must have a value)",Invoices migrated from 4.0 have no exchange rate. The credit line now keeps the amount as the company-currency value when the rate is missing or zero.,ad6d1baf737f3ba724af1c6fb106f81b2409d70d,Manual test case updated
 1012,Bug,Final invoice can be deleted,Closed,1 - Critical,1,12/4/2023 10:13:00 AM,12/4/2023 3:34:00 PM,Finance\Project Billing,4.0.0,Mikko Laine,Mikael Strand,"1. Finalise a proposal.
 2. Open /Proposals/Edit/<id> for the invoice from the browser history and press Delete proposal.
 Expected: refused
-Actual: the invoice is deleted and its time goes back to unbilled",ProposalService.Delete did not check the status. A final invoice is now refused with a pointer to credit notes.,1300b33115a474fbd60f26a571b3ec2d932761e6,Manual test case updated
+Actual: the invoice is deleted and its time goes back to unbilled",ProposalService.Delete did not check the status. A final invoice is now refused with a pointer to credit notes.,8b93911c87e009f54211f8c702f10d15b7ac78a4,Manual test case updated
 1013,Bug,UK customers reverse charged after Brexit,Closed,2 - High,1,12/7/2023 9:59:00 AM,12/11/2023 11:36:00 AM,Finance\Project Billing,4.0.0,Hanna Koskinen,Tuomas Aalto,"1. Create a proposal for Brightline Ltd (GB, VAT number GB...).
 Expected: no reverse charge note, export treatment as configured
-Actual: RC and the EU reverse charge wording",The country list came from 4.0 and still had GB. Removed.,9d8ccbb33785e35fbd9d8168552f5a3e921800fa,Manual test case updated
+Actual: RC and the EU reverse charge wording",The country list came from 4.0 and still had GB. Removed.,79f9f04e559cbd83d1c84e85d6caaaa1b6f1297e,Manual test case updated
 1015,Bug,Empty brackets after time line descriptions,Closed,4 - Low,3,12/12/2023 9:50:00 AM,12/13/2023 11:38:00 AM,Finance\Project Billing,4.0.0,Anna Virtanen,Jonas Berg,"1. Create a proposal where a time entry has no comment.
 Expected: 2023-11-02 Pekka Salo - CONS
-Actual: 2023-11-02 Pekka Salo - CONS ()",The comment is only added when there is one.,6be1b13aba380f37d70b84a3c59117d2fc1b0f0e,
+Actual: 2023-11-02 Pekka Salo - CONS ()",The comment is only added when there is one.,01c470f891f0ef6367595c668b1deb467d332740,
 1018,Bug,VAT not updated after a write-up,Closed,2 - High,1,12/19/2023 8:10:00 AM,12/20/2023 11:09:00 AM,Finance\Project Billing,4.0.0,Anna Virtanen,Tuomas Aalto,"1. On a proposal, write line 1 up by 100.00 with a reason.
 Expected: tax on line 1 rises by 24.00
-Actual: amount changes, tax stays the same",Recalculate passed the unadjusted source amount to the tax calculation. Amount and tax now use the same adjusted value.,d79a4c9280718f962baeafc5b28c3b59c3ee4145,Manual test case updated
+Actual: amount changes, tax stays the same",Recalculate passed the unadjusted source amount to the tax calculation. Amount and tax now use the same adjusted value.,957ec3189cba0b57e681dcade1e71d21b52ba79a,Manual test case updated
 1020,Bug,Halden billed at rate card instead of agreed rate,Closed,2 - High,1,1/8/2024 9:10:00 AM,1/9/2024 1:23:00 PM,Finance\Project Billing,4.0.0,Sofia Berg,Mikael Strand,"1. Create a proposal for P-1003 (Halden support retainer).
 2. Look at senior consultant time.
 Expected: 140.00 (Halden agreement)
-Actual: 155.00 (project rate card)","ResolveRate looked at the project rate card first. The customer agreement is now checked first, as in the contract terms.",622dca0345297f001b3ee2e1af7245effecff68c,Manual test case updated
+Actual: 155.00 (project rate card)","ResolveRate looked at the project rate card first. The customer agreement is now checked first, as in the contract terms.",c6f28473b359503b15980f583e252cca14c7e895,Manual test case updated
 1021,Bug,Private customer invoiced without VAT,Closed,3 - Medium,2,1/10/2024 10:59:00 AM,1/12/2024 11:15:00 AM,Finance\Project Billing,4.0.0,Hanna Koskinen,Tuomas Aalto,"1. Create a proposal for a private customer in Sweden that has a personal tax number entered in the VAT field.
 Expected: Finnish VAT
-Actual: reverse charge",Reverse charge applies to business customers only. IsReverseCharge now checks IsBusiness first.,1ef4069b20fdbde79d730d17be67d16c331b233e,Manual test case updated
+Actual: reverse charge",Reverse charge applies to business customers only. IsReverseCharge now checks IsBusiness first.,dcfb847ce9b62edfe63435fdc0e51f45f75b7b10,Manual test case updated
 1023,Bug,Submitted time billed before the project manager approved it,Closed,2 - High,1,1/16/2024 8:50:00 AM,1/17/2024 4:34:00 PM,Finance\Project Billing,4.1.0,Sofia Berg,Mikael Strand,"1. On P-1001, submit 4 h for the period but do not approve it.
 2. Create a proposal.
 Expected: the submitted entry is not billed
-Actual: it is on the proposal","The query excluded rejected entries only, so draft and submitted entries were billed. It now takes approved entries only.",61da2d382a9826cfbc5580b142259487218aaca6,Manual test case updated
+Actual: it is on the proposal","The query excluded rejected entries only, so draft and submitted entries were billed. It now takes approved entries only.",c3306734ef3c288b3d0c5e5745c05548d5dfabfe,Manual test case updated
 1026,Bug,Billing hold message does not say which customer,Closed,4 - Low,3,1/22/2024 8:16:00 AM,1/22/2024 11:50:00 AM,Finance\Project Billing,4.1.0,Anna Virtanen,Jonas Berg,"1. Put Ostra Logistics on hold with a reason.
 2. Create a proposal for P-1120.
 Expected: Billing hold: customer Ostra Logistics Oy is on hold. <reason>
-Actual: Customer C140 is on billing hold.",The message now gives the customer name and the hold reason.,df200156560bf48dcc448728ea4beb5b9bc09820,
+Actual: Customer C140 is on billing hold.",The message now gives the customer name and the hold reason.,6c50771e84345751c6a66a33b5d31fd2dd9eef90,
 1027,Bug,Ledger rejects invoices with long PO numbers,Closed,3 - Medium,2,1/24/2024 9:45:00 AM,1/25/2024 3:21:00 PM,Finance\Project Billing,4.1.0,Lars Eriksson,Mikael Strand,"1. Enter a 40 character purchase order number on a proposal and finalise.
 Expected: validation message
-Actual: invoice finalised, ledger posting fails overnight",The ledger PO field is 30 characters. IsValidPoNumber now rejects longer values.,01245c115eb59ea386abfaf6211600a29974dbad,Manual test case updated
+Actual: invoice finalised, ledger posting fails overnight",The ledger PO field is 30 characters. IsValidPoNumber now rejects longer values.,56095463ec918b7bc8aadcd292fd5b7070e358b2,Manual test case updated
 1029,Bug,Fixed-price milestone billed again the next month,Closed,2 - High,1,1/30/2024 10:24:00 AM,2/1/2024 4:50:00 PM,Finance\Project Billing,4.1.0,Mikko Laine,Mikael Strand,"1. P-1080: bill the completed milestone Solution design in January and finalise.
 2. Create the February proposal.
 Expected: no milestone line
-Actual: Solution design billed again","Finalise now records the invoice on each milestone it bills, and proposals skip milestones that already have an invoice.",537231347efd097dd50cf852069a7e98ad662463,Manual test case updated
+Actual: Solution design billed again","Finalise now records the invoice on each milestone it bills, and proposals skip milestones that already have an invoice.",3b9a29155e78e8fbbf9708fab52f4ef182982200,Manual test case updated
 1030,Bug,Header shows the calendar date instead of the business date,Closed,3 - Medium,2,2/1/2024 10:44:00 AM,2/2/2024 4:53:00 PM,Finance\Project Billing,4.1.0,Anna Virtanen,Jonas Berg,"1. Set Billing:BusinessDate to 2024-01-31 during the January run.
 2. Look at the header on 1 Feb.
 Expected: Business date 31 Jan 2024
-Actual: 1 Feb 2024",The layout used DateTime.Today. It now reads the SystemClock like the rest of the application.,dce9760cecb473c3152c189a938d09d0809d9dfa,Manual test case updated
+Actual: 1 Feb 2024",The layout used DateTime.Today. It now reads the SystemClock like the rest of the application.,6de511e8948f8d4aad0c9a698f31164ec781f3ba,Manual test case updated
 1032,Bug,Two invoices got the same number,Closed,1 - Critical,1,2/6/2024 9:38:00 AM,2/7/2024 2:24:00 PM,Finance\Project Billing,4.1.0,Lars Eriksson,Mikael Strand,"1. Two billing clerks finalise proposals at the same moment (seen in the January run: INV-000041 twice).
 Expected: consecutive numbers
-Actual: duplicate number",NumberingService read and incremented the counter without a lock. Allocation is now serialised and the company row is reloaded before use.,0453aae430ff6770f5a7e98f8d92e2c99e443555,Manual test case updated
+Actual: duplicate number",NumberingService read and incremented the counter without a lock. Allocation is now serialised and the company row is reloaded before use.,68688703e9220bd727dfb5a6ee39f38fdfa450fe,Manual test case updated
 1033,Bug,Due date counted from the day of finalising,Closed,3 - Medium,2,2/8/2024 9:46:00 AM,2/9/2024 11:38:00 AM,Finance\Project Billing,4.1.0,Lars Eriksson,Tuomas Aalto,"1. Create a proposal with invoice date 31 Jan, finalise it on 2 Feb.
 Expected: due 1 Mar (31 Jan + 30)
-Actual: due 3 Mar",Finalise passed the business date to DueDate. It now passes the invoice date.,aceef5e1bad430bfd26c4a9ec2b7591fe3d83dbc,Manual test case updated
+Actual: due 3 Mar",Finalise passed the business date to DueDate. It now passes the invoice date.,3667fc1272c17002987d8f712da6cb5f88509f1d,Manual test case updated
 1035,Bug,Credit note can be issued without a reason,Closed,3 - Medium,2,2/13/2024 9:15:00 AM,2/14/2024 2:31:00 PM,Finance\Project Billing,4.1.0,Mikko Laine,Mikael Strand,"1. Open a final invoice, Create credit note.
 2. Enter 50.00 on line 1, leave Reason empty, issue.
 Expected: Enter a reason for the credit note.
-Actual: credit note issued with the note 'Credit for invoice INV-000057. '","A reason is now required, and it is trimmed before it goes on the credit note.",eeef766b5523cce77c6ce86a67dda0915399fee7,Manual test case updated
+Actual: credit note issued with the note 'Credit for invoice INV-000057. '","A reason is now required, and it is trimmed before it goes on the credit note.",41531b5bcc8f9096d42bd3cddb862508ffdc398f,Manual test case updated
 1038,Bug,Period end shown as 28 February in a leap year,Closed,2 - High,1,2/29/2024 9:04:00 AM,2/29/2024 11:23:00 AM,Finance\Project Billing,4.1.0,Anna Virtanen,Jonas Berg,"1. Open New proposal on 29 Feb 2024.
 Expected: period end 2024-02-29
-Actual: 2024-02-28, and time entered on the 29th is left out",EndOfMonth had a fixed table of month lengths. It now uses DateTime.DaysInMonth.,13d2464132de794911cab5e5061b2dc915a1c43c,Manual test case updated
+Actual: 2024-02-28, and time entered on the 29th is left out",EndOfMonth had a fixed table of month lengths. It now uses DateTime.DaysInMonth.,b5d4f1501dfb9d3612f3ae0eeb2150d4cd28aedb,Manual test case updated
 1039,Bug,"Invoice date defaults to the business date, not the period end",Closed,3 - Medium,2,3/4/2024 10:35:00 AM,3/5/2024 3:25:00 PM,Finance\Project Billing,4.1.0,Anna Virtanen,Jonas Berg,"1. On 4 March, open New proposal.
 Expected: period end 2024-03-31, invoice date 2024-03-31
-Actual: invoice date 2024-03-04, which then fails 'The invoice date cannot be before the period end'",The page defaults the invoice date to the period end.,18204a17016ba0966dd11d772f17ca0a39a9ab95,
+Actual: invoice date 2024-03-04, which then fails 'The invoice date cannot be before the period end'",The page defaults the invoice date to the period end.,d87c53ffafa1b2099ba1222c586f5dca047970ac,
 1041,Bug,Missing exchange rate silently treated as 1.0,Closed,2 - High,1,3/7/2024 8:12:00 AM,3/8/2024 1:03:00 PM,Finance\Project Billing,4.1.0,Hanna Koskinen,Mikael Strand,"1. Delete the SEK rate for March (or create a proposal before it is entered).
 2. Create a proposal for a SEK customer.
 Expected: a clear warning that the rate is missing
-Actual: SEK amounts equal to the EUR amounts, no warning","The proposal keeps an empty rate instead of 1.0, the page shows a warning banner and 'Missing' in the rate field.",355f6b961b430dc661ae073509526ff36e541323,Manual test case updated
+Actual: SEK amounts equal to the EUR amounts, no warning","The proposal keeps an empty rate instead of 1.0, the page shows a warning banner and 'Missing' in the rate field.",7009588fe8dea0db1a4b236c941f3b497d6440a8,Manual test case updated
 1042,Bug,Invoice export fails when credit notes are in the list,Closed,3 - Medium,2,3/11/2024 10:57:00 AM,3/12/2024 11:37:00 AM,Finance\Project Billing,4.1.0,Lars Eriksson,Jonas Berg,"1. Invoices, search for Lumo, press Export.
 Expected: CSV file
-Actual: error page",Credit notes have no due date. The export now leaves the field empty.,54e0ed08cbcb771f77401c13041eaa05d6ff1b1e,
+Actual: error page",Credit notes have no due date. The export now leaves the field empty.,7108ac9f067c0cdaa48233225ae428d04d3dae24,
 1044,Bug,Amounts with a thousand separator are rejected,Closed,3 - Medium,2,3/14/2024 9:46:00 AM,3/14/2024 2:06:00 PM,Finance\Project Billing,4.1.0,Anna Virtanen,Jonas Berg,"1. On a credit note, enter 1,480.00 for line 1.
 Expected: accepted
-Actual: '1,480.00' is not a valid amount.",ParseMoney removes spaces and commas before parsing.,1543870d5162636cec71512016b14971cab4e177,Manual test case updated
+Actual: '1,480.00' is not a valid amount.",ParseMoney removes spaces and commas before parsing.,36a50bbfdd60101bf6917a4d57330f6d4775e1d3,Manual test case updated
 1046,Bug,Invoice line 0.5 cent amounts round down to even,Closed,2 - High,1,3/18/2024 10:29:00 AM,3/19/2024 1:05:00 PM,Finance\Project Billing,4.1.0,Hanna Koskinen,Tuomas Aalto,"1. Create a proposal for a SEK customer where a line converts to 1,234.565 SEK.
 Expected: 1,234.57
-Actual: 1,234.56 (and 1,234.575 gives 1,234.58)","Math.Round defaults to banker's rounding. RoundMoney now rounds half away from zero, as finance and the customer's AP systems expect.",80eb863c269ec028cba4ee36e830ae97e9a06c29,Manual test case updated
+Actual: 1,234.56 (and 1,234.575 gives 1,234.58)","Math.Round defaults to banker's rounding. RoundMoney now rounds half away from zero, as finance and the customer's AP systems expect.",acd3aaa22ae859c1a79becc6bd806c248a6bed3f,Manual test case updated
 1047,Bug,Reverse charge note lacks the legal reference,Closed,3 - Medium,2,3/21/2024 9:50:00 AM,3/22/2024 2:18:00 PM,Finance\Project Billing,4.1.0,Hanna Koskinen,Tuomas Aalto,"1. Create a proposal for Atlas (DE, VAT number).
 Expected: wording with the directive article, as required by the German customer's AP
-Actual: 'Reverse charge.'",The note now carries the full wording.,1ea60055f39a5e83170e10cf22f49b6c409328a7,Manual test case updated
+Actual: 'Reverse charge.'",The note now carries the full wording.,d59f40d3f0c6f9680293ecdee191839f1777aaf0,Manual test case updated
 1049,Bug,April exchange rate used on March invoices,Closed,2 - High,1,3/26/2024 10:42:00 AM,3/27/2024 3:54:00 PM,Finance\Project Billing,4.1.0,Hanna Koskinen,Tuomas Aalto,"1. Enter the GBP rate effective 1 April on 26 March.
 2. Create a March proposal for a GBP customer.
 Expected: the March rate
-Actual: the April rate",GetRate took the newest rate regardless of its effective date. It now takes the latest rate on or before the date.,4ea9d972a7b0e40518728ceac1a55598d8152dfb,Manual test case updated
+Actual: the April rate",GetRate took the newest rate regardless of its effective date. It now takes the latest rate on or before the date.,24bf446dfa341a8d3da33efd2de5fd1360c555ce,Manual test case updated
 1050,Bug,Invoice quantity shows recorded hours but bills quarter hours,Closed,3 - Medium,2,3/28/2024 9:43:00 AM,4/2/2024 4:06:00 PM,Finance\Project Billing,4.1.0,Sofia Berg,Mikael Strand,"1. Record 1.10 h on P-1001 and create a proposal.
 Expected: quantity 1.25, amount 1.25 x rate
-Actual: quantity 1.10, amount 1.25 x rate, so the line does not add up",The line quantity is now the rounded hours that are billed.,3c3643189a4051c991899ece944696ae50ea0649,Manual test case updated
+Actual: quantity 1.10, amount 1.25 x rate, so the line does not add up",The line quantity is now the rounded hours that are billed.,80ca32d50c70259aec292ccda76d1733005463b6,Manual test case updated
 1052,Bug,Credit note dated in the original invoice's period,Closed,3 - Medium,2,4/3/2024 8:58:00 AM,4/4/2024 11:05:00 AM,Finance\Project Billing,4.1.0,Lars Eriksson,Mikael Strand,"1. Credit a January invoice in April.
 Expected: credit note dated in April
-Actual: dated in January, a closed ledger period, posting fails",Credit notes take the business date as their invoice date.,930700cee1163364c1bc6c452a8303f02247eb88,Manual test case updated
+Actual: dated in January, a closed ledger period, posting fails",Credit notes take the business date as their invoice date.,42926c98af62c39d43484e13ce9b83d60824c00d,Manual test case updated
 1053,Bug,User switch redirects to any address in returnUrl,Closed,2 - High,1,4/5/2024 8:45:00 AM,4/5/2024 10:27:00 AM,Finance\Project Billing,4.1.0,Priya Nair,Jonas Berg,"1. POST /User/Switch with returnUrl=https://example.org.
 Expected: back to the home page
-Actual: redirected to the external site",The switch uses LocalRedirect and falls back to the home page for anything not local.,44987a7573bc774671ddd922aa52f078b8ff9242,Manual test case updated
+Actual: redirected to the external site",The switch uses LocalRedirect and falls back to the home page for anything not local.,91bc7484072a63c1fe5c18feee6ff7eedb44d284,Manual test case updated
 1055,Bug,Expenses stay reserved after a proposal is deleted,Closed,2 - High,1,4/11/2024 8:43:00 AM,4/12/2024 2:22:00 PM,Finance\Project Billing,4.2.0,Anna Virtanen,Mikael Strand,"1. Create a proposal for P-1040 with an expense line, delete the proposal.
 2. Create the proposal again.
 Expected: the expense is on it
-Actual: time is back, the expense is missing",Delete released time entries only. It now releases expenses too.,817b08e74d62fe2a71b38aef8eefc402b96efcc1,Manual test case updated
+Actual: time is back, the expense is missing",Delete released time entries only. It now releases expenses too.,8657998d211d242b35b1797adc34cf5a8c5340e0,Manual test case updated
 1056,Bug,Agreement discount of 150% accepted,Closed,3 - Medium,2,4/16/2024 9:10:00 AM,4/17/2024 11:11:00 AM,Finance\Project Billing,4.2.0,Mikko Laine,Jonas Berg,"1. Customers, open C100, enter 150 as discount and save.
 Expected: rejected
-Actual: saved, next proposal has negative time lines","The discount must be between 0 and 50%, the maximum in the price policy.",7cb4ebe0137a8f463365cdc1295d3da5461561a2,Manual test case updated
+Actual: saved, next proposal has negative time lines","The discount must be between 0 and 50%, the maximum in the price policy.",8179395ce4ed8023c6c305cffb4231b913e470d2,Manual test case updated
 1058,Bug,PO of a single space accepted for PO customers,Closed,3 - Medium,2,4/22/2024 8:48:00 AM,4/23/2024 12:25:00 PM,Finance\Project Billing,4.2.0,Lars Eriksson,Mikael Strand,"1. Meridian requires a PO. Enter a space as PO number and finalise.
 Expected: A purchase order number is required
-Actual: finalised, customer rejects the invoice",Finalise now uses IsValidPoNumber instead of an empty check.,23d01a7a419913ca2eeb2e9d498d1081014ab93d,Manual test case updated
+Actual: finalised, customer rejects the invoice",Finalise now uses IsValidPoNumber instead of an empty check.,61f04cd9f75c8456b0627797853ca5f4d18192b0,Manual test case updated
 1059,Bug,Correcting a rate adds a second rate for the same day,Closed,3 - Medium,2,4/25/2024 10:19:00 AM,4/26/2024 4:02:00 PM,Finance\Project Billing,4.2.0,Hanna Koskinen,Tuomas Aalto,"1. Exchange rates, save SEK 11.40 effective 2024-04-01, then save 11.45 for the same date.
 Expected: one rate, 11.45
-Actual: two rates, invoices pick either",Saving a rate for a date that already has one now updates it.,cd6279e6ec9a2f598c44f4ab73ed657c60570cc7,Manual test case updated
+Actual: two rates, invoices pick either",Saving a rate for a date that already has one now updates it.,e3fb1c2e2504f3b8490a8872c4c7343b6115f19a,Manual test case updated
 1061,Bug,Final invoice of a closing project deferred as too small,Closed,3 - Medium,2,5/6/2024 9:07:00 AM,5/7/2024 3:08:00 PM,Finance\Project Billing,4.2.0,Sofia Berg,Mikael Strand,"1. Set P-1090 to Closing with 30.00 EUR of unbilled time.
 2. Create a proposal.
 Expected: proposal for 30.00
-Actual: deferred, and the project cannot be closed",A closing project gets its last invoice regardless of the minimum.,226f8028d032da23d8f39452611dc3663c0cd6ea,Manual test case updated
+Actual: deferred, and the project cannot be closed",A closing project gets its last invoice regardless of the minimum.,0d1a859b90e9bddb3d41738051c666a91e45a096,Manual test case updated
 1062,Bug,Amounts wrap onto two lines in narrow columns,Closed,4 - Low,3,5/8/2024 10:14:00 AM,5/8/2024 2:14:00 PM,Finance\Project Billing,4.2.0,Anna Virtanen,Jonas Berg,"1. Open a proposal on a laptop screen.
 Expected: 1,234.50 EUR on one line
-Actual: currency code wraps under the amount",Number cells no longer wrap.,449de3772da55464eb9b89a1cad33bf5b03b0732,
+Actual: currency code wraps under the amount",Number cells no longer wrap.,42f6db6252d261a366528684250653f4a7751a40,
 1063,Bug,Converted amounts off by a cent on large SEK invoices,Closed,2 - High,1,5/13/2024 9:51:00 AM,5/14/2024 2:18:00 PM,Finance\Project Billing,4.2.0,Hanna Koskinen,Mikael Strand,"1. Create a proposal for Nordvik (SEK) with a line of 12,345.67 EUR at rate 11.4523.
 Expected: 141,385.32 SEK
-Actual: 141,385.31 SEK","Convert went through double, which loses precision. It now multiplies in decimal.",4bca4ea94197d6d35a7c6cd76bb57d334da5870e,Manual test case updated
+Actual: 141,385.31 SEK","Convert went through double, which loses precision. It now multiplies in decimal.",7ac9da49478e4a275e208b2f9bfd11fc5e2dd0e1,Manual test case updated
 1064,Bug,June expenses billed on the May invoice,Closed,2 - High,1,5/16/2024 8:26:00 AM,5/17/2024 4:19:00 PM,Finance\Project Billing,4.2.0,Sofia Berg,Mikael Strand,"1. Approve an expense dated 3 June on P-1040.
 2. Create a proposal with period end 31 May.
 Expected: not included
-Actual: included",The expense query had no period end condition. Added.,a62107b18df79767c905d3f20fb00b978cc195ec,Manual test case updated
+Actual: included",The expense query had no period end condition. Added.,0bdb5bd5c4defc9fff8dd0671998e74b348e5077,Manual test case updated
 1066,Bug,Due date equals invoice date for customers without terms,Closed,3 - Medium,2,5/21/2024 8:48:00 AM,5/22/2024 12:45:00 PM,Finance\Project Billing,4.2.0,Lars Eriksson,Tuomas Aalto,"1. Customer C170 has payment terms 0 (not set in the migration).
 2. Finalise an invoice.
 Expected: due 30 days after the invoice date
-Actual: due on the invoice date",Customers without payment terms get the 30 day default.,54dc490aa5a253805203b3a7fef07d2f0c4298aa,Manual test case updated
+Actual: due on the invoice date",Customers without payment terms get the 30 day default.,6e989d12ef0a6ed88171bc27c534d08c1492eaa1,Manual test case updated
 1068,Bug,Deferred proposal can be finalised,Closed,3 - Medium,2,5/27/2024 8:21:00 AM,5/28/2024 1:06:00 PM,Finance\Project Billing,4.2.0,Mikko Laine,Mikael Strand,"1. Create a proposal under 50 EUR (deferred).
 2. Post to the Finalise handler of that proposal.
 Expected: refused
-Actual: invoice for 12.00 EUR finalised",Finalise refuses deferred proposals.,a736ee277658f5fcf8c788e97473150a93ad5e11,
+Actual: invoice for 12.00 EUR finalised",Finalise refuses deferred proposals.,fbabe52f40f0dfd776c8ef1aedb4122c94262817,
 1069,Bug,Milestone completed on the last day not billed,Closed,2 - High,1,5/29/2024 8:58:00 AM,5/30/2024 11:06:00 AM,Finance\Project Billing,4.2.0,Sofia Berg,Jonas Berg,"1. During the May run (business date 31 May), on 3 June mark a P-1080 milestone complete.
 2. Create the May proposal.
 Expected: the milestone is billed
-Actual: it is completed on 3 June, after the period end, and left out",Mark complete now uses the business date.,a2425bae1ad2ec8923feb4e2715e7e58fc1df999,Manual test case updated
+Actual: it is completed on 3 June, after the period end, and left out",Mark complete now uses the business date.,546c91787a5b91923ca3c283f87657c673742d88,Manual test case updated
 1071,Bug,Negative credit amount increases what the customer owes,Closed,2 - High,1,6/4/2024 9:43:00 AM,6/5/2024 2:30:00 PM,Finance\Project Billing,4.2.0,Lars Eriksson,Mikael Strand,"1. Create a credit note and enter -100 on line 1.
 Expected: rejected
-Actual: a credit note with a positive amount is issued",Credit amounts must be positive.,3d3a5016ed9821813d07c2104b0b3c8c72a898b3,Manual test case updated
+Actual: a credit note with a positive amount is issued",Credit amounts must be positive.,85b851e6652fe726fa7fb0688eeca68eedb50d0e,Manual test case updated
 1073,Bug,Still open to credit shows more than the invoice total,Closed,2 - High,1,6/18/2024 8:40:00 AM,6/19/2024 2:51:00 PM,Finance\Project Billing,4.2.0,Lars Eriksson,Priya Nair,"1. Open INV-000291 (already credited by CN-000013) and press Create credit note.
 Expected: Still open to credit 1,857.40 EUR
-Actual: 4,116.40 EUR","Credit note totals are negative, so subtracting them added to the open amount. CreditedSoFar now sums absolute values.",ffaca797c70e3de4dde81e5e2232c72adfee4b8c,Automated test: tests/e2e/specs/invoicing/credit-notes.spec.ts
+Actual: 4,116.40 EUR","Credit note totals are negative, so subtracting them added to the open amount. CreditedSoFar now sums absolute values.",a652f55f8d83e8f403ac53b522563b001288d2cd,Automated test: tests/e2e/specs/invoicing/credit-notes.spec.ts
 1074,Bug,Milestone billed before it was complete,Closed,2 - High,1,6/20/2024 8:53:00 AM,6/24/2024 3:43:00 PM,Finance\Project Billing,4.2.0,Sofia Berg,Mikael Strand,"1. P-1080: a milestone planned for 15 June is not complete yet.
 2. Create the June proposal.
 Expected: not billed
-Actual: billed because its planned date has passed",4.0 billed milestones on their planned date. Only completed milestones are billed now.,a56d3125abf52728f3350100e373e9265c263df8,Manual test case updated
+Actual: billed because its planned date has passed",4.0 billed milestones on their planned date. Only completed milestones are billed now.,da9b49e5e08f0ecf7f030dea52e25718aebe5529,Manual test case updated
 1076,Bug,Finalise button shown on a final invoice,Closed,3 - Medium,2,6/25/2024 9:17:00 AM,6/26/2024 1:50:00 PM,Finance\Project Billing,4.2.0,Anna Virtanen,Priya Nair,"1. Open /Proposals/Edit/<id> for a final invoice.
 Expected: locked banner, no Finalise or Delete buttons
-Actual: both buttons shown (they fail with an error)",The action buttons are only rendered for open proposals.,325a2db2bfe9d245b591a88f345731b563b44ae6,Automated test: tests/e2e/specs/invoicing/locked.spec.ts
+Actual: both buttons shown (they fail with an error)",The action buttons are only rendered for open proposals.,a0c0bc8cdbd0deb269967d4ecfa48c8507682d50,Automated test: tests/e2e/specs/invoicing/locked.spec.ts
 1077,Bug,Agreement discount taken off expenses,Closed,2 - High,1,6/27/2024 9:06:00 AM,6/28/2024 12:57:00 PM,Finance\Project Billing,4.2.0,Mikko Laine,Tuomas Aalto,"1. Set a 10% discount on Halden (C100).
 2. Create a proposal for P-1002.
 Expected: time lines discounted, expense line 120.00
-Actual: expense line 108.00",ApplyDiscount ignored the line kind. It now discounts time lines only.,8b19585e5553fb5b6600dd5d75aa6fd590ead8b1,Automated test: tests/e2e/specs/pricing/discount.spec.ts
+Actual: expense line 108.00",ApplyDiscount ignored the line kind. It now discounts time lines only.,9cc645f27b159c1c74e87836faa8b2395734adf1,Automated test: tests/e2e/specs/pricing/discount.spec.ts
 1079,Bug,Credit notes take numbers from the invoice sequence,Closed,2 - High,1,7/2/2024 9:02:00 AM,7/3/2024 11:54:00 AM,Finance\Project Billing,4.3.0,Lars Eriksson,Mikael Strand,"1. Issue a credit note.
 Expected: CN-000014
-Actual: INV-000188, and the next invoice skips a number",CreateAsync asked for an invoice number. It now uses the credit note sequence.,d95777a911b8bef1e0672d27f88b8225fc1974b7,Automated test: tests/e2e/specs/invoicing/numbering.spec.ts
+Actual: INV-000188, and the next invoice skips a number",CreateAsync asked for an invoice number. It now uses the credit note sequence.,cfe76daf3a4ff79491d63470673a1ab75f176489,Automated test: tests/e2e/specs/invoicing/numbering.spec.ts
 1080,Bug,Reverse charge applied to EU customer without a VAT number,Closed,2 - High,1,7/4/2024 9:07:00 AM,7/5/2024 4:53:00 PM,Finance\Project Billing,4.3.0,Hanna Koskinen,Tuomas Aalto,"1. Create a proposal for P-1060 (Lumo, DE, no VAT number on file).
 Expected: Finnish VAT
-Actual: RC, no VAT",Without a VAT number the customer cannot account for the VAT. IsReverseCharge now requires one.,431aa228a2f03b22882e980d90aecd4445c97f63,Automated test: tests/e2e/specs/pricing/tax.spec.ts
+Actual: RC, no VAT",Without a VAT number the customer cannot account for the VAT. IsReverseCharge now requires one.,04af283777f462a22185dd752562032f918d324c,Automated test: tests/e2e/specs/pricing/tax.spec.ts
 1082,Bug,Proposal totals shown under the adjustment column,Closed,4 - Low,3,7/9/2024 10:36:00 AM,7/10/2024 2:25:00 PM,Finance\Project Billing,4.3.0,Anna Virtanen,Jonas Berg,"1. Open any proposal.
 Expected: Subtotal, Tax and Total under Amount
-Actual: one column to the left",The footer colspan did not count the Adjustment column.,5c55d32f8059afa7044668f85faac97fcd944127,
+Actual: one column to the left",The footer colspan did not count the Adjustment column.,8f0205e9601c3055cb661f540f09aebd8dbac3da,
 1084,Bug,Gaps in invoice numbers after deleting proposals,Closed,2 - High,1,7/11/2024 9:55:00 AM,7/12/2024 11:08:00 AM,Finance\Project Billing,4.3.0,Lars Eriksson,Mikael Strand,"1. Create a proposal (number INV-000190 shown), delete it.
 2. Create and finalise another.
 Expected: INV-000190
-Actual: INV-000191, the auditors flagged the gap","Proposals took a number when they were created. The number is now given when the invoice is finalised, and the proposal shows 'Assigned when finalised'.",08cf877f732c0ae887ede4d338aff2e07c27f9b5,Automated test: tests/e2e/specs/invoicing/numbering.spec.ts
+Actual: INV-000191, the auditors flagged the gap","Proposals took a number when they were created. The number is now given when the invoice is finalised, and the proposal shows 'Assigned when finalised'.",071f2cd915e8873fd4999d2118c12a9f6a449b9a,Automated test: tests/e2e/specs/invoicing/numbering.spec.ts
 1085,Bug,Project on billing hold still invoiced,Closed,2 - High,1,7/16/2024 10:54:00 AM,7/17/2024 1:40:00 PM,Finance\Project Billing,4.3.0,Mikko Laine,Mikael Strand,"1. Put P-1011 on billing hold (disputed hours).
 2. Create a proposal for it.
 Expected: Billing hold: project P-1011 is on hold.
-Actual: proposal created",Only the customer hold was checked. The project hold is checked too.,2b9a7dd72aabb4b8cce96829982dc9f96987fcd7,Automated test: tests/e2e/specs/proposals/holds.spec.ts
+Actual: proposal created",Only the customer hold was checked. The project hold is checked too.,2723606e840ef122d86092ff78332f434bbf0fef,Automated test: tests/e2e/specs/proposals/holds.spec.ts
 1087,Bug,Write-down can take a line below zero,Closed,3 - Medium,2,7/18/2024 10:21:00 AM,7/19/2024 2:11:00 PM,Finance\Project Billing,4.3.0,Anna Virtanen,Mikael Strand,"1. Write line 1 (500.00) down by 600.00 with a reason.
 Expected: refused
-Actual: line -100.00",A write-down cannot be larger than the line.,776e71542db99c3dda6e992de2322293a1044544,Manual test case updated
+Actual: line -100.00",A write-down cannot be larger than the line.,564fc4c46a38c28ac4ce12062c4ce202b41103ef,Manual test case updated
 1088,Bug,Credit note one cent short of the invoice line,Closed,2 - High,1,7/22/2024 8:48:00 AM,7/23/2024 11:02:00 AM,Finance\Project Billing,4.3.0,Lars Eriksson,Tuomas Aalto,"1. Credit 99.995 GBP equivalent on a GBP invoice line (full credit of a converted line).
 Expected: -100.00
-Actual: -99.99, leaving 0.01 open on the invoice",CreditAmount truncated to two decimals. It now uses the same rounding as invoice lines.,4856d56c5608b1acec2152b2dafd0b2a885a21af,Manual test case updated
+Actual: -99.99, leaving 0.01 open on the invoice",CreditAmount truncated to two decimals. It now uses the same rounding as invoice lines.,63bbf6abd694694a0fe59066101296be552b61d3,Manual test case updated
 1090,Bug,Reverse charge note missing from the proposal,Closed,3 - Medium,2,7/30/2024 9:37:00 AM,7/31/2024 12:13:00 PM,Finance\Project Billing,4.3.0,Hanna Koskinen,Priya Nair,"1. Create a proposal for Atlas (P-1050).
 Expected: the reverse charge note under the header
-Actual: no note; it only appears on the PDF",The note from the tax result is now stored on the invoice when the proposal is created.,7a5382dcd86b5ad322110d7a576d07cf778d67d3,Automated test: tests/e2e/specs/pricing/tax.spec.ts
+Actual: no note; it only appears on the PDF",The note from the tax result is now stored on the invoice when the proposal is created.,4d66a6267ecb0db2cf4a40029a847ed3c4a5c939,Automated test: tests/e2e/specs/pricing/tax.spec.ts
 1092,Bug,Invoice credited twice over,Closed,1 - Critical,1,8/6/2024 10:11:00 AM,8/7/2024 4:03:00 PM,Finance\Project Billing,4.3.0,Lars Eriksson,Mikael Strand,"1. INV-000291 has line 2 credited by CN-000013.
 2. Create another credit note for both lines in full.
 Expected: refused, only 1,857.40 EUR is still open
-Actual: issued; the customer received 900.00 + tax twice",The credit limit was the invoice total. It is now the total less what earlier credit notes have credited.,a550b9557b084ef48f6b8dbd2a6f33d96a025f09,Automated test: tests/e2e/specs/invoicing/credit-notes.spec.ts
+Actual: issued; the customer received 900.00 + tax twice",The credit limit was the invoice total. It is now the total less what earlier credit notes have credited.,7047d90ab0184fb93e097c2cbd464687af3248c0,Automated test: tests/e2e/specs/invoicing/credit-notes.spec.ts
 1093,Bug,Not-to-exceed limit reached too early,Closed,2 - High,1,8/8/2024 8:19:00 AM,8/12/2024 12:48:00 PM,Finance\Project Billing,4.3.0,Sofia Berg,Mikael Strand,"1. P-1030 has a not-to-exceed of 40,000 EUR, 32,000 invoiced and 4,000 credited.
 2. Create a proposal with 6,000 EUR of time.
 Expected: all time billed (28,000 + 6,000 is under the limit)
-Actual: entries held back; open proposals and deferred proposals were also counted",Billed to date now counts final invoices and subtracts final credit notes.,7f0966397ebaffe737b34264734049e8652de62c,Manual test case updated
+Actual: entries held back; open proposals and deferred proposals were also counted",Billed to date now counts final invoices and subtracts final credit notes.,0877769ff9f11f8cb1f9e8d1102413e6effbaa38,Manual test case updated
 1095,Bug,Proposal does not say that entries were held back,Closed,3 - Medium,2,8/14/2024 10:23:00 AM,8/15/2024 1:47:00 PM,Finance\Project Billing,4.3.0,Sofia Berg,Jonas Berg,"1. Create a proposal for a project close to its not-to-exceed limit.
 Expected: a message that some entries were held back
-Actual: entries silently missing",The proposal stores how many entries were held back and the page shows the status reason as a banner.,4024a5747e55c515cbd328f81c05bd22df1e7daa,Manual test case updated
+Actual: entries silently missing",The proposal stores how many entries were held back and the page shows the status reason as a banner.,cb65e09207fda33d6aad8133e4cef48c01bbb288,Manual test case updated
 1098,Bug,Cancelled invoice can be adjusted,Closed,3 - Medium,2,8/22/2024 10:51:00 AM,8/23/2024 2:57:00 PM,Finance\Project Billing,4.3.0,Mikko Laine,Mikael Strand,"1. Open a cancelled invoice from 4.0 in the proposal screen.
 Expected: locked
-Actual: lines can be adjusted",IsLocked now covers cancelled invoices too.,aee1a50e3b4c011f74663e6519a09606d62ead38,
+Actual: lines can be adjusted",IsLocked now covers cancelled invoices too.,fa2336dda4a1fdef64bb46d8d557d3b6f5e50a72,
 1100,Bug,Time on the last day of the period left out,Closed,2 - High,1,8/28/2024 10:57:00 AM,8/29/2024 1:18:00 PM,Finance\Project Billing,4.3.0,Sofia Berg,Priya Nair,"1. Record approved time on P-1001 on 31 August.
 2. Create a proposal with period end 31 August.
 Expected: included
-Actual: left out, billed a month late",The period end comparison was exclusive. It is now on or before.,eb63e483fe93ac9893485aa5d7b5ef1aa57ae086,Automated test: tests/e2e/specs/pricing/proposal-totals.spec.ts
+Actual: left out, billed a month late",The period end comparison was exclusive. It is now on or before.,7522e72d972f0b1bbcfa937adddcb72596e63f2a,Automated test: tests/e2e/specs/pricing/proposal-totals.spec.ts
 1102,Bug,New 25.5% VAT rate shown as 26%,Closed,2 - High,1,9/3/2024 8:28:00 AM,9/4/2024 11:58:00 AM,Finance\Project Billing,4.3.0,Hanna Koskinen,Tuomas Aalto,"1. After the VAT change on 1 September, open a proposal or invoice.
 Expected: S 25.5%
-Actual: S 26% (amounts are right)","Rates were formatted without decimals. Proposal, invoice and credit note pages now show up to two.",aa3a3d95db11fb35cd9f2c2d1aad43be2c2fd4fc,Manual test case updated
+Actual: S 26% (amounts are right)","Rates were formatted without decimals. Proposal, invoice and credit note pages now show up to two.",3cd5dd63868b88a432d17f4104031c524815f4dd,Manual test case updated
 1103,Bug,Credit note for an August invoice charges 25.5% VAT,Closed,2 - High,1,9/5/2024 8:01:00 AM,9/6/2024 12:14:00 PM,Finance\Project Billing,4.3.0,Hanna Koskinen,Tuomas Aalto,"1. Credit an invoice from August 2024 (24% VAT).
 Expected: credit note at 24%
-Actual: 25.5%, today's rate for code S",Credit lines took the current rate of the tax code. They now take the rate charged on the original line.,436232b243800cff86a000089fd939e5ed5f429a,Manual test case updated
+Actual: 25.5%, today's rate for code S",Credit lines took the current rate of the tax code. They now take the rate charged on the original line.,cf671b3169c527b45233d829977780d5343eb1b9,Manual test case updated
 1105,Bug,Proposal fails for roles without a rate card entry,Closed,2 - High,1,9/11/2024 9:24:00 AM,9/12/2024 3:25:00 PM,Finance\Project Billing,4.3.0,Sofia Berg,Mikael Strand,"1. Add junior consultant time to P-1003 (no Halden or card rate for juniors).
 2. Create a proposal.
 Expected: billed at the standard junior rate 85.00
-Actual: No rate found for role JUN on project P-1003.",ResolveRate falls back to the role's standard rate.,5ff34a17001e990662695eb2fa2f121de7ef8bf9,Automated test: tests/e2e/specs/pricing/rates.spec.ts
+Actual: No rate found for role JUN on project P-1003.",ResolveRate falls back to the role's standard rate.,8b280737ce1845a8f251c9c29c324e59931324e8,Automated test: tests/e2e/specs/pricing/rates.spec.ts
 1107,Bug,Credit note does not show which invoice it credits,Closed,3 - Medium,2,9/17/2024 10:26:00 AM,9/18/2024 1:23:00 PM,Finance\Project Billing,4.3.0,Lars Eriksson,Priya Nair,"1. Issue a credit note and open it.
 Expected: 'Credits invoice INV-...' with a link
-Actual: nothing",The details page loads the original invoice and links to it.,936913467e78ccb01b905f8efeb785f50439822f,Automated test: tests/e2e/specs/invoicing/credit-notes.spec.ts
+Actual: nothing",The details page loads the original invoice and links to it.,d054a1340b8f8d175c9da62e6fd43e287bb0a5c2,Automated test: tests/e2e/specs/invoicing/credit-notes.spec.ts
 1108,Bug,Invoice finalised in October uses October rate for a September invoice date,Closed,2 - High,1,9/19/2024 9:38:00 AM,9/20/2024 3:20:00 PM,Finance\Project Billing,4.3.0,Hanna Koskinen,Tuomas Aalto,"1. Create a proposal dated 30 Sep, finalise on 2 Oct after the October rate is entered.
 Expected: September rate
-Actual: October rate",Finalise looked the rate up on the business date. It now uses the invoice date.,004a3cdd5f8ac589dd03f1891751b197fcb667cf,Manual test case updated
+Actual: October rate",Finalise looked the rate up on the business date. It now uses the invoice date.,8b208503788a16993deb47cf1a4ca16d3d182463,Manual test case updated
 1110,Bug,Expenses billed over the not-to-exceed limit,Closed,2 - High,1,9/25/2024 9:39:00 AM,9/26/2024 11:09:00 AM,Finance\Project Billing,4.3.0,Sofia Berg,Mikael Strand,"1. P-1030 is 100 EUR under its limit; approve a 400 EUR expense.
 2. Create a proposal.
 Expected: the expense is held back
-Actual: billed, limit exceeded",The limit was only checked for time. Expenses are checked the same way.,40e20e17f054600f33b103b24a1c08afe3bc9d22,Manual test case updated
+Actual: billed, limit exceeded",The limit was only checked for time. Expenses are checked the same way.,24a0ff75abf235ef482374c6e425a7fb6ee214cd,Manual test case updated
 1112,Bug,Proposal total shown without the currency,Closed,4 - Low,3,10/1/2024 9:49:00 AM,10/2/2024 1:49:00 PM,Finance\Project Billing,4.3.0,Anna Virtanen,Jonas Berg,"1. Open a proposal for a SEK customer.
 Expected: Total 12,450.00 SEK
-Actual: Total 12,450.00",The total uses FormatMoney like the invoice page.,872f568783ec2b658f4e7e2dc76810755593e2e1,Automated test: tests/e2e/specs/pricing/proposal-totals.spec.ts
+Actual: Total 12,450.00",The total uses FormatMoney like the invoice page.,cd39beef6515398ebbbdcb0976df1b967de7372f,Automated test: tests/e2e/specs/pricing/proposal-totals.spec.ts
 1113,Bug,SEK invoice finalised with EUR amounts,Closed,1 - Critical,1,10/3/2024 8:27:00 AM,10/4/2024 1:41:00 PM,Finance\Project Billing,4.3.0,Hanna Koskinen,Mikael Strand,"1. Create a proposal for a SEK customer before the October rate is entered.
 2. Finalise it.
 Expected: refused until the rate is entered
-Actual: finalised at 1.0, customer invoiced 1,500 SEK instead of 17,000 SEK",Finalise stops with a message naming the currency and date when no rate is found.,6d8498cdafc6d337e1d96672b4c0f28e74c635c6,Manual test case updated
+Actual: finalised at 1.0, customer invoiced 1,500 SEK instead of 17,000 SEK",Finalise stops with a message naming the currency and date when no rate is found.,ebc3b942c47c591264b55cec28021c9133880d27,Manual test case updated
 1115,Bug,Adjust buttons shown on a final invoice,Closed,3 - Medium,2,10/9/2024 9:15:00 AM,10/10/2024 1:17:00 PM,Finance\Project Billing,4.4.0,Anna Virtanen,Priya Nair,"1. Open /Proposals/Edit/<id> for a final invoice.
 Expected: no adjustment column
-Actual: Adjust buttons on every line (they fail with an error)",The adjustment column is only rendered for open proposals.,9696de4c782f0a20fffa28ac2ca88ef901ea28b4,Automated test: tests/e2e/specs/invoicing/locked.spec.ts
+Actual: Adjust buttons on every line (they fail with an error)",The adjustment column is only rendered for open proposals.,e7af5c77c2766761690355f852e9dac7dd8d0767,Automated test: tests/e2e/specs/invoicing/locked.spec.ts
 1116,Bug,One large entry stops all later time being billed,Closed,2 - High,1,10/14/2024 8:57:00 AM,10/15/2024 1:02:00 PM,Finance\Project Billing,4.4.0,Sofia Berg,Mikael Strand,"1. P-1030 has 900 EUR left under its limit. Time: 2 h, 8 h, 1 h.
 2. Create a proposal.
 Expected: the 8 h entry held back, the 1 h entry billed
-Actual: both later entries held back",The time loop stopped at the first entry over the limit. It now skips that entry and carries on.,d5644c39fa881c7a619621f8075b0336ef9116b3,Manual test case updated
+Actual: both later entries held back",The time loop stopped at the first entry over the limit. It now skips that entry and carries on.,7612937e47b5030efd235892468a76cb81ecb700,Manual test case updated
 1119,Bug,Credit line can exceed the invoice line,Closed,3 - Medium,2,10/29/2024 9:28:00 AM,10/30/2024 4:51:00 PM,Finance\Project Billing,4.4.0,Lars Eriksson,Mikael Strand,"1. Credit 2,000.00 on a 1,480.00 line of an invoice that has other lines.
 Expected: refused for the line
-Actual: accepted as long as the invoice total is not exceeded",Each line can be credited up to its own amount.,68a23b155f244ff77fbee2cd37b515d242a61180,Manual test case updated
+Actual: accepted as long as the invoice total is not exceeded",Each line can be credited up to its own amount.,545388f946eac780acc82e1aeff7586394c40dc9,Manual test case updated
 1121,Bug,Printed SEK lines do not add up to the invoice total,Closed,2 - High,1,11/4/2024 8:32:00 AM,11/5/2024 1:09:00 PM,Finance\Project Billing,4.4.0,Hanna Koskinen,Mikael Strand,"1. Create a proposal for Nordvik (SEK) with 14 time lines.
 2. Add up the printed line amounts.
 Expected: equal to the subtotal
-Actual: 0.03 SEK different; the customer's AP rejected the invoice",Lines were converted without rounding and only the total was rounded. Each line is now rounded in the invoice currency and the totals are the sum of the rounded lines.,c6f3d353de38b7d7fe2effef1e2b05866debc40d,Manual test case updated
+Actual: 0.03 SEK different; the customer's AP rejected the invoice",Lines were converted without rounding and only the total was rounded. Each line is now rounded in the invoice currency and the totals are the sum of the rounded lines.,b500c16edde865ef38f8be309b4e639f9145b159,Manual test case updated
 1123,Bug,Short time entries rounded down to the quarter hour,Closed,3 - Medium,2,11/12/2024 8:53:00 AM,11/13/2024 4:46:00 PM,Finance\Project Billing,4.4.0,Sofia Berg,Mikael Strand,"1. Record 0.10 h (a six minute call) on P-1001.
 2. Create a proposal.
 Expected: 0.25 h billed
-Actual: 0.00 h, line with zero amount","Hours were rounded to the nearest quarter. They are rounded up, per the billing policy.",8dc2a6a558c0e213294af3795c7e98066d49cf17,Manual test case updated
+Actual: 0.00 h, line with zero amount","Hours were rounded to the nearest quarter. They are rounded up, per the billing policy.",6a9074758ea4295b5b1aabf4c49460c58c22457f,Manual test case updated
 1125,Bug,Credit limit check ignores VAT,Closed,2 - High,1,11/19/2024 10:51:00 AM,11/20/2024 3:04:00 PM,Finance\Project Billing,4.4.0,Lars Eriksson,Tuomas Aalto,"1. An invoice has 100.00 open including VAT.
 2. Credit 90.00 before tax (112.95 with VAT).
 Expected: refused
-Actual: issued, invoice over-credited by 12.95",The check compared the credit before tax with the open amount including tax. It now compares the credit total.,c1e49e414c6edebb6b78688c870aaae93ff32170,Manual test case updated
+Actual: issued, invoice over-credited by 12.95",The check compared the credit before tax with the open amount including tax. It now compares the credit total.,5688ebf39f0931e3c508b80a5e08bf7bf9afb2db,Manual test case updated
 1131,Bug,Milestone billed on two proposals,Closed,2 - High,1,12/5/2024 9:12:00 AM,12/9/2024 3:47:00 PM,Finance\Project Billing,4.4.0,Mikko Laine,Mikael Strand,"1. Create a December proposal for P-1080 (completed milestone).
 2. Create another one for the same project before finalising the first.
 Expected: refused
-Actual: second proposal with the same milestone; both were finalised",A project can only have one open proposal.,f6b5e8967f4ac806831b95d06023b3a37e0c926b,Manual test case updated
+Actual: second proposal with the same milestone; both were finalised",A project can only have one open proposal.,87d25f378a191ca58f4c8d858cacdb61019f70fc,Manual test case updated
 1133,Bug,Saving an exchange rate without a date gives an error page,Closed,3 - Medium,2,12/11/2024 10:27:00 AM,12/12/2024 12:07:00 PM,Finance\Project Billing,4.4.0,Hanna Koskinen,Jonas Berg,"1. Exchange rates, enter a rate, leave the date empty, Save rate.
 Expected: message asking for the date
-Actual: error page",The page checks the date before saving.,c061ef89a8772d7cb93cad37ba82703a35727af4,
+Actual: error page",The page checks the date before saving.,18744df2483dcafd98dcb9fd9f49c68354e11046,
 1135,Bug,Write-up saved without a reason,Closed,3 - Medium,2,1/8/2025 8:02:00 AM,1/9/2025 3:48:00 PM,Finance\Project Billing,4.4.0,Mikko Laine,Mikael Strand,"1. On a proposal, write line 1 up by 100 without a reason.
 Expected: Enter a reason for the write-up.
-Actual: saved; the customer queried the extra amount and nobody knew why",Both write-ups and write-downs now need a reason.,81fe42de7f98c4e3bbf4cad364b8ac9789765cfd,Manual test case updated
+Actual: saved; the customer queried the extra amount and nobody knew why",Both write-ups and write-downs now need a reason.,7dd0d5121c58ac3ddfa4f98e882d1aa0853b5e6e,Manual test case updated
 1136,Bug,Interim billing above the contract value,Closed,3 - Medium,2,1/10/2025 8:48:00 AM,1/13/2025 2:14:00 PM,Finance\Project Billing,4.4.0,Sofia Berg,Tuomas Aalto,"1. On a pilot fixed-price project, cost to date exceeds the estimate.
 2. Build the interim proposal.
 Expected: billing stops at the contract value
-Actual: 112% of the contract billed",The completion percentage is capped at 100%.,e4a4f41963c46c3257058a6bea7f8997ad348cfc,Manual test case updated
+Actual: 112% of the contract billed",The completion percentage is capped at 100%.,babbc3e5f2381b04e3f033e073adfb669655f348,Manual test case updated
 1140,Bug,PO numbers in lower case rejected by the customer's AP,Closed,4 - Low,3,1/22/2025 8:11:00 AM,1/23/2025 2:27:00 PM,Finance\Project Billing,4.5.0,Lars Eriksson,Mikael Strand,"1. Enter po-4471 as purchase order on a Meridian proposal and finalise.
 Expected: PO-4471 on the invoice
-Actual: po-4471, rejected by Meridian's matching","PO numbers are trimmed and upper-cased when saved, and an empty value no longer fails.",98d52b76cea9fa202db6e0cccff960d9c1f76405,
+Actual: po-4471, rejected by Meridian's matching","PO numbers are trimmed and upper-cased when saved, and an empty value no longer fails.",8cb78d6e39ad7c55590a1a77b652160f0971343d,
 1141,Bug,Written-down proposal deferred as below minimum,Closed,3 - Medium,2,1/24/2025 10:32:00 AM,1/27/2025 11:53:00 AM,Finance\Project Billing,4.5.0,Anna Virtanen,Mikael Strand,"1. Write a proposal up from 40 to 80 EUR.
 Expected: proposal counted at 80 EUR
-Actual: the subtotal used for the minimum and the not-to-exceed check stays at 40",BaseSubtotal now includes write-ups and write-downs.,aab6a551ef72448aef0fa0fe0b3a172583594a1c,Manual test case updated
+Actual: the subtotal used for the minimum and the not-to-exceed check stays at 40",BaseSubtotal now includes write-ups and write-downs.,468834d7d653c0632f89efdd760a0849cfa2a55d,Manual test case updated
 1143,Bug,Invoice amounts not updated to the final exchange rate,Closed,2 - High,1,2/4/2025 10:23:00 AM,2/5/2025 12:23:00 PM,Finance\Project Billing,4.5.0,Hanna Koskinen,Tuomas Aalto,"1. Create a GBP proposal before the month's rate is entered, enter the rate, finalise.
 Expected: lines converted at the stored rate
-Actual: rate on the invoice is new, amounts are still in EUR",Finalise recalculates the lines after setting the rate.,fc8ff6281c35a2b105a60994233e3ca891fed728,Manual test case updated
+Actual: rate on the invoice is new, amounts are still in EUR",Finalise recalculates the lines after setting the rate.,b4057dc835622fac126beec311a018d7037ad240,Manual test case updated
 1146,Bug,PO number can be changed on a final invoice,Closed,3 - Medium,2,2/12/2025 10:37:00 AM,2/17/2025 1:33:00 PM,Finance\Project Billing,4.5.0,Lars Eriksson,Mikael Strand,"1. Post a PO change to a final invoice from an old browser tab.
 Expected: refused
-Actual: PO changed on the final invoice, different from the ledger",SetPurchaseOrder refuses locked invoices.,2b1aa8dcbf03588d2b28cfe6c1adc535a41bc199,Manual test case updated
+Actual: PO changed on the final invoice, different from the ledger",SetPurchaseOrder refuses locked invoices.,c0b1cc6752b014333e748363c781a3f560a8b015,Manual test case updated
 1151,Bug,Empty credit note issued and numbered,Closed,3 - Medium,2,3/6/2025 9:59:00 AM,3/7/2025 3:42:00 PM,Finance\Project Billing,4.5.0,Lars Eriksson,Mikael Strand,"1. Open Create credit note and press Issue without entering amounts.
 Expected: Enter an amount to credit on at least one line.
-Actual: CN-000031 issued for 0.00",A credit note needs at least one line.,1dd8e5694cc1f649971cdfedcf8b032fbdc00620,Manual test case updated
+Actual: CN-000031 issued for 0.00",A credit note needs at least one line.,b7f394e41ee24ea5fe0876e31424a884bf405d7a,Manual test case updated
 1153,Bug,Fixed-price projects listed with unbilled hours,Closed,4 - Low,3,3/12/2025 10:42:00 AM,3/13/2025 12:25:00 PM,Finance\Project Billing,4.5.0,Sofia Berg,Jonas Berg,"1. Open Projects.
 Expected: fixed-price projects show 0.00 unbilled hours
-Actual: they show logged hours, which are never billed","Fixed-price projects bill milestones, so the list shows 0.00 for them.",6b6d20d25a91385a359d3a6da352dfc0bb10fa11,
+Actual: they show logged hours, which are never billed","Fixed-price projects bill milestones, so the list shows 0.00 for them.",d65bbd8992426349492b75652caa9f6e7732c9fc,
 1156,Bug,Exempt invoices lack the exemption wording,Closed,3 - Medium,2,3/20/2025 8:17:00 AM,3/21/2025 4:57:00 PM,Finance\Project Billing,4.5.0,Hanna Koskinen,Tuomas Aalto,"1. Create a proposal for the training project P-1095 (tax code E, exempt).
 Expected: 0% and the exemption note
-Actual: 0%, no note",Exempt tax codes return a note with the code description.,12f78acc65e88c3f0efa2095cdf7a4d84bbea535,Manual test case updated
+Actual: 0%, no note",Exempt tax codes return a note with the code description.,8aa085b4a938455f180d9028f14766c2437f657e,Manual test case updated
 1159,Bug,Write-down of 40% finalised without review,Closed,2 - High,1,4/3/2025 10:40:00 AM,4/7/2025 11:50:00 AM,Finance\Project Billing,4.5.0,Mikko Laine,Mikael Strand,"1. On a 12,000 EUR proposal for P-1001, write lines down by 4,800 EUR with a reason.
 2. Finalise.
 Expected: the proposal waits for a billing manager
-Actual: finalised straight away; finance found it at month end","Write-downs above 10% of the proposal now put it in Awaiting approval, and Finalise refuses it until a billing manager approves.",0a95c5e980e0dff2df26e238a68642ed6995e213,
+Actual: finalised straight away; finance found it at month end","Write-downs above 10% of the proposal now put it in Awaiting approval, and Finalise refuses it until a billing manager approves.",8572777d07e62b182c4915cdcd1f94097894246b,
 1161,Bug,Proposal stays awaiting approval after the write-down is removed,Closed,3 - Medium,2,4/15/2025 10:48:00 AM,4/16/2025 2:04:00 PM,Finance\Project Billing,4.5.0,Anna Virtanen,Mikael Strand,"1. Write a proposal down by 20%, it goes to Awaiting approval.
 2. Set the adjustment back to 0.
 Expected: back to Proposal
-Actual: still Awaiting approval",When write-downs fall back under the limit the proposal returns to Proposal.,2a862856d4e02bc0fe27c63de62a4967e4b2fcce,Manual test case updated
+Actual: still Awaiting approval",When write-downs fall back under the limit the proposal returns to Proposal.,aa9128859d56f89ad410c4fb4e38fee8056ea2be,Manual test case updated
 1162,Bug,Project manager can approve write-downs,Closed,2 - High,1,4/17/2025 9:16:00 AM,4/18/2025 2:01:00 PM,Finance\Project Billing,4.5.0,Mikko Laine,Mikael Strand,"1. Switch user to Sofia Berg (project manager).
 2. Approvals, approve her own write-down.
 Expected: refused
-Actual: approved",Approve and Reject check the billing manager role.,344350a472c4b6d9b6578d28059d06fefe56345b,Manual test case updated
+Actual: approved",Approve and Reject check the billing manager role.,0c7274bd1c679cb69a8e2d66f775343924de15f4,Manual test case updated
 1164,Bug,Approvals list shows 0.00 written down,Closed,3 - Medium,2,4/23/2025 8:37:00 AM,4/24/2025 11:45:00 AM,Finance\Project Billing,4.5.0,Mikko Laine,Jonas Berg,"1. Open Approvals with one proposal waiting.
 Expected: amounts before and written down
-Actual: 0.00 and 0.00, no reasons",The list query now loads the proposal lines.,c17843bbb35bd6f994975a903af76cbf15c8477e,
+Actual: 0.00 and 0.00, no reasons",The list query now loads the proposal lines.,328d645b952fc748daa340eed766b519e4d6ccd0,
 1167,Bug,Status shown as PendingApproval,Closed,4 - Low,3,5/2/2025 8:57:00 AM,5/5/2025 11:21:00 AM,Finance\Project Billing,4.5.0,Anna Virtanen,Jonas Berg,"1. Open a proposal awaiting approval.
 Expected: Status Awaiting approval
-Actual: PendingApproval",StatusLabel has a label for the new status.,beabd12b57f430a776cbcd555ed13a1a9bbf4e04,
+Actual: PendingApproval",StatusLabel has a label for the new status.,58944e65dd00684d63f134e183094efd285b73d6,
 1169,Bug,Second proposal created while the first awaits approval,Closed,2 - High,1,5/8/2025 8:13:00 AM,5/9/2025 3:13:00 PM,Finance\Project Billing,4.5.0,Mikko Laine,Mikael Strand,"1. P-1001 has a proposal awaiting approval.
 2. Create another proposal for P-1001.
 Expected: refused
-Actual: created with the milestone and new time; both were finalised",The open proposal check includes proposals awaiting approval.,d33a1d20f5a93a5ff85c045a87cc8c75c4066faf,Manual test case updated
+Actual: created with the milestone and new time; both were finalised",The open proposal check includes proposals awaiting approval.,7806483495d4a09c1decbd2ab1901649650c9bb5,Manual test case updated
 1171,Bug,No message when a write-down sends the proposal for approval,Closed,4 - Low,3,5/14/2025 8:14:00 AM,5/15/2025 11:35:00 AM,Finance\Project Billing,4.5.0,Anna Virtanen,Jonas Berg,"1. Write a proposal down by 20%.
 Expected: message that it now needs a billing manager's approval
-Actual: 'Adjustment saved.'",The message says when the proposal needs approval.,9ed4cb3fb92310d3a9b5131e88020a482d725f81,
+Actual: 'Adjustment saved.'",The message says when the proposal needs approval.,4f0c182e08e44fb45a7e7746402e8729d09c7ed3,
 1177,Bug,Type filter on the invoice list shows everything,Closed,3 - Medium,2,5/28/2025 9:09:00 AM,5/29/2025 4:08:00 PM,Finance\Project Billing,4.6.0,Lars Eriksson,Jonas Berg,"1. Invoices, choose Type: Credit notes, Search.
 Expected: credit notes only
-Actual: invoices and credit notes",The list query ignored the type. It now filters on it when one is chosen.,42d6e9eee85cf2abe479c5a3967f13927b8fd9e8,
+Actual: invoices and credit notes",The list query ignored the type. It now filters on it when one is chosen.,d859347be6d226e03e21b2af3b25becc5590ef9b,
 1180,Bug,Customer with lower-case country code charged VAT,Closed,3 - Medium,2,6/5/2025 9:00:00 AM,6/6/2025 12:27:00 PM,Finance\Project Billing,4.6.0,Hanna Koskinen,Tuomas Aalto,"1. Customer C210 was imported with country 'de'.
 2. Create a proposal.
 Expected: reverse charge (German business with VAT number)
-Actual: Finnish VAT",IsEu upper-cases the country code before the lookup.,965f62104e64459843282f0f06a0c5183fb74c3e,Manual test case updated
+Actual: Finnish VAT",IsEu upper-cases the country code before the lookup.,7edca4a563d215bbbd40510e8361f996a8b1ce99,Manual test case updated
 1183,Bug,Credit note lines in a different order from the invoice,Closed,4 - Low,3,6/10/2025 8:13:00 AM,6/11/2025 2:59:00 PM,Finance\Project Billing,4.6.0,Lars Eriksson,Elif Kaya,"1. Credit lines 1, 2 and 3 of a three-line invoice.
 Expected: credit lines in the same order
-Actual: sometimes 2, 1, 3",The original invoice is loaded with its lines in sequence order.,e3203462b7391fc2864b3169024c38cf4d61b6b5,
+Actual: sometimes 2, 1, 3",The original invoice is loaded with its lines in sequence order.,21918aa68e288e3d9e4332b48da22866b3a742aa,
 1185,Bug,Totals unchanged after write-downs are rejected,Closed,3 - Medium,2,6/12/2025 10:41:00 AM,6/13/2025 12:16:00 PM,Finance\Project Billing,4.6.0,Mikko Laine,Elif Kaya,"1. Reject the write-downs on a proposal awaiting approval.
 Expected: lines and totals back to the original amounts
-Actual: lines show no adjustment but the total is still the written-down total",Reject recalculates the proposal after clearing the write-downs.,2e9d9e70f7a043763db0f52f163d5f47f994e335,Manual test case updated
+Actual: lines show no adjustment but the total is still the written-down total",Reject recalculates the proposal after clearing the write-downs.,852bf030be7757772828fd0333d9a5e44fd45307,Manual test case updated
 1187,Bug,Yen invoices show decimals,Closed,2 - High,1,6/16/2025 8:18:00 AM,6/17/2025 4:56:00 PM,Finance\Project Billing,4.6.0,Hanna Koskinen,Elif Kaya,"1. Create a proposal for Kaito Systems (JPY).
 Expected: amounts in whole yen
-Actual: 152,340.47 JPY; the customer's bank rejected the payment reference",MinorUnits returned 2 for every currency. JPY has none.,e91df16b5153ad73796d981c84ebe61869c683e0,
+Actual: 152,340.47 JPY; the customer's bank rejected the payment reference",MinorUnits returned 2 for every currency. JPY has none.,2cd36e2e87b0a57c0e2193483721d6b03bc55b07,
 1189,Bug,Approval kept after a further write-down,Closed,2 - High,1,6/26/2025 10:53:00 AM,6/27/2025 2:45:00 PM,Finance\Project Billing,4.6.0,Mikko Laine,Elif Kaya,"1. A billing manager approves a 15% write-down.
 2. The clerk writes another line down; total 30%.
 Expected: Awaiting approval again
-Actual: still approved, finalised at 30%",Any write-down over the limit clears an earlier approval.,8277e68b9f9eaf62ed8baadc8bd73a2ab37c8d70,Manual test case updated
+Actual: still approved, finalised at 30%",Any write-down over the limit clears an earlier approval.,c22066ddf1fa1db0b494d5e3a749bf6648c993ba,Manual test case updated
 1191,Bug,Write-up reason not shown on the proposal,Closed,3 - Medium,2,7/3/2025 9:28:00 AM,7/4/2025 2:10:00 PM,Finance\Project Billing,4.6.0,Mikko Laine,Priya Nair,"1. Write line 1 up with a reason.
 Expected: reason shown under the line description
-Actual: only visible in the audit log",The proposal page shows the reason under the line.,84222b7a996f5dc722ce5d2437d1d2953a813fd7,Automated test: tests/e2e/specs/proposals/write-up.spec.ts
+Actual: only visible in the audit log",The proposal page shows the reason under the line.,522c97a5bec1550f33f37e84ac95f427e78a4c57,Automated test: tests/e2e/specs/proposals/write-up.spec.ts
 1193,Bug,Interim billing counts open proposals as billed,Closed,3 - Medium,2,7/15/2025 10:32:00 AM,7/17/2025 2:31:00 PM,Finance\Project Billing,4.6.0,Sofia Berg,Tuomas Aalto,"1. Build an interim proposal, then build another before finalising the first.
 Expected: second one bills the same amount
-Actual: second one bills less, the open proposal counted as billed",Billed to date counts final invoices only.,cab2fb1839702da982cc1f8c097194c87cafa076,Manual test case updated
+Actual: second one bills less, the open proposal counted as billed",Billed to date counts final invoices only.,b0b4cb0cbcb51df614da10faf445270d0c1502fb,Manual test case updated
 1195,Bug,Invoice list takes a minute to open,Closed,3 - Medium,2,8/5/2025 9:21:00 AM,8/6/2025 4:12:00 PM,Finance\Project Billing,4.6.0,Lars Eriksson,Jonas Berg,"1. Open Invoices without a search.
 Expected: list in a few seconds
-Actual: about 60 s with 6,000 documents",The page shows the latest 200 and says how many there are; search narrows the list.,2cbaa7cf8a3bd099de619a41f36f66b7cf030729,Manual test case updated
+Actual: about 60 s with 6,000 documents",The page shows the latest 200 and says how many there are; search narrows the list.,7603146f94b5b0d3f5cc52fbc4c36423f034c413,Manual test case updated
 1197,Bug,Exchange rate of zero accepted,Closed,3 - Medium,2,8/12/2025 9:46:00 AM,8/13/2025 2:02:00 PM,Finance\Project Billing,4.6.0,Hanna Koskinen,Elif Kaya,"1. Exchange rates, enter 0 for SEK and save.
 Expected: refused
-Actual: saved; proposals show 0.00 SEK",The rate must be greater than zero.,026787893b3111780c9dc3cfbf27d358d333b840,
+Actual: saved; proposals show 0.00 SEK",The rate must be greater than zero.,cb7cfd8051b572c8252ed6fe62de3e60057f49fb,
 1199,Bug,Credit amounts cleared after a validation error,Closed,4 - Low,3,8/20/2025 10:27:00 AM,8/21/2025 1:23:00 PM,Finance\Project Billing,4.6.0,Lars Eriksson,Jonas Berg,"1. Enter amounts on five lines, leave the reason empty, issue.
 Expected: error, amounts still filled in
-Actual: error, all fields empty",The form shows the entered amounts and reason again.,4ee3aa24193de004ccfed35469598f716327ed0c,
+Actual: error, all fields empty",The form shows the entered amounts and reason again.,7e91b39745bb836099c1fd3cf3136750702c9320,
 1201,Bug,Purchase order form runs off the screen,Closed,4 - Low,3,9/2/2025 10:14:00 AM,9/2/2025 3:33:00 PM,Finance\Project Billing,4.6.0,Anna Virtanen,Jonas Berg,"1. Open a proposal on a 1366 px laptop.
 Expected: PO form fits
-Actual: Save PO button off screen",Inline forms wrap.,dedf1bf21dc1d8d59012521be50ed04c3e4d3d17,
+Actual: Save PO button off screen",Inline forms wrap.,06101523c96d071daf676a03386f3dea1f153b2e,
 1203,Bug,VAT on SEK invoices off by a few öre,Closed,2 - High,1,9/8/2025 10:28:00 AM,9/9/2025 4:04:00 PM,Finance\Project Billing,4.6.0,Hanna Koskinen,Elif Kaya,"1. Create a proposal for Nordvik (SEK) and check the VAT on each line.
 Expected: VAT = rounded line amount x 25.5%, rounded
-Actual: VAT worked out on the unrounded converted amount; 0.01 SEK out on some lines",LineTax now converts and rounds the line first and works out the tax on that amount.,dc8ad2b6d66801c07f78392616a8ce48066b59a0,
+Actual: VAT worked out on the unrounded converted amount; 0.01 SEK out on some lines",LineTax now converts and rounds the line first and works out the tax on that amount.,55eab5b1728f6cc7826fba16399373d1bb1f9433,
 1205,Bug,Error page when a project has an unknown tax code,Closed,3 - Medium,2,9/23/2025 8:38:00 AM,9/24/2025 12:47:00 PM,Finance\Project Billing,4.6.0,Anna Virtanen,Tuomas Aalto,"1. Project P-1097 has tax code S2 (removed).
 2. Create a proposal.
 Expected: message naming the tax code
-Actual: error page",TaxService reports the missing code.,379237f0710324e5e2fca070117e1e133bea0cfc,
+Actual: error page",TaxService reports the missing code.,402d8169dbc7d5661ee6e4e716664d8316a265ed,
 1207,Bug,Error page when creating a proposal without a project,Closed,4 - Low,3,10/14/2025 8:31:00 AM,10/15/2025 1:23:00 PM,Finance\Project Billing,4.7.0,Anna Virtanen,Jonas Berg,"1. New proposal, leave Project empty, Create proposal.
 Expected: Select a project.
-Actual: error page",The page asks for a project.,4217b211b75dbab6e0a4fd16d656e21d84322a03,
+Actual: error page",The page asks for a project.,ff67634ce10286446219cf56fe315b4c0be77392,
 1209,Bug,Expense lines on the invoice have no date,Closed,4 - Low,3,11/4/2025 10:57:00 AM,11/5/2025 2:31:00 PM,Finance\Project Billing,4.7.0,Lars Eriksson,Elif Kaya,"1. Create a proposal with two hotel expenses.
 Expected: each line starts with the expense date
-Actual: only the description","Expense lines start with the date, like time lines.",e855a9cc0ec0ba44e1b4e10ff37915c84e823489,
+Actual: only the description","Expense lines start with the date, like time lines.",ce45c88b86dd1942f2441d00010d2fb87fb855a8,
 1212,Bug,Interim billing line shows 37.142857142857% complete,Closed,4 - Low,3,11/25/2025 8:31:00 AM,11/26/2025 11:38:00 AM,Finance\Project Billing,4.7.0,Sofia Berg,Elif Kaya,"1. Build an interim proposal for a pilot project.
 Expected: Progress billing 37.1% complete
-Actual: 37.142857142857142857142857143%",The percentage is rounded to one decimal in the description.,c36647843136284d6f3a8c8994be984c8ee49b7c,
+Actual: 37.142857142857142857142857143%",The percentage is rounded to one decimal in the description.,9d2ebaae5ce74c10e151ac7a69105f52fc932d47,
 1214,Bug,Error page for a credit note link to a missing invoice,Closed,4 - Low,3,12/9/2025 9:33:00 AM,12/10/2025 11:28:00 AM,Finance\Project Billing,4.7.0,Lars Eriksson,Jonas Berg,"1. Open /CreditNotes/Create?invoiceId=999999.
 Expected: Not found
-Actual: error page",The page returns Not found when the invoice does not exist.,641b56e38c881163cdf55178f2289cd088dfda75,
+Actual: error page",The page returns Not found when the invoice does not exist.,ca66d63a7f04bbd9a1d598f3af5cc8a922281228,
 1216,Bug,Home page counts projects with only non-billable time,Closed,4 - Low,3,1/13/2026 9:27:00 AM,1/14/2026 11:43:00 AM,Finance\Project Billing,4.7.0,Sofia Berg,Jonas Berg,"1. Open the home page.
 Expected: Projects with unbilled time counts billable time only
-Actual: includes internal projects with non-billable time",The tile counts billable time only.,6d38cb27ef3d371f8e8ae358284cdd630d92d3af,
+Actual: includes internal projects with non-billable time",The tile counts billable time only.,ef3400b26add3ee1c4e03a88e83749034b1b374b,
 1219,Bug,KRW and ISK invoices show decimals,Closed,3 - Medium,2,2/9/2026 8:33:00 AM,2/10/2026 11:22:00 AM,Finance\Project Billing,4.7.0,Hanna Koskinen,Jonas Berg,"1. Create a proposal for Hanseo Logistics (KRW) or Fjord Data ehf (ISK).
 Expected: whole won / krónur
-Actual: two decimals",KRW and ISK have no minor units either. Added them next to JPY.,5c8a422a2c38365b22de824f46f94c532868b4a6,Manual test case updated
+Actual: two decimals",KRW and ISK have no minor units either. Added them next to JPY.,4c757a9c6710c1f44c3287d939e335ee4da7879b,Manual test case updated
 1222,Bug,Labels wrap in the proposal header,Closed,4 - Low,3,3/3/2026 9:53:00 AM,3/4/2026 3:52:00 PM,Finance\Project Billing,4.7.0,Anna Virtanen,Jonas Berg,"1. Open an approved proposal.
 Expected: 'Write-downs approved by' on one line
-Actual: wraps onto two lines",The label column is wider.,be89568cd52e15d5f837348141356990ff7208d9,
+Actual: wraps onto two lines",The label column is wider.,97a7ea39d11660f9a5cd8c3033c6ad5f8aae14c0,
 1225,Bug,Interim billing fails with a division error,Closed,3 - Medium,2,4/7/2026 8:33:00 AM,4/8/2026 11:30:00 AM,Finance\Project Billing,4.8.0,Sofia Berg,Elif Kaya,"1. Build an interim proposal with an estimated cost of 0.
 Expected: nothing to bill
-Actual: error page (attempted to divide by zero)",A zero or negative estimate gives nothing to bill.,16c641987c38aac028ce400de40c648efb547f45,Manual test case updated
+Actual: error page (attempted to divide by zero)",A zero or negative estimate gives nothing to bill.,c05642085dd47ce255cbdf8cf4060b0a89502f5b,Manual test case updated
 1228,Bug,EUR offered on the exchange rate page,Closed,4 - Low,3,5/12/2026 8:56:00 AM,5/13/2026 11:59:00 AM,Finance\Project Billing,4.8.0,Hanna Koskinen,Jonas Berg,"1. Open Exchange rates.
 Expected: foreign currencies only
-Actual: EUR is in the list and a EUR to EUR rate can be saved",The company currency is left out of the list.,8da03de55f91c252f64f832dd2e6c56888453bfc,
+Actual: EUR is in the list and a EUR to EUR rate can be saved",The company currency is left out of the list.,f32eb23b702691a83847066045491ad2abb23368,
 1231,Bug,Home page shows the business date as the period end,Closed,4 - Low,3,6/9/2026 9:06:00 AM,6/10/2026 3:18:00 PM,Finance\Project Billing,4.8.0,Anna Virtanen,Jonas Berg,"1. Open the home page on 9 June.
 Expected: Billing period ending 30 June 2026
-Actual: Billing period ending 9 June 2026",The home page uses the end of the month.,1b5143e3f8349eced9bc24d18697087b4914aba8,
+Actual: Billing period ending 9 June 2026",The home page uses the end of the month.,b7eecddc091eb31a88e6c7c87f7b696f68998d6d,
 1235,Bug,Audit log does not say whether a line was written up or down,Closed,4 - Low,3,7/21/2026 9:23:00 AM,7/22/2026 12:32:00 PM,Finance\Project Billing,4.8.1,Mikko Laine,Elif Kaya,"1. Write a line down, open the audit log.
 Expected: Write-down
-Actual: Adjustment",The audit action says Write-up or Write-down.,f336ddd44a47529bc5cf5826f23370e40b4c54d8,
+Actual: Adjustment",The audit action says Write-up or Write-down.,60e2723073827994ba96747271d3efd83e2e3e3c,
 1238,Bug,Rate page jumps back to the first currency after saving,Closed,4 - Low,3,8/25/2026 9:30:00 AM,8/26/2026 3:03:00 PM,Finance\Project Billing,4.8.1,Hanna Koskinen,Jonas Berg,"1. Exchange rates, choose SEK, save a rate.
 Expected: SEK history shown
-Actual: GBP history shown",The redirect keeps the currency.,33e95fe79a6cb697f83f2e2af85138eb3dc512f9,
+Actual: GBP history shown",The redirect keeps the currency.,b4c08306b7bacf89617c0c72a9efd0ae7a069acf,
 1240,Bug,Customer put on hold without a reason,Closed,3 - Medium,2,9/15/2026 8:06:00 AM,9/16/2026 1:41:00 PM,Finance\Project Billing,4.8.1,Mikko Laine,Elif Kaya,"1. Customers, open C140, tick Billing hold, leave the reason empty, save.
 Expected: Enter a reason for the billing hold.
-Actual: error page","A hold needs a reason, as on the project page.",2e5c7a6679dbba19a4de312e1526d2bc525c458a,Manual test case updated
+Actual: error page","A hold needs a reason, as on the project page.",936ee7f1ab6b4327253c2cb3fdb510a896998680,Manual test case updated

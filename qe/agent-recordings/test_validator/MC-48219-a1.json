@@ -1,0 +1,192 @@
+{
+  "input_hash": "f3f8ac70df0609ed60636303bc9145f2a175204454dc975722dfeebf781165d5",
+  "source": "live_model",
+  "model": "claude-opus-5-5",
+  "duration_ms": 23392,
+  "output": {
+    "checks": [
+      {
+        "check": "Currency",
+        "expected": "SEK. Note: the scenario names projects.norrskenGrid (P-1020 Norrsken grid analytics), but manual test 48219 selects P-1130 Polar vessel reporting (USD). All values below are for P-1020, as the scenario names it; engineers should resolve which project is intended.",
+        "basis": [
+          {
+            "document": "Test data catalogue",
+            "find": "name: Norrsken grid analytics"
+          },
+          {
+            "document": "Test data catalogue",
+            "find": "name: Norrsken Energi AB"
+          },
+          {
+            "document": "Test data catalogue",
+            "find": "currency: SEK"
+          },
+          {
+            "document": "Help page 14-what-a-proposal-contains.md",
+            "find": "| **Currency** | The customer's invoice currency. |"
+          }
+        ]
+      },
+      {
+        "check": "Exchange rate",
+        "expected": "11.4700 (the SEK rate effective from 2026-10-01 is the latest one on or before the 31 Oct 2026 invoice date)",
+        "basis": [
+          {
+            "document": "Test data catalogue",
+            "find": "rate: 11.47"
+          },
+          {
+            "document": "Help page 17-currencies-and-exchange-rates.md",
+            "find": "An invoice uses the latest rate whose **Effective from** date is on or before its **Invoice date**."
+          },
+          {
+            "document": "Help page 14-what-a-proposal-contains.md",
+            "find": "EUR invoices show 1.0000."
+          }
+        ]
+      },
+      {
+        "check": "Line count",
+        "expected": "3 (three approved, billable time entries dated 2026-10-01, 2026-10-02 and 2026-10-05; no expenses)",
+        "basis": [
+          {
+            "document": "Help page 11-billable-time-and-expenses.md",
+            "find": "Each time entry becomes one line."
+          },
+          {
+            "document": "Rule register",
+            "find": "A proposal includes time entries that are approved, marked billable, not yet billed and dated on or"
+          },
+          {
+            "document": "Help page 12-quarter-hour-billing.md",
+            "find": "On P-1020 Norrsken grid analytics, Sara Holm recorded two calls with the grid operator, each of 0.25 hours."
+          }
+        ]
+      },
+      {
+        "check": "Line 1 amount",
+        "expected": "430.13 (0.25 h × 150.00 EUR, the SNR standard rate, = 37.50 EUR; × 11.47 = 430.125, rounded half away from zero)",
+        "basis": [
+          {
+            "document": "Test data catalogue",
+            "find": "standard_rate: 150"
+          },
+          {
+            "document": "Help page 07-rates.md",
+            "find": "3. **The role's standard rate.**"
+          },
+          {
+            "document": "Help page 18-rounding.md",
+            "find": "Amounts exactly halfway are rounded away from zero."
+          }
+        ]
+      },
+      {
+        "check": "Line 2 amount",
+        "expected": "430.13 (0.25 h × 150.00 EUR = 37.50 EUR; × 11.47 = 430.125, rounded to 430.13)",
+        "basis": [
+          {
+            "document": "Test data catalogue",
+            "find": "standard_rate: 150"
+          },
+          {
+            "document": "Help page 18-rounding.md",
+            "find": "3. rounds the result to the decimal places of the invoice currency. This is the line **Amount**,"
+          }
+        ]
+      },
+      {
+        "check": "Line 3 amount",
+        "expected": "10,323.00 (7.50 h × 120.00 EUR, the CONS standard rate, = 900.00 EUR; × 11.47)",
+        "basis": [
+          {
+            "document": "Test data catalogue",
+            "find": "standard_rate: 120"
+          },
+          {
+            "document": "Help page 18-rounding.md",
+            "find": "2. multiplies it by the exchange rate,"
+          }
+        ]
+      },
+      {
+        "check": "Line 1 tax",
+        "expected": "0.00 (reverse charge, RC 0%). Note that RC does not appear in the seeded tax_codes list, although the help says it is set automatically.",
+        "basis": [
+          {
+            "document": "Help page 16-reverse-charge.md",
+            "find": "| Norrsken Energi AB | SE | SE556677889901 | Reverse charge, *RC* 0% |"
+          },
+          {
+            "document": "Help page 16-reverse-charge.md",
+            "find": "- every line gets the tax code *RC* at 0%,"
+          }
+        ]
+      },
+      {
+        "check": "Line 2 tax",
+        "expected": "0.00 (RC 0%)",
+        "basis": [
+          {
+            "document": "Help page 16-reverse-charge.md",
+            "find": "- every line gets the tax code *RC* at 0%,"
+          }
+        ]
+      },
+      {
+        "check": "Line 3 tax",
+        "expected": "0.00 (RC 0%)",
+        "basis": [
+          {
+            "document": "Help page 16-reverse-charge.md",
+            "find": "- every line gets the tax code *RC* at 0%,"
+          }
+        ]
+      },
+      {
+        "check": "Subtotal",
+        "expected": "11,183.26",
+        "basis": [
+          {
+            "document": "Help page 18-rounding.md",
+            "find": "- **Subtotal** is the sum of the rounded line amounts,"
+          }
+        ]
+      },
+      {
+        "check": "Tax total",
+        "expected": "0.00",
+        "basis": [
+          {
+            "document": "Help page 18-rounding.md",
+            "find": "- **Tax** is the sum of the rounded line tax amounts,"
+          }
+        ]
+      },
+      {
+        "check": "Total",
+        "expected": "11,183.26 SEK",
+        "basis": [
+          {
+            "document": "Help page 14-what-a-proposal-contains.md",
+            "find": "- **Total**: subtotal plus tax, with the currency."
+          },
+          {
+            "document": "Help page 18-rounding.md",
+            "find": "- **Total** is Subtotal plus Tax."
+          }
+        ]
+      },
+      {
+        "check": "Deletion message",
+        "expected": "Proposal deleted.",
+        "basis": [
+          {
+            "document": "Help page 13-creating-a-proposal.md",
+            "find": "The message \"Proposal deleted.\" confirms it."
+          }
+        ]
+      }
+    ]
+  }
+}

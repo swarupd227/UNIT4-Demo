@@ -1,0 +1,146 @@
+{
+  "input_hash": "3c446596081b6570cfee86565f27662ce2ab023fbfe00b62d6661dff6cc0e527",
+  "source": "live_model",
+  "model": "claude-opus-5-5",
+  "duration_ms": 26686,
+  "output": {
+    "steps": [
+      {
+        "step": 1,
+        "verdict": "agrees",
+        "expected": "The New invoice proposal page opens. The business date is 2026-10-30, so Period end defaults to 2026-10-31, the last day of that month, and Invoice date defaults to the period end, 2026-10-31.",
+        "basis": [
+          {
+            "document": "Test data catalogue",
+            "find": "business_date: '2026-10-30'"
+          },
+          {
+            "document": "Help page 13-creating-a-proposal.md",
+            "find": "2. On the **New invoice proposal** page, select the **Project**. Closed projects are not listed."
+          },
+          {
+            "document": "Help page 02-business-date-and-billing-period.md",
+            "find": "When you open **New proposal**, the period end is set to the last day of the month of the business date."
+          },
+          {
+            "document": "Help page 02-business-date-and-billing-period.md",
+            "find": "Each proposal also has an **Invoice date**. It is set to the period end by default."
+          }
+        ]
+      },
+      {
+        "step": 2,
+        "verdict": "agrees",
+        "expected": "The proposal opens in NOK with Exchange rate 11.6830, the 2026-10-01 NOK rate, which is the latest on or before 2026-10-31. Line 1 is 2026-10-22 Timo Lehto - WORKSHOP, Qty 6.00, Unit price 150.00 EUR. Timo Lehto is SNR, and the standard rate applies because C130 has no agreed rates and P-1030 has no rate card. 900.00 EUR x 11.683 gives an Amount of 10,514.70. Tax is Z 0% because P-1030 uses code Z and Norway is not in the EU, so there is no reverse charge. Tax amount is 0.00. The help page shows the Tax column as code and rate, so the screen should read Z 0%.",
+        "basis": [
+          {
+            "document": "Test data catalogue",
+            "find": "name: Vestfold Shipping AS"
+          },
+          {
+            "document": "Test data catalogue",
+            "find": "currency: NOK"
+          },
+          {
+            "document": "Test data catalogue",
+            "find": "rate: 11.683"
+          },
+          {
+            "document": "Test data catalogue",
+            "find": "Timo Lehto: SNR"
+          },
+          {
+            "document": "Test data catalogue",
+            "find": "standard_rate: 150"
+          },
+          {
+            "document": "Test data catalogue",
+            "find": "name: Vestfold fleet optimisation"
+          },
+          {
+            "document": "Help page 17-currencies-and-exchange-rates.md",
+            "find": "An invoice uses the latest rate whose **Effective from** date is on or before its **Invoice date**."
+          },
+          {
+            "document": "Help page 07-rates.md",
+            "find": "3. **The role's standard rate.**"
+          },
+          {
+            "document": "Help page 16-reverse-charge.md",
+            "find": "| Vestfold Shipping AS | NO | NO987654321MVA | Project tax code. Norway is not in the EU. |"
+          },
+          {
+            "document": "Help page 14-what-a-proposal-contains.md",
+            "find": "| **Tax** | The tax code and rate, for example *S 25.5%*. |"
+          },
+          {
+            "document": "Help page 11-billable-time-and-expenses.md",
+            "find": "Each time entry becomes one line. The **Description** is the date, the employee name and the activity code"
+          }
+        ]
+      },
+      {
+        "step": 3,
+        "verdict": "agrees",
+        "expected": "Subtotal 10,514.70, Tax 0.00 and Total 10,514.70 NOK. No note appears: code Z adds no note, and reverse charge does not apply to a Norwegian customer.",
+        "basis": [
+          {
+            "document": "Help page 15-vat-and-tax-codes.md",
+            "find": "Code *Z* is used for services to businesses outside the EU, for example Brightwater Utilities Ltd in the United Kingdom or Vestfold Shipping AS in Norway. The lines carry 0% VAT. No note is added."
+          },
+          {
+            "document": "Help page 14-what-a-proposal-contains.md",
+            "find": "- **Total**: subtotal plus tax, with the currency."
+          },
+          {
+            "document": "Help page 18-rounding.md",
+            "find": "- **Subtotal** is the sum of the rounded line amounts,"
+          }
+        ]
+      },
+      {
+        "step": 4,
+        "verdict": "disagrees",
+        "expected": "The documents describe a posting page, \"Posting INV-xxxxxx to the ledger\", followed by the invoice page opening by itself. Its heading is Invoice and the number, and Status is Final. No message such as \"Invoice INV-<number> finalised.\" is documented for finalising, so the case's message is not supported by the documents.",
+        "basis": [
+          {
+            "document": "Help page 22-finalising-an-invoice.md",
+            "find": "3. Wait. The page \"Posting INV-000123 to the ledger\" shows while Project Billing posts the invoice to the general ledger."
+          },
+          {
+            "document": "Help page 22-finalising-an-invoice.md",
+            "find": "When posting is done, the invoice page opens by itself. The invoice is already final and numbered while it is posting."
+          },
+          {
+            "document": "Help page 22-finalising-an-invoice.md",
+            "find": "The heading is **Invoice** and the number."
+          }
+        ]
+      },
+      {
+        "step": 5,
+        "verdict": "not_checkable",
+        "expected": "The case should state observable values. The invoice is listed under Invoices. Status Final, Customer Vestfold Shipping AS, Project P-1030, Invoice date 2026-10-31, Due date 2026-11-30 (30 days' payment terms), Currency NOK, Exchange rate 11.6830. One line: 2026-10-22 Timo Lehto - WORKSHOP, Qty 6.00, Amount 10,514.70, Tax Z 0%, Tax amount 0.00. Subtotal 10,514.70, Tax 0.00, Total 10,514.70. No reverse charge note.",
+        "basis": [
+          {
+            "document": "Help page 22-finalising-an-invoice.md",
+            "find": "The page shows the **Status**, **Customer**, **Project**, **Invoice date**, **Due date**, **Currency**, **Exchange rate**"
+          },
+          {
+            "document": "Test data catalogue",
+            "find": "payment_terms_days: 30"
+          },
+          {
+            "document": "Help page 23-invoice-numbers-and-due-dates.md",
+            "find": "The due date is set when the invoice is finalised. It is the **invoice date** plus the customer's **Payment terms (days)**."
+          },
+          {
+            "document": "Help page 22-finalising-an-invoice.md",
+            "find": "Below are the lines with **#**, **Type**, **Description**, **Qty**, **Amount**, **Tax** and **Tax amount**, and the **Subtotal**, **Tax** and **Total**."
+          }
+        ]
+      }
+    ],
+    "summary": "Steps 1 to 3 agree with the documents (NOK at 11.6830, 10,514.70 NOK, Z 0%, no note), but step 4 quotes a finalise message the documents do not describe and step 5 needs observable values such as Total 10,514.70 NOK and Due date 2026-11-30."
+  }
+}

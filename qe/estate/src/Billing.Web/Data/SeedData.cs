@@ -107,6 +107,10 @@ public static class SeedData
             new ProjectSpec("P-1130", "Polar vessel reporting", "C220", BillingType.TimeAndMaterials, "S", 0m, null, new(2025, 10, 1), new[] { "E02", "E03" }, true),
             new ProjectSpec("P-1131", "Polar crew app fixes", "C220", BillingType.TimeAndMaterials, "S", 0m, null, new(2026, 10, 1), new[] { "E05" }, false),
             new ProjectSpec("P-1132", "Polar legacy closeout", "C220", BillingType.TimeAndMaterials, "S", 0m, null, new(2026, 10, 1), new[] { "E05" }, false, ProjectStatus.Closing),
+            new ProjectSpec("P-1133", "Polar fleet dashboard", "C220", BillingType.TimeAndMaterials, "S", 0m, null, new(2026, 10, 1), new[] { "E05" }, false),
+            new ProjectSpec("P-1021", "Norrsken substation study", "C120", BillingType.TimeAndMaterials, "S", 0m, null, new(2026, 10, 1), new[] { "E01" }, false),
+            new ProjectSpec("P-1051", "Atlas loyalty programme", "C150", BillingType.TimeAndMaterials, "S", 0m, null, new(2026, 10, 1), new[] { "E07", "E03" }, false),
+            new ProjectSpec("P-1071", "Sakura quality dashboard", "C170", BillingType.TimeAndMaterials, "Z", 0m, null, new(2026, 10, 1), new[] { "E03" }, false),
         };
 
         var projects = new Dictionary<string, Project>();
@@ -267,16 +271,22 @@ public static class SeedData
         Time("P-1020", "E07", new(2026, 10, 2), 0.25m, comment: "Call with grid operator");
         Time("P-1020", "E03", new(2026, 10, 5), 7.5m, activity: "ANALYSIS");
 
+        Time("P-1021", "E01", new(2026, 10, 6), 0.75m, comment: "Substation data review");
+        Time("P-1021", "E01", new(2026, 10, 20), 1.75m, activity: "ANALYSIS");
+
         Time("P-1030", "E12", new(2026, 10, 22), 6m, activity: "WORKSHOP");
 
         Time("P-1040", "E08", new(2026, 10, 21), 6m);
         Expense("P-1040", new(2026, 10, 21), "Hotel Oulu, two nights", 250.00m);
 
         Time("P-1050", "E09", new(2026, 10, 14), 5m, activity: "BUILD");
+        Time("P-1051", "E07", new(2026, 10, 13), 8m, activity: "WORKSHOP");
+        Time("P-1051", "E03", new(2026, 10, 14), 6m);
         Time("P-1060", "E03", new(2026, 10, 19), 3m);
 
         Time("P-1070", "E03", new(2026, 10, 7), 0.25m, comment: "Supplier call");
         Time("P-1070", "E09", new(2026, 10, 8), 8m, activity: "BUILD");
+        Time("P-1071", "E03", new(2026, 10, 15), 1m, comment: "Defect triage with supplier");
 
         Time("P-1080", "E04", new(2026, 10, 12), 8m, activity: "BUILD");
         Time("P-1080", "E09", new(2026, 10, 13), 8m, activity: "BUILD");
@@ -297,6 +307,7 @@ public static class SeedData
 
         Time("P-1131", "E05", new(2026, 10, 9), 0.5m, activity: "TEST");
         Time("P-1132", "E05", new(2026, 10, 9), 0.5m, activity: "ADMIN");
+        Time("P-1133", "E05", new(2026, 10, 16), 1m, activity: "TEST");
 
         db.TimeEntries.AddRange(entries);
         db.Expenses.AddRange(expenses);

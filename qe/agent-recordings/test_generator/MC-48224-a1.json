@@ -1,0 +1,63 @@
+{
+  "input_hash": "70411d25af733ebaa4759741077e6ff80d7561b912e0870073a0bc5b49e66f9d",
+  "source": "live_model",
+  "model": "claude-opus-5-5",
+  "duration_ms": 20849,
+  "output": {
+    "path": "specs/proposals/minimum-amount-closing-project.spec.ts",
+    "title": "BR-14 a closing project is billed even when the proposal is below the minimum amount",
+    "data": {
+      "group": "projects",
+      "key": "polarCloseout",
+      "value": "P-1132 Polar legacy closeout"
+    },
+    "data_choice": "P-1132 is the only free project with status Closing. Its single approved, billable entry of 0.50 h at 85.00 comes to 46.05 USD before tax, which is under the 50.00 EUR minimum, so the closing exception decides whether it is billed.",
+    "scenario": [
+      "Create a proposal for P-1132 Polar legacy closeout with period end and invoice date 2026-10-31",
+      "Click Delete proposal and accept the confirmation dialog"
+    ],
+    "checks": [
+      {
+        "check": "Proposal status",
+        "value": "Proposal"
+      },
+      {
+        "check": "Number of lines",
+        "value": "1"
+      },
+      {
+        "check": "Line 1 date",
+        "value": "2026-10-09"
+      },
+      {
+        "check": "Line 1 employee",
+        "value": "Emma Lindqvist"
+      },
+      {
+        "check": "Line 1 quantity",
+        "value": "0.50"
+      },
+      {
+        "check": "Line 1 unit price",
+        "value": "85.00"
+      },
+      {
+        "check": "Line 1 amount",
+        "value": "46.05"
+      },
+      {
+        "check": "Line 1 tax amount",
+        "value": "11.74"
+      },
+      {
+        "check": "Proposal total",
+        "value": "57.79 USD"
+      },
+      {
+        "check": "Delete message",
+        "value": "Proposal deleted."
+      }
+    ],
+    "code": "import { expect, test } from '../../fixtures/billing';\nimport { PERIOD_END, projects } from '../../fixtures/testData';\n\ntest('BR-14 a closing project is billed even when the proposal is below the minimum amount', async ({ proposal, page }) => {\n  await proposal.create(projects.polarCloseout, PERIOD_END);\n\n  // 0.50 h at 85.00 is under the minimum, but the project is closing, so it is not deferred.\n  await expect(proposal.status).toHaveText('Proposal');\n  await expect(proposal.lines).toHaveCount(1);\n  await expect(proposal.line(1)).toContainText('2026-10-09');\n  await expect(proposal.line(1)).toContainText('Emma Lindqvist');\n  await expect(proposal.line(1).locator('.line-quantity')).toHaveText('0.50');\n  await expect(proposal.unitPriceOf(1)).toHaveText('85.00');\n  await expect(proposal.amountOf(1)).toHaveText('46.05');\n  await expect(proposal.line(1).locator('.line-tax')).toHaveText('11.74');\n  await expect(proposal.total).toHaveText('57.79 USD');\n\n  page.once('dialog', (dialog) => dialog.accept());\n  await page.locator('#delete-proposal').click();\n  await expect(page.getByRole('status')).toHaveText('Proposal deleted.');\n});\n"
+  }
+}

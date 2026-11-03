@@ -1,0 +1,66 @@
+{
+  "input_hash": "4adf83387554b2fdcf8e3f8d14d9905e1794f3ff757383508e3d8ca57d732230",
+  "source": "live_model",
+  "model": "claude-opus-5-5",
+  "duration_ms": 29609,
+  "output": {
+    "path": "specs/proposals/write-down-approval.spec.ts",
+    "title": "BR-07 write-downs over 10% of a proposal wait for a billing manager's approval before it can be finalised @critical",
+    "data": {
+      "group": "projects",
+      "key": "atlasLoyalty",
+      "value": "P-1051 Atlas loyalty programme"
+    },
+    "data_choice": "P-1051 is free, in EUR with no agreed or project rates, and has two approved, billable entries (8 h SNR at 150 and 6 h CONS at 120), so its value before adjustments is 1,920.00 and 10% is exactly 192.00. A -200 write-down is just over the limit, and -192 sits on it, which catches the approval coming back at or below 10%. This assumes 'value before adjustments' means the subtotal before tax, as the proposed test on P-1001 implies.",
+    "scenario": [
+      "Create a proposal for P-1051 Atlas loyalty programme with period end 2026-10-31",
+      "Write line 1 down by -200 with the reason 'Loyalty workshop overran, agreed with customer'",
+      "Click Finalise invoice",
+      "Write line 1 down by -192 with the reason 'Loyalty workshop overran, agreed with customer'",
+      "Delete the proposal and accept the confirmation"
+    ],
+    "checks": [
+      {
+        "check": "Proposal value before adjustments",
+        "value": "1,920.00"
+      },
+      {
+        "check": "Message after the write-down over 10%",
+        "value": "Adjustment saved. The proposal now needs a billing manager\\'s approval."
+      },
+      {
+        "check": "Line 1 adjustment over 10%",
+        "value": "-200.00"
+      },
+      {
+        "check": "Line 1 reason",
+        "value": "Loyalty workshop overran"
+      },
+      {
+        "check": "Status over 10%",
+        "value": "Awaiting approval"
+      },
+      {
+        "check": "Finalise refused",
+        "value": "Write-downs on this proposal are waiting for a billing manager\\'s approval."
+      },
+      {
+        "check": "Still a proposal with no number",
+        "value": "Assigned when finalised"
+      },
+      {
+        "check": "Line 1 adjustment at 10%",
+        "value": "-192.00"
+      },
+      {
+        "check": "Status at exactly 10%",
+        "value": "Proposal"
+      },
+      {
+        "check": "Delete button gone after deletion",
+        "value": "0"
+      }
+    ],
+    "code": "import { expect, test } from '../../fixtures/billing';\nimport { PERIOD_END, projects } from '../../fixtures/testData';\n\ntest('BR-07 write-downs over 10% of a proposal wait for a billing manager\\'s approval before it can be finalised @critical', async ({ proposal, page }) => {\n  await proposal.create(projects.atlasLoyalty, PERIOD_END);\n  await expect(proposal.subtotal).toHaveText('1,920.00');\n\n  // 200.00 is just over 10% of 1,920.00.\n  await proposal.adjust(1, '-200', 'Loyalty workshop overran, agreed with customer');\n  await expect(page.getByRole('status')).toHaveText('Adjustment saved. The proposal now needs a billing manager\\'s approval.');\n  await expect(proposal.line(1).locator('.line-adjustment')).toHaveText('-200.00');\n  await expect(proposal.line(1)).toContainText('Loyalty workshop overran');\n  await expect(proposal.status).toHaveText('Awaiting approval');\n\n  await proposal.finalise();\n  await expect(proposal.error).toHaveText('Write-downs on this proposal are waiting for a billing manager\\'s approval.');\n  await expect(proposal.status).toHaveText('Awaiting approval');\n  await expect(proposal.number).toHaveText('Assigned when finalised');\n\n  // 192.00 is exactly 10%, which needs no approval.\n  await proposal.adjust(1, '-192', 'Loyalty workshop overran, agreed with customer');\n  await expect(proposal.line(1).locator('.line-adjustment')).toHaveText('-192.00');\n  await expect(proposal.status).toHaveText('Proposal');\n\n  page.once('dialog', (dialog) => dialog.accept());\n  await page.locator('#delete-proposal').click();\n  await expect(page.locator('#delete-proposal')).toHaveCount(0);\n});\n"
+  }
+}

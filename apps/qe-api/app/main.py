@@ -7,7 +7,7 @@ from fastapi import FastAPI
 from pydantic import BaseModel
 from sqlalchemy import text
 
-from app import context
+from app import context, tests_api
 from app.config import get_settings
 from app.db import Db
 from qe.engines.estate import estate
@@ -23,6 +23,7 @@ async def lifespan(_: FastAPI) -> AsyncIterator[None]:
 
 app = FastAPI(title="Test Assurance API", lifespan=lifespan)
 app.include_router(context.router)
+app.include_router(tests_api.router)
 
 
 class Person(BaseModel):

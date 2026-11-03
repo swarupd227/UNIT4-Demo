@@ -1,0 +1,68 @@
+{
+  "input_hash": "2c9e9b2c89351301e010fb0c359060c6d6bc4141ebc687346326c753f0a2a515",
+  "source": "live_model",
+  "model": "claude-opus-5-5",
+  "duration_ms": 47335,
+  "output": {
+    "path": "specs/pricing/usd-tax-on-rounded-line.spec.ts",
+    "title": "BR-04 a USD line is rounded to cents before its tax is worked out @critical",
+    "data": {
+      "group": "projects",
+      "key": "polarFleetDashboard",
+      "value": "P-1133 Polar fleet dashboard"
+    },
+    "data_choice": "P-1133 bills USD customer C220 at the October rate of 1.0835 with tax S 25.5%, and its one 85.00 EUR line converts to 92.0975 USD, so tax on the rounded 92.10 (23.49) differs from tax on the unrounded amount (23.48). The source's own project, P-1130, does not reproduce its case: the catalogue has 2.1 h x 120 = 252.00 EUR, not 270.00 EUR, for line 3, and none of the free USD projects gives an exact half-cent, so this test does not exercise half away from zero. The catalogue does not settle whether P-1132, in Closing status, can be proposed.",
+    "scenario": [
+      "Create a proposal for projects.polarFleetDashboard with period end and invoice date PERIOD_END (2026-10-31)",
+      "Read the currency, exchange rate, line count, line 1 unit price, amount, tax code and tax amount, and the subtotal, tax and total",
+      "Click Delete proposal and accept the confirmation dialog"
+    ],
+    "checks": [
+      {
+        "check": "Currency",
+        "value": "USD"
+      },
+      {
+        "check": "Exchange rate",
+        "value": "1.0835"
+      },
+      {
+        "check": "Line count",
+        "value": "1"
+      },
+      {
+        "check": "Line 1 unit price",
+        "value": "85.00"
+      },
+      {
+        "check": "Line 1 amount",
+        "value": "92.10"
+      },
+      {
+        "check": "Line 1 tax code",
+        "value": "S 25.5%"
+      },
+      {
+        "check": "Line 1 tax",
+        "value": "23.49"
+      },
+      {
+        "check": "Subtotal",
+        "value": "92.10"
+      },
+      {
+        "check": "Tax total",
+        "value": "23.49"
+      },
+      {
+        "check": "Total",
+        "value": "115.59 USD"
+      },
+      {
+        "check": "Deletion message",
+        "value": "Proposal deleted."
+      }
+    ],
+    "code": "import { expect, test } from '../../fixtures/billing';\nimport { PERIOD_END, projects } from '../../fixtures/testData';\n\ntest('BR-04 a USD line is rounded to cents before its tax is worked out @critical', async ({ proposal, page }) => {\n  await proposal.create(projects.polarFleetDashboard, PERIOD_END);\n\n  await expect(page.locator('#proposal-currency')).toHaveText('USD');\n  await expect(page.locator('#proposal-rate')).toHaveText('1.0835');\n  await expect(proposal.lines).toHaveCount(1);\n  await expect(proposal.unitPriceOf(1)).toHaveText('85.00');\n\n  // 85.00 EUR x 1.0835 = 92.0975 USD, rounded to cents.\n  await expect(proposal.amountOf(1)).toHaveText('92.10');\n  await expect(proposal.line(1).locator('.line-tax-code')).toHaveText('S 25.5%');\n\n  // 92.10 x 25.5% = 23.4855; tax on the unrounded 92.0975 would give 23.48.\n  await expect(proposal.line(1).locator('.line-tax')).toHaveText('23.49');\n  await expect(proposal.subtotal).toHaveText('92.10');\n  await expect(proposal.tax).toHaveText('23.49');\n  await expect(proposal.total).toHaveText('115.59 USD');\n\n  page.once('dialog', (dialog) => dialog.accept());\n  await page.locator('#delete-proposal').click();\n  await expect(page.getByRole('status')).toHaveText('Proposal deleted.');\n});\n"
+  }
+}

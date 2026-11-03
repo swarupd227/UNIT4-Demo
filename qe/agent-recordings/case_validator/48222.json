@@ -1,0 +1,130 @@
+{
+  "input_hash": "a558704595c30eeee4c26e2fe58a4ff5b41454708110c4b6eca0044616ba2392",
+  "source": "live_model",
+  "model": "claude-opus-5-5",
+  "duration_ms": 31599,
+  "output": {
+    "steps": [
+      {
+        "step": 1,
+        "verdict": "agrees",
+        "expected": "With CHF chosen in Show, the table lists a single CHF rate: Effective from 2026-11-01, Rate 0.9312. The seeded data holds no other CHF rate.",
+        "basis": [
+          {
+            "document": "Test data catalogue",
+            "find": "effective: '2026-11-01'"
+          },
+          {
+            "document": "Test data catalogue",
+            "find": "rate: 0.9312"
+          },
+          {
+            "document": "Help page 17-currencies-and-exchange-rates.md",
+            "find": "Use **Show** to pick the currency."
+          }
+        ]
+      },
+      {
+        "step": 2,
+        "verdict": "agrees",
+        "expected": "The New invoice proposal page opens. The business date is 2026-10-30, so Period end defaults to 31 Oct 2026 and Invoice date defaults to the period end, 31 Oct 2026.",
+        "basis": [
+          {
+            "document": "Test data catalogue",
+            "find": "business_date: '2026-10-30'"
+          },
+          {
+            "document": "Help page 02-business-date-and-billing-period.md",
+            "find": "When you open **New proposal**, the period end is set to the last day of the month of the business date."
+          },
+          {
+            "document": "Help page 02-business-date-and-billing-period.md",
+            "find": "It is set to the period end by default."
+          },
+          {
+            "document": "Help page 13-creating-a-proposal.md",
+            "find": "On the **New invoice proposal** page, select the **Project**."
+          }
+        ]
+      },
+      {
+        "step": 3,
+        "verdict": "agrees",
+        "expected": "The proposal is created for Alpine Precision AG (CHF). No CHF rate is effective on or before 31 Oct 2026, so Exchange rate shows Missing and the banner \"No exchange rate to CHF for 31 Oct 2026 yet. Amounts are shown in EUR until the rate is entered.\" appears. There is one line: Aino Makela, ARCH, 6.00 hours at the standard rate of 185.00, with an Amount of 1,110.00 in EUR. The customer has no agreed rates and the project has no rate card.",
+        "basis": [
+          {
+            "document": "Test data catalogue",
+            "find": "name: Alpine MES upgrade"
+          },
+          {
+            "document": "Test data catalogue",
+            "find": "name: Alpine Precision AG"
+          },
+          {
+            "document": "Test data catalogue",
+            "find": "standard_rate: 185"
+          },
+          {
+            "document": "Help page 07-rates.md",
+            "find": "| Solution architect | ARCH | 185.00 |"
+          },
+          {
+            "document": "Help page 17-currencies-and-exchange-rates.md",
+            "find": "The **Exchange rate** shows *Missing*, and this message is shown:"
+          },
+          {
+            "document": "Help page 17-currencies-and-exchange-rates.md",
+            "find": "No exchange rate to CHF for 31 Oct 2026 yet. Amounts are shown in EUR until the rate is entered."
+          },
+          {
+            "document": "Help page 17-currencies-and-exchange-rates.md",
+            "find": "The amounts on the proposal are then the EUR values."
+          }
+        ]
+      },
+      {
+        "step": 4,
+        "verdict": "agrees",
+        "expected": "Finalising fails with \"No exchange rate from EUR to CHF on or before 31 Oct 2026. Add the rate before finalising.\" The invoice is not finalised, so Status stays Proposal and Invoice number still shows \"Assigned when finalised\". No invoice number is used.",
+        "basis": [
+          {
+            "document": "Help page 22-finalising-an-invoice.md",
+            "find": "No exchange rate from EUR to CHF on or before 31 Oct 2026. Add the rate before finalising."
+          },
+          {
+            "document": "Help page 22-finalising-an-invoice.md",
+            "find": "If one fails, the invoice is not finalised and the message is shown at the top of the proposal."
+          },
+          {
+            "document": "Help page 23-invoice-numbers-and-due-dates.md",
+            "find": "Assigned when finalised"
+          },
+          {
+            "document": "Help page 23-invoice-numbers-and-due-dates.md",
+            "find": "a finalise that fails, for example because the PO number is missing, does not use a number."
+          },
+          {
+            "document": "Help page 17-currencies-and-exchange-rates.md",
+            "find": "A rate effective from a later date, for example 1 Nov 2026, does not help an invoice dated 31 Oct 2026."
+          }
+        ]
+      },
+      {
+        "step": 5,
+        "verdict": "agrees",
+        "expected": "After the dialog \"Delete this proposal? Its entries go back to unbilled.\" is confirmed, the message \"Proposal deleted.\" is shown and the entries return to unbilled. The help pages confirm the message but do not say which page is shown afterwards, so the claim that the Invoice proposals list is shown is not settled by the documents.",
+        "basis": [
+          {
+            "document": "Help page 13-creating-a-proposal.md",
+            "find": "Confirm the question \"Delete this proposal? Its entries go back to unbilled.\" The message \"Proposal deleted.\" confirms it."
+          },
+          {
+            "document": "Help page 01-getting-started.md",
+            "find": "When something works, a short confirmation appears in a box at the top of the page, for example \"Proposal deleted.\""
+          }
+        ]
+      }
+    ],
+    "summary": "Every step agrees with the documents and the test data catalogue, though the documents do not settle which page is shown after the proposal is deleted in step 5."
+  }
+}

@@ -1,0 +1,9 @@
+# This sprint's automation batch for project billing, chosen by the quality engineering lead from the
+# coverage map and the risk cards. The workbench reads it; people change it.
+chosen_by: Maria Lindgren
+# Manual cases on the rules with the most risk, plus the cases a regression run spends most time on.
+manual_cases: [48207, 48208, 48212, 48218, 48219, 48222, 48224, 48229, 48230, 48236]
+# The rounding defects on the BR-04 risk card that were fixed without an automated test.
+defects: [BILL-1046, BILL-1121, BILL-1187, BILL-1203]
+# Approved context with a proposed test.
+context: [HIDDEN-01]

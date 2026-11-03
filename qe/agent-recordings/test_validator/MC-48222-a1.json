@@ -1,0 +1,152 @@
+{
+  "input_hash": "ac5dec628b58ceb3220346404333c2516959cfa8f630658eee18c4f94b2073e0",
+  "source": "live_model",
+  "model": "claude-opus-5-5",
+  "duration_ms": 13614,
+  "output": {
+    "checks": [
+      {
+        "check": "Missing rate banner",
+        "expected": "No exchange rate to CHF for 31 Oct 2026 yet. Amounts are shown in EUR until the rate is entered.",
+        "basis": [
+          {
+            "document": "Help page 17-currencies-and-exchange-rates.md",
+            "find": "\"No exchange rate to CHF for 31 Oct 2026 yet. Amounts are shown in EUR until the rate is entered.\""
+          },
+          {
+            "document": "Test data catalogue",
+            "find": "currency: CHF"
+          },
+          {
+            "document": "Test data catalogue",
+            "find": "effective: '2026-11-01'"
+          },
+          {
+            "document": "Test data catalogue",
+            "find": "name: Alpine Precision AG"
+          }
+        ]
+      },
+      {
+        "check": "Exchange rate",
+        "expected": "Missing",
+        "basis": [
+          {
+            "document": "Help page 14-what-a-proposal-contains.md",
+            "find": "| **Exchange rate** | The rate from EUR, or *Missing*. EUR invoices show 1.0000. |"
+          },
+          {
+            "document": "Help page 17-currencies-and-exchange-rates.md",
+            "find": "If there is no rate on or before the invoice date, the proposal is still created. The **Exchange rate** shows *Missing*"
+          }
+        ]
+      },
+      {
+        "check": "Line 1 quantity",
+        "expected": "6.00",
+        "basis": [
+          {
+            "document": "Test data catalogue",
+            "find": "employee: Aino Makela"
+          },
+          {
+            "document": "Help page 12-quarter-hour-billing.md",
+            "find": "An entry that is already a whole quarter hour is not changed."
+          },
+          {
+            "document": "Help page 14-what-a-proposal-contains.md",
+            "find": "| **Qty** | Hours for time lines, 1.00 for others. |"
+          }
+        ]
+      },
+      {
+        "check": "Line 1 unit price",
+        "expected": "185.00",
+        "basis": [
+          {
+            "document": "Help page 07-rates.md",
+            "find": "| Solution architect | ARCH | 185.00 |"
+          },
+          {
+            "document": "Test data catalogue",
+            "find": "Aino Makela: ARCH"
+          },
+          {
+            "document": "Help page 07-rates.md",
+            "find": "3. **The role's standard rate.**"
+          }
+        ]
+      },
+      {
+        "check": "Line 1 amount",
+        "expected": "1,110.00 (the EUR value, 6.00 × 185.00, because the CHF rate is missing)",
+        "basis": [
+          {
+            "document": "Help page 17-currencies-and-exchange-rates.md",
+            "find": "The amounts on the proposal are then the EUR values."
+          },
+          {
+            "document": "Help page 00-index.md",
+            "find": "Amounts are written with a full stop for decimals and a comma for thousands, for example 1,050.00 EUR."
+          },
+          {
+            "document": "Help page 12-quarter-hour-billing.md",
+            "find": "The amount of the line is the billed hours times the hourly rate, less any agreement discount."
+          }
+        ]
+      },
+      {
+        "check": "Finalise error",
+        "expected": "No exchange rate from EUR to CHF on or before 31 Oct 2026. Add the rate before finalising.",
+        "basis": [
+          {
+            "document": "Help page 22-finalising-an-invoice.md",
+            "find": "| No exchange rate | \"No exchange rate from EUR to CHF on or before 31 Oct 2026. Add the rate before finalising.\" |"
+          },
+          {
+            "document": "Help page 17-currencies-and-exchange-rates.md",
+            "find": "A rate effective from a later date, for example 1 Nov 2026, does not help an invoice dated 31 Oct 2026."
+          }
+        ]
+      },
+      {
+        "check": "Status after finalise attempt",
+        "expected": "Proposal",
+        "basis": [
+          {
+            "document": "Help page 22-finalising-an-invoice.md",
+            "find": "If one fails, the invoice is not finalised and the message is shown at the top of the proposal."
+          },
+          {
+            "document": "Help page 14-what-a-proposal-contains.md",
+            "find": "| **Status** | *Proposal*, or *Deferred*. |"
+          }
+        ]
+      },
+      {
+        "check": "Invoice number after finalise attempt",
+        "expected": "Assigned when finalised",
+        "basis": [
+          {
+            "document": "Help page 23-invoice-numbers-and-due-dates.md",
+            "find": "a finalise that fails, for example because the PO number is missing, does not use a number."
+          },
+          {
+            "document": "Help page 14-what-a-proposal-contains.md",
+            "find": "| **Invoice number** | \"Assigned when finalised\". |"
+          }
+        ]
+      },
+      {
+        "check": "Deletion message",
+        "expected": "Proposal deleted.",
+        "basis": [
+          {
+            "document": "Help page 13-creating-a-proposal.md",
+            "find": "The message \"Proposal deleted.\" confirms it."
+          }
+        ]
+      }
+    ]
+  }
+}

@@ -1,0 +1,80 @@
+{
+  "input_hash": "ebcb7a481e5ef885e4c1a183eee0fe86d4fc40d43fde4d4cc18001552ed22f35",
+  "source": "live_model",
+  "model": "claude-opus-5-5",
+  "duration_ms": 26408,
+  "output": {
+    "path": "specs/pricing/multi-currency-rounding.spec.ts",
+    "title": "BR-04 JPY lines are converted and rounded one by one to whole yen, and the total is the sum of the rounded lines @critical",
+    "data": {
+      "group": "projects",
+      "key": "sakuraPortal",
+      "value": "P-1070 Sakura supplier portal"
+    },
+    "data_choice": "Sakura invoices in JPY, which has no decimals. One line rounds down (4,871.10) and the other rounds up (142,885.60), so a wrong conversion or rounding would change what the page shows. The total alone would not separate summing rounded lines from rounding the sum (147,756.70 also rounds to 147,757), so the per-line amounts carry the rule.",
+    "scenario": [
+      "Create a proposal for P-1070 Sakura supplier portal with period end and invoice date 2026-10-31",
+      "Read the currency and exchange rate",
+      "Read the number of lines",
+      "Read line 1: date, amount and tax amount",
+      "Read line 2: date, amount and tax amount",
+      "Read the subtotal, tax and total",
+      "Click Delete proposal and accept the confirmation dialog"
+    ],
+    "checks": [
+      {
+        "check": "Currency",
+        "value": "JPY"
+      },
+      {
+        "check": "Exchange rate",
+        "value": "162.3700"
+      },
+      {
+        "check": "Line count",
+        "value": "2"
+      },
+      {
+        "check": "Line 1 date",
+        "value": "2026-10-07"
+      },
+      {
+        "check": "Line 1 amount",
+        "value": "4,871"
+      },
+      {
+        "check": "Line 1 tax amount",
+        "value": "0"
+      },
+      {
+        "check": "Line 2 date",
+        "value": "2026-10-08"
+      },
+      {
+        "check": "Line 2 amount",
+        "value": "142,886"
+      },
+      {
+        "check": "Line 2 tax amount",
+        "value": "0"
+      },
+      {
+        "check": "Subtotal",
+        "value": "147,757"
+      },
+      {
+        "check": "Tax",
+        "value": "0"
+      },
+      {
+        "check": "Total",
+        "value": "147,757 JPY"
+      },
+      {
+        "check": "Delete message",
+        "value": "Proposal deleted."
+      }
+    ],
+    "code": "import { expect, test } from '../../fixtures/billing';\nimport { PERIOD_END, projects } from '../../fixtures/testData';\n\ntest('BR-04 JPY lines are converted and rounded one by one to whole yen, and the total is the sum of the rounded lines @critical', async ({ proposal }) => {\n  await proposal.create(projects.sakuraPortal, PERIOD_END);\n\n  await expect(proposal.page.locator('#proposal-currency')).toHaveText('JPY');\n  await expect(proposal.page.locator('#proposal-rate')).toHaveText('162.3700');\n\n  // The rejected September entry stays out.\n  await expect(proposal.lines).toHaveCount(2);\n\n  // 30.00 EUR x 162.37 = 4,871.10, rounded down to whole yen.\n  await expect(proposal.line(1)).toContainText('2026-10-07');\n  await expect(proposal.amountOf(1)).toHaveText('4,871');\n  await expect(proposal.line(1).locator('.line-tax')).toHaveText('0');\n\n  // 880.00 EUR x 162.37 = 142,885.60, rounded up to whole yen.\n  await expect(proposal.line(2)).toContainText('2026-10-08');\n  await expect(proposal.amountOf(2)).toHaveText('142,886');\n  await expect(proposal.line(2).locator('.line-tax')).toHaveText('0');\n\n  await expect(proposal.subtotal).toHaveText('147,757');\n  await expect(proposal.tax).toHaveText('0');\n  await expect(proposal.total).toHaveText('147,757 JPY');\n\n  proposal.page.once('dialog', (dialog) => dialog.accept());\n  await proposal.page.locator('#delete-proposal').click();\n  await expect(proposal.page.getByRole('status')).toHaveText('Proposal deleted.');\n});\n"
+  }
+}

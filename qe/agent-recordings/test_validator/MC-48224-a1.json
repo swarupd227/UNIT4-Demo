@@ -1,0 +1,174 @@
+{
+  "input_hash": "5d18458b6c62a0482f07954e0ed51bc2552e1ad9f2f1fd97ad7f1c06cf82b00b",
+  "source": "live_model",
+  "model": "claude-opus-5-5",
+  "duration_ms": 18062,
+  "output": {
+    "checks": [
+      {
+        "check": "Proposal status",
+        "expected": "Proposal",
+        "basis": [
+          {
+            "document": "Help page 21-minimum-invoice-amount.md",
+            "find": "The minimum does not apply to projects with the status *Closing*."
+          },
+          {
+            "document": "Help page 21-minimum-invoice-amount.md",
+            "find": "For example, P-1132 Polar legacy closeout is *Closing*. A proposal for 0.50 hours is created as a normal proposal."
+          },
+          {
+            "document": "Test data catalogue",
+            "find": "name: Polar legacy closeout"
+          },
+          {
+            "document": "Help page 14-what-a-proposal-contains.md",
+            "find": "| **Status** | *Proposal*, or *Deferred*. |"
+          }
+        ]
+      },
+      {
+        "check": "Number of lines",
+        "expected": "1",
+        "basis": [
+          {
+            "document": "Help page 11-billable-time-and-expenses.md",
+            "find": "Each time entry becomes one line."
+          },
+          {
+            "document": "Test data catalogue",
+            "find": "activity: ADMIN"
+          },
+          {
+            "document": "Help page 11-billable-time-and-expenses.md",
+            "find": "4. is dated on or before the proposal's **Period end**."
+          }
+        ]
+      },
+      {
+        "check": "Line 1 date",
+        "expected": "2026-10-09",
+        "basis": [
+          {
+            "document": "Test data catalogue",
+            "find": "date: '2026-10-09'"
+          },
+          {
+            "document": "Help page 11-billable-time-and-expenses.md",
+            "find": "The **Description** is the date, the employee name and the activity code"
+          }
+        ]
+      },
+      {
+        "check": "Line 1 employee",
+        "expected": "Emma Lindqvist",
+        "basis": [
+          {
+            "document": "Test data catalogue",
+            "find": "employee: Emma Lindqvist"
+          },
+          {
+            "document": "Help page 11-billable-time-and-expenses.md",
+            "find": "\"2026-10-01 Sara Holm - CONS (Call with grid operator)\""
+          }
+        ]
+      },
+      {
+        "check": "Line 1 quantity",
+        "expected": "0.50",
+        "basis": [
+          {
+            "document": "Test data catalogue",
+            "find": "hours: 0.5"
+          },
+          {
+            "document": "Help page 12-quarter-hour-billing.md",
+            "find": "An entry that is already a whole quarter hour is not changed."
+          }
+        ]
+      },
+      {
+        "check": "Line 1 unit price",
+        "expected": "85.00",
+        "basis": [
+          {
+            "document": "Help page 07-rates.md",
+            "find": "| Junior consultant | JUN | 85.00 |"
+          },
+          {
+            "document": "Test data catalogue",
+            "find": "Emma Lindqvist: JUN"
+          },
+          {
+            "document": "Help page 07-rates.md",
+            "find": "3. **The role's standard rate.**"
+          }
+        ]
+      },
+      {
+        "check": "Line 1 amount",
+        "expected": "46.05",
+        "basis": [
+          {
+            "document": "Test data catalogue",
+            "find": "rate: 1.0835"
+          },
+          {
+            "document": "Help page 17-currencies-and-exchange-rates.md",
+            "find": "An invoice uses the latest rate whose **Effective from** date is on or before its **Invoice date**."
+          },
+          {
+            "document": "Help page 18-rounding.md",
+            "find": "3. rounds the result to the decimal places of the invoice currency. This is the line **Amount**,"
+          },
+          {
+            "document": "Help page 18-rounding.md",
+            "find": "Polar Marine Oy is invoiced in USD with standard VAT at 25.5%."
+          }
+        ]
+      },
+      {
+        "check": "Line 1 tax amount",
+        "expected": "11.74",
+        "basis": [
+          {
+            "document": "Help page 18-rounding.md",
+            "find": "4. works out the tax on the rounded line amount and rounds that too. This is the line **Tax amount**."
+          },
+          {
+            "document": "Help page 16-reverse-charge.md",
+            "find": "4. The customer's country is not Finland."
+          },
+          {
+            "document": "Help page 15-vat-and-tax-codes.md",
+            "find": "| S | Standard rate | 25.5% | |"
+          }
+        ]
+      },
+      {
+        "check": "Proposal total",
+        "expected": "57.79 USD",
+        "basis": [
+          {
+            "document": "Help page 14-what-a-proposal-contains.md",
+            "find": "- **Total**: subtotal plus tax, with the currency."
+          },
+          {
+            "document": "Help page 18-rounding.md",
+            "find": "- **Total** is Subtotal plus Tax."
+          }
+        ]
+      },
+      {
+        "check": "Delete message",
+        "expected": "Proposal deleted.",
+        "basis": [
+          {
+            "document": "Help page 13-creating-a-proposal.md",
+            "find": "The message \"Proposal deleted.\" confirms it."
+          }
+        ]
+      }
+    ]
+  }
+}

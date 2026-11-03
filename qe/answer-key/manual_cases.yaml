@@ -236,6 +236,7 @@ cases:
     rule: BR-03
     title: "Invoice to non-EU customer (Vestfold, Norway)"
     planted: T5
+    drift: posting_message
     duplicate_of: null
     expected_correct: true
     manual_minutes: 8
@@ -244,6 +245,7 @@ cases:
     rule: BR-09
     title: "Invoice number is given only at finalisation"
     planted: null
+    drift: posting_message
     duplicate_of: null
     expected_correct: true
     manual_minutes: 8
@@ -252,6 +254,7 @@ cases:
     rule: BR-09
     title: "Deleting a proposal does not use up an invoice number"
     planted: null
+    drift: posting_message
     duplicate_of: null
     expected_correct: true
     manual_minutes: 8
@@ -260,6 +263,7 @@ cases:
     rule: BR-10
     title: "Due date follows customer payment terms - Brightwater 45 days"
     planted: null
+    drift: posting_message
     duplicate_of: null
     expected_correct: true
     manual_minutes: 6
@@ -268,6 +272,7 @@ cases:
     rule: BR-10
     title: "30 day default when the customer has no payment terms"
     planted: null
+    drift: posting_message
     duplicate_of: null
     expected_correct: true
     manual_minutes: 8
@@ -276,6 +281,7 @@ cases:
     rule: BR-17
     title: "Norrsken invoice finalised with a purchase order number"
     planted: null
+    drift: posting_message
     duplicate_of: null
     expected_correct: true
     manual_minutes: 6
@@ -284,6 +290,7 @@ cases:
     rule: BR-11
     title: "Milestone is billed once (Koivula permit system)"
     planted: null
+    drift: posting_message
     duplicate_of: null
     expected_correct: true
     manual_minutes: 10
@@ -292,6 +299,7 @@ cases:
     rule: BR-19
     title: "Nothing more can be billed once the not-to-exceed limit is reached"
     planted: null
+    drift: posting_message
     duplicate_of: null
     expected_correct: true
     manual_minutes: 9

@@ -1,0 +1,214 @@
+{
+  "input_hash": "e22edb487b8d50168e5199be564debbd41779d4bd0fc4b39bf377ac7aa32717d",
+  "source": "live_model",
+  "model": "claude-opus-5-5",
+  "duration_ms": 27033,
+  "output": {
+    "checks": [
+      {
+        "check": "Proposal currency",
+        "expected": "USD",
+        "basis": [
+          {
+            "document": "Test data catalogue",
+            "find": "name: Polar vessel reporting"
+          },
+          {
+            "document": "Test data catalogue",
+            "find": "customer: C220"
+          },
+          {
+            "document": "Test data catalogue",
+            "find": "name: Polar Marine Oy"
+          },
+          {
+            "document": "Help page 14-what-a-proposal-contains.md",
+            "find": "| **Currency** | The customer's invoice currency. |"
+          }
+        ]
+      },
+      {
+        "check": "Exchange rate",
+        "expected": "1.0835 (the USD rate effective from 1 Oct 2026, assuming the invoice date, which defaults to PERIOD_END, is on or after 1 Oct 2026)",
+        "basis": [
+          {
+            "document": "Test data catalogue",
+            "find": "rate: 1.0835"
+          },
+          {
+            "document": "Test data catalogue",
+            "find": "effective: '2026-10-01'"
+          },
+          {
+            "document": "Help page 17-currencies-and-exchange-rates.md",
+            "find": "An invoice uses the latest rate whose **Effective from** date is on or before its **Invoice date**."
+          },
+          {
+            "document": "Help page 02-business-date-and-billing-period.md",
+            "find": "Each proposal also has an **Invoice date**. It is set to the period end by default."
+          }
+        ]
+      },
+      {
+        "check": "Line count",
+        "expected": "3, assuming PERIOD_END is on or after 14 Oct 2026 (for example the default 31 Oct 2026). PERIOD_END is not defined in the material, so an earlier value would give fewer lines. The 29 Sep 2026 entry is not billable and is left out.",
+        "basis": [
+          {
+            "document": "Test data catalogue",
+            "find": "business_date: '2026-10-30'"
+          },
+          {
+            "document": "Test data catalogue",
+            "find": "billable: false"
+          },
+          {
+            "document": "Help page 11-billable-time-and-expenses.md",
+            "find": "is dated on or before the proposal's **Period end**."
+          },
+          {
+            "document": "Rule register",
+            "find": "A proposal includes time entries that are approved, marked billable, not yet billed and dated on or"
+          }
+        ]
+      },
+      {
+        "check": "Line 1 amount",
+        "expected": "1,300.20 (12 Oct 2026, Juha Niemi, SNR, 8.00 h at the 150.00 EUR standard rate = 1,200.00 EUR x 1.0835)",
+        "basis": [
+          {
+            "document": "Test data catalogue",
+            "find": "Juha Niemi: SNR"
+          },
+          {
+            "document": "Test data catalogue",
+            "find": "standard_rate: 150"
+          },
+          {
+            "document": "Help page 07-rates.md",
+            "find": "3. **The role's standard rate.**"
+          },
+          {
+            "document": "Help page 18-rounding.md",
+            "find": "3. rounds the result to the decimal places of the invoice currency. This is the line **Amount**,"
+          }
+        ]
+      },
+      {
+        "check": "Line 1 tax",
+        "expected": "331.55 (S 25.5% on 1,300.20 = 331.551)",
+        "basis": [
+          {
+            "document": "Test data catalogue",
+            "find": "tax_code: S"
+          },
+          {
+            "document": "Help page 15-vat-and-tax-codes.md",
+            "find": "| S | Standard rate | 25.5% | |"
+          },
+          {
+            "document": "Help page 18-rounding.md",
+            "find": "4. works out the tax on the rounded line amount and rounds that too. This is the line **Tax amount**."
+          }
+        ]
+      },
+      {
+        "check": "Line 2 amount",
+        "expected": "1,040.16 (13 Oct 2026, Laura Koskinen, CONS, 8.00 h at 120.00 EUR = 960.00 EUR x 1.0835)",
+        "basis": [
+          {
+            "document": "Test data catalogue",
+            "find": "Laura Koskinen: CONS"
+          },
+          {
+            "document": "Test data catalogue",
+            "find": "standard_rate: 120"
+          },
+          {
+            "document": "Help page 17-currencies-and-exchange-rates.md",
+            "find": "Each line is converted from EUR and rounded on its own."
+          }
+        ]
+      },
+      {
+        "check": "Line 2 tax",
+        "expected": "265.24 (25.5% of 1,040.16 = 265.2408)",
+        "basis": [
+          {
+            "document": "Help page 15-vat-and-tax-codes.md",
+            "find": "The tax on each line is the rounded line amount times the rate, rounded to the currency's decimal places."
+          }
+        ]
+      },
+      {
+        "check": "Line 3 amount",
+        "expected": "292.55 (14 Oct 2026, Laura Koskinen, 2.1 h rounded up to 2.25 h at 120.00 EUR = 270.00 EUR x 1.0835 = 292.545, rounded half away from zero)",
+        "basis": [
+          {
+            "document": "Test data catalogue",
+            "find": "hours: 2.1"
+          },
+          {
+            "document": "Help page 12-quarter-hour-billing.md",
+            "find": "Each time entry is rounded **up** to the next quarter hour."
+          },
+          {
+            "document": "Help page 18-rounding.md",
+            "find": "Amounts exactly halfway are rounded away from zero."
+          }
+        ]
+      },
+      {
+        "check": "Line 3 tax",
+        "expected": "74.60 (25.5% of 292.55 = 74.60025)",
+        "basis": [
+          {
+            "document": "Help page 18-rounding.md",
+            "find": "4. works out the tax on the rounded line amount and rounds that too. This is the line **Tax amount**."
+          },
+          {
+            "document": "Rule register",
+            "find": "half away from zero. Tax is worked out on the rounded line."
+          }
+        ]
+      },
+      {
+        "check": "Subtotal",
+        "expected": "2,632.91",
+        "basis": [
+          {
+            "document": "Help page 18-rounding.md",
+            "find": "**Subtotal** is the sum of the rounded line amounts,"
+          },
+          {
+            "document": "Help page 00-index.md",
+            "find": "Amounts are written with a full stop for decimals and a comma for thousands"
+          }
+        ]
+      },
+      {
+        "check": "Tax total",
+        "expected": "671.39",
+        "basis": [
+          {
+            "document": "Help page 18-rounding.md",
+            "find": "**Tax** is the sum of the rounded line tax amounts,"
+          }
+        ]
+      },
+      {
+        "check": "Total",
+        "expected": "3,304.30 USD",
+        "basis": [
+          {
+            "document": "Help page 18-rounding.md",
+            "find": "**Total** is Subtotal plus Tax."
+          },
+          {
+            "document": "Help page 14-what-a-proposal-contains.md",
+            "find": "**Total**: subtotal plus tax, with the currency."
+          }
+        ]
+      }
+    ]
+  }
+}

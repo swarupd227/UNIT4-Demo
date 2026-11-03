@@ -75,7 +75,10 @@ services:
     image: qe-lab
     volumes:
       - ./qe/estate/tests/e2e:/estate/tests/e2e:ro
+      - ./qe/generated:/estate/generated:ro
       - ./qe/lab/results:/results
+      # The harness itself, so a change to it needs no rebuild of every build in the image.
+      - ./qe/lab/run.mjs:/lab/run.mjs:ro
 
 volumes:
   qe_pgdata:
