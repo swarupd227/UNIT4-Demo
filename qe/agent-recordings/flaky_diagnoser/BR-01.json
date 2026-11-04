@@ -1,0 +1,31 @@
+{
+  "input_hash": "312eb0d452323121a78c78a96ef48d798fc0ec689738923d690392b389372039",
+  "source": "live_model",
+  "model": "claude-opus-5-5",
+  "duration_ms": 29394,
+  "output": {
+    "cause": "shared_data",
+    "explanation": "BR-01 builds a proposal for P-1001 Halden ERP rollout, which belongs to customer C100, and expects the undiscounted subtotal of 1,950.00 and total of 2,447.25 EUR. BR-16 sets C100's agreement discount to 10 per cent and only resets it to 0 at the end, so a BR-01 run that falls inside that window gets discounted time amounts and its toHaveText checks time out. The material does not show the actual values on the page in the failed runs, so this is inferred from the data and the run statistics rather than confirmed by a screenshot or trace.",
+    "evidence": [
+      "All 6 failures out of 20 runs have the same message: 'Timed out 10000ms waiting for expect(locator).toHaveText(expected)'. This is consistent with an amount on the page that differs from the expected text.",
+      "shared_data lists only BR-16 (specs/pricing/discount.spec.ts) as changing C100, and the change is 'the customer's agreement discount'. BR-02 also uses C100 but changes nothing.",
+      "BR-01 uses projects.haldenRollout, P-1001 Halden ERP rollout, whose customer is C100 in the test data catalogue.",
+      "BR-16 ran alongside BR-01 in all 6 failed runs and in only 4 of the 14 passed runs. The passes are consistent with BR-01 reading the proposal before BR-16 set the discount or after it reset it, but the material does not record the timing.",
+      "BR-05, BR-06 and BR-11 also ran alongside in all 6 failed runs and none of the passed runs, but shared_data shows no data they share with BR-01. The material does not settle whether they play any part.",
+      "BR-16 calls customer.setDiscount('10') on customers.halden and only calls setDiscount('0') at the very end, so C100 is discounted for the whole of its run. If it fails part-way, the discount is not reset at all.",
+      "BR-01's expected figures assume no discount: 7.5 h CONS at 120 = 900.00, plus 6 h SNR at the agreed 140 = 840.00, plus 1.5 h SNR at 140 = 210.00, giving 1,950.00. Adding 25.5 per cent VAT of 497.25 gives 2,447.25. A 10 per cent time discount would give 1,755.00.",
+      "The suite convention says each test owns its seeded project or invoice so tests can run in parallel without touching each other's data. BR-16 breaks this by changing a customer used by BR-01 and BR-02."
+    ],
+    "fix_summary": "Move BR-16 onto its own unused customer and project from free_data, C230 Kaleva Design Oy and P-1140 Kaleva service design, so that changing the agreement discount no longer touches C100, which BR-01 and BR-02 depend on.",
+    "files": [
+      {
+        "path": "fixtures/testData.ts",
+        "content": "/**\n * Seeded test data. The test environment loads the same data on every reset,\n * so these values are fixed. Period: October 2026.\n */\nexport const PERIOD_END = '2026-10-31';\n\nexport const projects = {\n  haldenRollout: 'P-1001 Halden ERP rollout',\n  haldenData: 'P-1002 Halden data platform',\n  haldenSupport: 'P-1003 Halden support retainer',\n  brightwaterSurvey: 'P-1010 Brightwater asset survey',\n  brightwaterStudy: 'P-1011 Brightwater network study',\n  vestfold: 'P-1030 Vestfold fleet optimisation',\n  meridian: 'P-1040 Meridian clinical scheduling',\n  atlas: 'P-1050 Atlas store analytics',\n  lumo: 'P-1060 Lumo brand system',\n  pacificTracking: 'P-1080 Pacific freight tracking',\n  pacificCustoms: 'P-1081 Pacific customs integration',\n  ostra: 'P-1120 Ostra warehouse WMS',\n  /** Owned by the agreement discount test only: 6 h consultant time and a 95.00 train expense. */\n  kalevaDesign: 'P-1140 Kaleva service design',\n};\n\nexport const customers = {\n  halden: 'C100',\n  /** Owned by the agreement discount test only, so changing its discount touches no other test. */\n  kaleva: 'C230',\n};\n\nexport const invoices = {\n  /** Lumo, September 2026: 2 lines, 2,986.90 EUR, line 2 already credited by CN-000013. */\n  lumoSeptember: 'INV-000291',\n  /** Any final invoice will do for the lock check. */\n  final: 'INV-000280',\n};\n"
+      },
+      {
+        "path": "specs/pricing/discount.spec.ts",
+        "content": "import { expect, test } from '../../fixtures/billing';\nimport { customers, PERIOD_END, projects } from '../../fixtures/testData';\n\ntest('BR-16 the agreement discount applies to time, not to expenses', async ({ customer, proposal }) => {\n  await customer.open(customers.kaleva);\n  await customer.setDiscount('10');\n\n  await proposal.create(projects.kalevaDesign, PERIOD_END);\n  await expect(proposal.amountOf(1)).toHaveText('648.00'); // 6 h consultant at 120.00, less 10%\n  await expect(proposal.amountOf(2)).toHaveText('95.00'); // train expense at cost, no discount\n\n  await customer.open(customers.kaleva);\n  await customer.setDiscount('0');\n});\n"
+      }
+    ]
+  }
+}

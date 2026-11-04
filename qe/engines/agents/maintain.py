@@ -40,7 +40,8 @@ def suite_overlay() -> Path:
 
 
 def diagnose(gateway: RecordingGateway) -> None:
-    runs = generation.PROOF / f"attempt-{generation.attempts()[-1]}-runs.jsonl"
+    # The existing suite's 20 runs of the unchanged module (npm run qe:lab -- --builds baseline --runs 20).
+    runs = QE_ROOT / "lab" / "results" / "baseline-20.jsonl"
     found = [f for f in flaky.triage(ESTATE, runs) if 0 < f["failed"] < f["runs"] and f["file"]]
     diagnoses, files = [], []
     for item in found:

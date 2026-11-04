@@ -6,6 +6,7 @@ fix. The lab then proves the fix the same way as a new test: 20 runs on fresh da
 """
 
 import json
+import re
 from pathlib import Path
 from typing import Any
 
@@ -22,6 +23,7 @@ QE_ROOT = Path(__file__).resolve().parents[1]
 OUT = QE_ROOT / "generated" / "maintenance"
 RESULTS = QE_ROOT / "lab" / "results" / "maintenance"
 ALLOWED = ("specs/", "fixtures/", "pages/")
+DATA_FILE = "fixtures/testData.ts"
 FORBIDDEN_FIXES = ("waitForTimeout(", "retries", "test.slow(", "timeout:")
 
 
@@ -36,6 +38,17 @@ def _suite_files(estate: Estate, folder: str) -> dict[str, str]:
     }
 
 
+def generated_data_labels() -> set[str]:
+    """The data the last generation attempt's tests own."""
+    manifests = sorted(
+        OUT.parent.glob("attempt-*/manifest.json"), key=lambda p: int(p.parent.name.split("-")[1])
+    )
+    if not manifests:
+        return set()
+    candidates = json.loads(manifests[-1].read_text(encoding="utf-8"))["candidates"]
+    return {c["generated"]["data"]["value"] for c in candidates}
+
+
 def free_customers(estate: Estate) -> list[str]:
     """Customers whose projects no test uses, with their projects, for a test that must change data."""
     catalogue = yaml.safe_load(_text(estate.root / "test-data" / "catalogue.yaml"))
@@ -47,6 +60,9 @@ def free_customers(estate: Estate) -> list[str]:
         for k in suite.data_in_use
         if k.startswith("customers.")
     }
+    # The generated tests own data too.
+    owner = {f"{code} {p['name']}": p["customer"] for code, p in catalogue["projects"].items()}
+    used |= {owner.get(label, "") for label in generated_data_labels()}
     out = []
     for code, customer in catalogue["customers"].items():
         if code in used or customer["on_hold"]:
@@ -137,8 +153,32 @@ def write_overlay(name: str, files: list[dict[str, str]], extra: Path | None = N
     for change in files:
         target = folder / change["path"]
         target.parent.mkdir(parents=True, exist_ok=True)
-        target.write_text(change["content"].rstrip() + "\n", encoding="utf-8", newline="\n")
+        content = change["content"]
+        if change["path"] == DATA_FILE and target.exists():
+            # The fix was written against the suite's own test data. Keep what the earlier overlay
+            # added, and add only the entries the fix introduces.
+            content = merged_test_data(target.read_text(encoding="utf-8"), content)
+        target.write_text(content.rstrip() + "\n", encoding="utf-8", newline="\n")
     return folder
+
+
+def _data_entries(text: str) -> dict[str, dict[str, str]]:
+    return {
+        group: dict(re.findall(r"^\s+(\w+): '([^']+)'", body, re.MULTILINE))
+        for group, body in re.findall(r"export const (\w+) = \{(.*?)\n\};", text, re.DOTALL)
+    }
+
+
+def merged_test_data(current: str, proposed: str) -> str:
+    have = _data_entries(current)
+    for group, entries in _data_entries(proposed).items():
+        for key, value in entries.items():
+            if key in have.get(group, {}):
+                continue
+            pattern = re.compile(rf"(export const {group} = \{{.*?)(\n\}};)", re.DOTALL)
+            entry = f"\n  {key}: '{value}',"
+            current = pattern.sub(lambda m, entry=entry: m.group(1) + entry + m.group(2), current, count=1)
+    return current
 
 
 def save(name: str, record: dict[str, Any]) -> None:

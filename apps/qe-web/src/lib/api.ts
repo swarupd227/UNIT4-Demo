@@ -221,3 +221,54 @@ export type Tests = {
 export const testsApi = {
   tests: () => request<Tests>("/api/tests"),
 };
+
+export type Review = { status: "approved" | "rejected"; reviewed_by: string; reviewed_at: string; note: string | null };
+export type FileChange = { path: string; content: string };
+
+export type FlakyEntry = {
+  test: {
+    title: string;
+    rule: string;
+    file: string;
+    failed: number;
+    runs: number;
+    messages: { message: string; count: number }[];
+    running_alongside: { test: string; when_failed: number; failed_runs: number; when_passed: number; passed_runs: number }[];
+    shared_data: { test: string; file: string; customers: string[]; changes: string[] }[];
+  };
+  diagnosis: { cause: string; explanation: string; evidence: string[]; fix_summary: string; files: FileChange[] };
+  agent: { source: string; model: string | null; duration_ms: number | null };
+  after: { failed: number; runs: number } | null;
+  change_id: string;
+  review: Review | null;
+};
+
+export type Flaky = {
+  runs_before: number;
+  runs_after: number;
+  suite_after: number;
+  failures_after: number;
+  tests: FlakyEntry[];
+};
+
+export type Maintenance = {
+  release?: { id: string; description: string; file: string; find: string; replace: string };
+  failures?: { title: string; error: string | null }[];
+  repair: { cause: string; fix_summary: string; files: FileChange[] } | null;
+  agent?: { source: string; model: string | null; duration_ms: number | null };
+  after?: { tests: number; failed: number };
+  timing?: { detect_seconds: number; repair_seconds: number; verify_seconds: number; machine_seconds: number };
+  change_id?: string;
+  review?: Review | null;
+};
+
+export const maintenanceApi = {
+  flaky: () => request<Flaky>("/api/flaky"),
+  maintenance: () => request<Maintenance>("/api/maintenance"),
+  review: (changeId: string, personKey: string, decision: "approved" | "rejected", note = "") =>
+    request<{ status: string }>(`/api/changes/${encodeURIComponent(changeId)}/review`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ person_key: personKey, decision, note }),
+    }),
+};

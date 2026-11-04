@@ -78,6 +78,7 @@ public static class SeedData
             ["C200"] = new() { Code = "C200", Name = "Koivula Municipality", Currency = "EUR", CountryCode = "FI", IsBusiness = false, PoRequired = true, PaymentTermsDays = 21 },
             ["C210"] = new() { Code = "C210", Name = "Ostra Logistics Oy", Currency = "EUR", CountryCode = "FI", VatNumber = "FI34567890", IsOnHold = true, HoldReason = "Disputed invoices, see case 4471." },
             ["C220"] = new() { Code = "C220", Name = "Polar Marine Oy", Currency = "USD", CountryCode = "FI", VatNumber = "FI45678901" },
+            ["C230"] = new() { Code = "C230", Name = "Kaleva Design Oy", Currency = "EUR", CountryCode = "FI", VatNumber = "FI56789012" },
         };
         db.Customers.AddRange(customers.Values);
 
@@ -110,6 +111,7 @@ public static class SeedData
             new ProjectSpec("P-1133", "Polar fleet dashboard", "C220", BillingType.TimeAndMaterials, "S", 0m, null, new(2026, 10, 1), new[] { "E05" }, false),
             new ProjectSpec("P-1021", "Norrsken substation study", "C120", BillingType.TimeAndMaterials, "S", 0m, null, new(2026, 10, 1), new[] { "E01" }, false),
             new ProjectSpec("P-1051", "Atlas loyalty programme", "C150", BillingType.TimeAndMaterials, "S", 0m, null, new(2026, 10, 1), new[] { "E07", "E03" }, false),
+            new ProjectSpec("P-1140", "Kaleva service design", "C230", BillingType.TimeAndMaterials, "S", 0m, null, new(2026, 10, 1), new[] { "E08" }, false),
             new ProjectSpec("P-1071", "Sakura quality dashboard", "C170", BillingType.TimeAndMaterials, "Z", 0m, null, new(2026, 10, 1), new[] { "E03" }, false),
         };
 
@@ -308,6 +310,9 @@ public static class SeedData
         Time("P-1131", "E05", new(2026, 10, 9), 0.5m, activity: "TEST");
         Time("P-1132", "E05", new(2026, 10, 9), 0.5m, activity: "ADMIN");
         Time("P-1133", "E05", new(2026, 10, 16), 1m, activity: "TEST");
+
+        Time("P-1140", "E08", new(2026, 10, 19), 6m, activity: "WORKSHOP");
+        Expense("P-1140", new(2026, 10, 19), "Train Helsinki - Oulu return", 95.00m);
 
         db.TimeEntries.AddRange(entries);
         db.Expenses.AddRange(expenses);

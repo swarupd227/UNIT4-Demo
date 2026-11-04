@@ -238,6 +238,17 @@ customers:
     po_required: false
     on_hold: null
     agreed_rates: {}
+  C230:
+    name: Kaleva Design Oy
+    currency: EUR
+    country: FI
+    vat_number: FI56789012
+    business: true
+    payment_terms_days: 30
+    agreement_discount_percent: 0
+    po_required: false
+    on_hold: null
+    agreed_rates: {}
 projects:
   P-1001:
     name: Halden ERP rollout
@@ -1007,4 +1018,30 @@ projects:
       status: Approved
       billable: true
     unbilled_expenses: []
+    milestones: []
+  P-1140:
+    name: Kaleva service design
+    customer: C230
+    billing_type: Time and materials
+    status: Active
+    tax_code: S
+    expense_markup_percent: 0
+    not_to_exceed_eur: null
+    on_hold: null
+    project_rates: {}
+    unbilled_time:
+    - date: '2026-10-19'
+      employee: Ville Korhonen
+      role: CONS
+      hours: 6
+      activity: WORKSHOP
+      comment: null
+      status: Approved
+      billable: true
+    unbilled_expenses:
+    - date: '2026-10-19'
+      description: Train Helsinki - Oulu return
+      cost: 95
+      status: Approved
+      billable: 1
     milestones: []

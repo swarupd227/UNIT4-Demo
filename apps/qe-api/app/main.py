@@ -7,7 +7,7 @@ from fastapi import FastAPI
 from pydantic import BaseModel
 from sqlalchemy import text
 
-from app import context, tests_api
+from app import context, maintenance_api, tests_api
 from app.config import get_settings
 from app.db import Db
 from qe.engines.estate import estate
@@ -18,12 +18,14 @@ async def lifespan(_: FastAPI) -> AsyncIterator[None]:
     # Read the estate while the API starts, so the first screen does not wait for the file reads.
     threading.Thread(target=_area_card, daemon=True).start()
     threading.Thread(target=context.warm, daemon=True).start()
+    threading.Thread(target=maintenance_api.warm, daemon=True).start()
     yield
 
 
 app = FastAPI(title="Test Assurance API", lifespan=lifespan)
 app.include_router(context.router)
 app.include_router(tests_api.router)
+app.include_router(maintenance_api.router)
 
 
 class Person(BaseModel):
