@@ -1,9 +1,12 @@
 import * as Dropdown from "@radix-ui/react-dropdown-menu";
 import { useQuery } from "@tanstack/react-query";
 import { Check, ChevronDown } from "lucide-react";
-import { NavLink, Outlet } from "react-router-dom";
+import { useEffect } from "react";
+import { NavLink, Outlet, useNavigate } from "react-router-dom";
 import { api } from "../lib/api";
 import { usePersona } from "../lib/persona";
+import { useAudienceLink } from "../lib/presenter";
+import { recordingPath, sceneForPath, SCENES } from "../lib/scenes";
 import { ROLE_KEYS, ROLES, STAGES } from "../lib/terms";
 import { Skeleton } from "../ui/primitives";
 
@@ -101,6 +104,27 @@ function StageRail() {
 }
 
 export function AppShell() {
+  const navigate = useNavigate();
+  const { fallback, closeFallback } = useAudienceLink();
+
+  useEffect(() => {
+    function onKey(event: KeyboardEvent) {
+      // The presenter console has no menu entry, because it is not part of the product.
+      if (event.ctrlKey && event.altKey && event.key.toLowerCase() === "p") {
+        event.preventDefault();
+        window.open("/presenter", "assurance-presenter", "popup,width=1280,height=800");
+        return;
+      }
+      const target = event.target as HTMLElement;
+      const busy = /INPUT|TEXTAREA|SELECT/.test(target.tagName) || document.querySelector("[role=dialog]");
+      if (busy || !["ArrowLeft", "ArrowRight"].includes(event.key)) return;
+      const next = SCENES[sceneForPath(window.location.pathname) + (event.key === "ArrowRight" ? 1 : -1)];
+      if (next) navigate(next.path);
+    }
+    window.addEventListener("keydown", onKey);
+    return () => window.removeEventListener("keydown", onKey);
+  }, [navigate]);
+
   return (
     <div className="flex h-full min-w-[1180px] flex-col">
       <AreaBar />
@@ -108,6 +132,15 @@ export function AppShell() {
       <main className="flex min-h-0 flex-1 flex-col">
         <Outlet />
       </main>
+      {fallback !== null && (
+        <video
+          src={recordingPath(fallback)}
+          autoPlay
+          muted
+          onEnded={closeFallback}
+          className="fixed inset-0 z-50 size-full bg-spine object-contain"
+        />
+      )}
     </div>
   );
 }

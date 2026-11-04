@@ -17,7 +17,8 @@
     "sim": "docker compose -f docker-compose.azure.yml up --build -d --wait db blob api web && docker compose -f docker-compose.azure.yml run --rm --build seed",
     "sim:e2e": "docker compose -f docker-compose.azure.yml run --rm e2e",
     "sim:stop": "docker compose -f docker-compose.azure.yml down -v",
-    "qe:dev": "docker compose -f docker-compose.qe.yml up --build qe-db qe-api qe-web module",
+    "qe:dev": "docker compose -f docker-compose.qe.yml up --build qe-db qe-api qe-web module lab-runner",
+    "qe:demo": "docker compose -f docker-compose.qe.yml --profile demo up -d qe-db qe-api lab-runner qe-web-demo",
     "qe:stop": "docker compose -f docker-compose.qe.yml down",
     "qe:lab": "docker compose -f docker-compose.qe.yml run --rm lab",
     "qe:verify": "docker compose -f docker-compose.qe.yml run --rm --no-deps qe-api sh -c \"cd /workspace && python -m qe.tools.verify --lab\"",
@@ -27,6 +28,8 @@
     "qe:prove": "node qe/lab/prove.mjs",
     "qe:maintain": "docker compose -f docker-compose.qe.yml exec -w /workspace qe-api python -m qe.engines.agents.maintain",
     "qe:maintain-lab": "node qe/lab/maintain.mjs",
+    "qe:rehearse": "docker compose -f docker-compose.qe.yml run --rm rehearsal",
+    "qe:record-fallbacks": "docker compose -f docker-compose.qe.yml run --rm -e RECORD=1 rehearsal",
     "qe:reset": "docker compose -f docker-compose.qe.yml exec -w /workspace/apps/qe-api qe-api python -m app.reset"
   }
 }

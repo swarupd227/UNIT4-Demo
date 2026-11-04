@@ -3,11 +3,13 @@
 //   node run.mjs --builds baseline --runs 20            repeat runs of the baseline
 //   node run.mjs --builds all --workers 1 --confirm 5   the fault check: a catch must fail on 5 fresh runs
 //   node run.mjs --serve baseline --port 5280            serve one build for people to use
+//   node run.mjs --listen 5390                           run one check on request, for the workbench
 //
 // Options: --tests <dir> (default /estate/tests/e2e), --overlay <dir> (candidate files laid over the
 // suite), --grep <pattern>, --workers <n>, --out <file.jsonl>
 import { spawn } from 'node:child_process';
 import { copyFileSync, cpSync, existsSync, mkdirSync, readdirSync, readFileSync, rmSync, symlinkSync, appendFileSync } from 'node:fs';
+import { createServer } from 'node:http';
 import { join } from 'node:path';
 
 const args = Object.fromEntries(
@@ -49,12 +51,12 @@ async function waitHealthy(port, server) {
   throw new Error('module did not start');
 }
 
-function suiteCopy(name) {
+function suiteCopy(name, overlay = args.overlay) {
   const dir = `/tmp/suites/${name}`;
   rmSync(dir, { recursive: true, force: true });
   cpSync(tests, dir, { recursive: true, filter: (src) => !src.includes('node_modules') && !src.includes('test-results') });
   // Candidate tests and their test data, laid out like the suite, go over the copy.
-  if (args.overlay) cpSync(args.overlay, dir, { recursive: true, filter: (src) => !src.endsWith('manifest.json') });
+  if (overlay) cpSync(overlay, dir, { recursive: true, filter: (src) => !src.endsWith('manifest.json') });
   symlinkSync('/lab/tests/node_modules', join(dir, 'node_modules'));
   return dir;
 }
@@ -153,8 +155,33 @@ async function serve() {
   server.on('exit', (code) => process.exit(code ?? 0));
 }
 
+// One run on request, for the live check in the workbench: POST /run {build, grep, overlay}.
+async function listen() {
+  let busy = false;
+  const reply = (res, status, body) => res.writeHead(status, { 'Content-Type': 'application/json' }).end(JSON.stringify(body));
+  createServer(async (req, res) => {
+    if (req.method !== 'POST' || req.url !== '/run') return reply(res, 404, { error: 'Not found.' });
+    if (busy) return reply(res, 409, { error: 'The lab is already running a check.' });
+    let body = '';
+    for await (const chunk of req) body += chunk;
+    const { build, grep, overlay } = JSON.parse(body || '{}');
+    if (!build || !existsSync(join(BUILDS, build))) return reply(res, 400, { error: `No build called ${build}.` });
+    if (overlay && !overlay.startsWith('/estate/generated/')) return reply(res, 400, { error: 'Unknown overlay.' });
+    busy = true;
+    try {
+      const suite = suiteCopy('live', overlay);
+      reply(res, 200, await runOnce(build, `live-${Date.now()}`, 5399, suite, grep));
+    } catch (error) {
+      reply(res, 500, { error: String(error) });
+    } finally {
+      busy = false;
+    }
+  }).listen(Number(args.listen), '0.0.0.0', () => console.log(`Lab listening on ${args.listen}`));
+}
+
 async function main() {
   if (args.serve) return serve();
+  if (args.listen) return listen();
 
   const available = readdirSync(BUILDS).sort();
   const builds = !args.builds || args.builds === 'all'

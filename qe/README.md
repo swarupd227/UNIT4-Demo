@@ -84,6 +84,28 @@ npm run qe:reset
 
 Puts the workbench back to the start for a rehearsal. It rebuilds the module repository, which reopens the pull request, and clears every review, merge and audit event. Recordings and lab results are kept.
 
+## On stage
+
+```bash
+npm run qe:demo
+```
+
+Starts the workbench as presented: a production build on http://localhost:5194, the API, and the lab runner for the one live check in the Proof scene. In the audience window, Ctrl+Alt+P opens the presenter console. It shows each scene's notes and time budget and moves the audience window between scenes. It can also play a scene's recorded fallback and reset the workbench to the start. The arrow keys move between scenes in either window.
+
+```bash
+npm run qe:rehearse
+npm run qe:record-fallbacks
+```
+
+`qe:rehearse` runs the whole journey in script order against the production build, starting from a reset. It covers the live fault run and the engineer's real merge, and checks that every scene is ready within two seconds. `qe:record-fallbacks` runs the same journey and keeps each scene's video in `apps/qe-web/public/fallback`, for the console's Play recording. Restart `qe-web-demo` afterwards so the build includes them.
+
+```bash
+node demo-video/qe/record.mjs
+cd demo-video/qe && node assemble.mjs
+```
+
+Records the 3 to 4 minute video against `npm run qe:demo`, in the same format as the Migration Studio video. Each scene has one caption, and Artizent screens open and close it. The kit lives in the git-ignored `demo-video/qe` folder, and the finished video goes to `deliverables/`.
+
 ```bash
 npm run qe:verify
 ```

@@ -14,6 +14,8 @@ export default defineConfig({
   },
   preview: {
     port: 5194,
+    strictPort: true,
+    allowedHosts: ["localhost", "qe-web-demo"],
     proxy: {
       "/api": process.env.API_PROXY_TARGET ?? "http://localhost:8030",
     },

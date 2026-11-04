@@ -1,8 +1,9 @@
-import { useQuery } from "@tanstack/react-query";
-import { ArrowRight, Check, Minus, X } from "lucide-react";
-import { testsApi, type Attempt } from "../lib/api";
+import { useMutation, useQuery } from "@tanstack/react-query";
+import { useState } from "react";
+import { ArrowRight, Check, Minus, Play, X } from "lucide-react";
+import { testsApi, type Attempt, type GeneratedTest } from "../lib/api";
 import { ErrorNote, Panel, Screen } from "../ui/layout";
-import { CodeBadge, Skeleton } from "../ui/primitives";
+import { Button, CodeBadge, Skeleton } from "../ui/primitives";
 
 function Mark({ passed, ran = true }: { passed: boolean; ran?: boolean }) {
   if (!ran) return <Minus size={18} className="text-ink-3" aria-label="Not run" />;
@@ -47,6 +48,52 @@ function Cells({ attempt }: { attempt: Attempt }) {
   );
 }
 
+// One fault run now, in front of the audience: the test must fail on the build that puts its defect back.
+function LiveCheckPanel({ tests }: { tests: GeneratedTest[] }) {
+  const [testId, setTestId] = useState(tests[0]?.id ?? "");
+  const run = useMutation({ mutationFn: () => testsApi.live(testId) });
+  if (!tests.length) return null;
+  return (
+    <Panel title="Run one check now" aside={<CodeBadge title="Runs in the lab on a fresh database, now." />}>
+      <div className="flex flex-wrap items-center gap-3">
+        <label className="text-[15px]" htmlFor="live-test">
+          Put a defect back and run its test
+        </label>
+        <select
+          id="live-test"
+          value={testId}
+          onChange={(event) => {
+            setTestId(event.target.value);
+            run.reset();
+          }}
+          className="h-11 rounded-lg border border-line-strong bg-surface px-3 text-[15px]"
+        >
+          {tests.map((t) => (
+            <option key={t.id} value={t.id}>
+              {t.ref}: {t.title.replace(" @critical", "")}
+            </option>
+          ))}
+        </select>
+        <Button variant="primary" disabled={run.isPending} onClick={() => run.mutate()}>
+          <Play size={17} aria-hidden /> {run.isPending ? "Running in the lab…" : "Run"}
+        </Button>
+      </div>
+      <div aria-live="polite" className="mt-3 text-[15px]">
+        {run.error && <ErrorNote message={(run.error as Error).message} />}
+        {run.data && (
+          <p>
+            <span className={`font-semibold ${run.data.caught ? "text-ok" : "text-bad"}`}>
+              {run.data.caught ? "Caught." : "Not caught."}
+            </span>{" "}
+            On build {run.data.build} ({run.data.fault}), the test {run.data.caught ? "failed, as it must" : "passed"}, in{" "}
+            {run.data.seconds} s. <span className="font-mono text-[13px] text-ink-2">{run.data.error}</span>
+          </p>
+        )}
+      </div>
+    </Panel>
+  );
+}
+
 export function ProofScreen() {
   const { data, error } = useQuery({ queryKey: ["tests"], queryFn: testsApi.tests });
   const rows = data?.tests.flatMap((t) => t.attempts.map((a) => ({ test: t, attempt: a }))) ?? [];
@@ -82,6 +129,7 @@ export function ProofScreen() {
               </p>
             </div>
           </Panel>
+          <LiveCheckPanel tests={data.tests.filter((t) => t.accepted && t.kind === "Defect")} />
           <Panel title="Checks">
             <table className="w-full text-left text-[15px]">
               <thead className="text-[13px] text-ink-3">

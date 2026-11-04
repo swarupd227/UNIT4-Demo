@@ -89,6 +89,12 @@ Phase 3 as built:
 - **Generated tests:** one per remaining source, 10 in all.
 - **Test data:** a project allows only one open proposal, so each test must own its project. Four October projects were added to the seed: P-1021, P-1051, P-1071 and P-1133. Without them, F04d (tax on the unrounded line) could not show on any seeded data.
 
+Phases 4 to 6 as built:
+- **Phase 4: flaky tests.** BR-01 and BR-09 each failed 6 of 20 runs before their fixes, and all 22 tests passed 20 of 20 after. T7's fix needed a customer of its own, so Kaleva (C230, P-1140) was added to the seed.
+- **Phase 4: maintenance.** Release 4.9 relabels the adjustment field and breaks five tests. A one-line page-object repair fixes them, and about five minutes of machine time is measured before the engineer's review.
+- **Phase 5.** The pull request merges as a real two-parent commit in the module's repository and changes only `tests/e2e`. The pipeline (`azure-pipelines.yml`, standing in for Full Circuit) is untouched. All ten known issues are handled.
+- **Phase 6.** One live check runs in the Proof scene: a test is run on the build that puts its defect back, in about 20 seconds. The rehearsal checks every scene loads in under two seconds, and it does, in under one.
+
 Biggest risk: **Phase 1.** The module has to feel like real legacy code and behave deterministically under faults, while staying fast enough for 20 runs per test. Build speed matters too: test runs are pre-computed, but one live fault run must finish in seconds.
 
 ## 6. What needs people

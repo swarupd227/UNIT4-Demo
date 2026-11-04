@@ -26,6 +26,7 @@ services:
     environment:
       QE_DATABASE_URL: postgresql+psycopg://qe:qe@qe-db:5432/qe
       QE_LLM_MODE: ${QE_LLM_MODE:-replay}
+      QE_LAB_URL: http://lab-runner:5390
       ANTHROPIC_API_KEY: ${ANTHROPIC_API_KEY:-}
       PYTHONPATH: /workspace:/workspace/apps/qe-api
     volumes:
@@ -59,6 +60,23 @@ services:
       qe-api:
         condition: service_healthy
 
+  # The workbench as presented: a production build on 5194 (npm run qe:demo). The rehearsal runs against it.
+  qe-web-demo:
+    profiles: ["demo", "rehearsal"]
+    image: node:22-alpine
+    working_dir: /workspace/apps/qe-web
+    environment:
+      API_PROXY_TARGET: http://qe-api:8030
+    volumes:
+      - .:/workspace
+      - qe_web_node_modules:/workspace/apps/qe-web/node_modules
+    command: sh -c "npm install --no-audit --no-fund && npx vite build --logLevel warn && npx vite preview --host 0.0.0.0"
+    ports:
+      - "5194:5194"
+    depends_on:
+      qe-api:
+        condition: service_healthy
+
   # The billing module itself, for people to use. Every lab run starts its own copy instead.
   module:
     build:
@@ -68,6 +86,31 @@ services:
     command: ["--serve", "baseline", "--port", "5280"]
     ports:
       - "5280:5280"
+
+  # Runs one check on request from the workbench: the live run in the Proof scene.
+  lab-runner:
+    image: qe-lab
+    command: ["--listen", "5390"]
+    volumes:
+      - ./qe/estate/tests/e2e:/estate/tests/e2e:ro
+      - ./qe/generated:/estate/generated:ro
+      - ./qe/lab/run.mjs:/lab/run.mjs:ro
+
+  # The rehearsal of the whole journey against the workbench: npm run qe:rehearse.
+  # Uses the lab image's Playwright and browsers, so it needs no install of its own.
+  rehearsal:
+    profiles: ["rehearsal"]
+    image: qe-lab
+    entrypoint: ["sh", "-c"]
+    command:
+      - mkdir -p /tmp/e2e && cp -r /workspace/apps/qe-web/e2e/. /tmp/e2e && ln -sfn /lab/tests/node_modules /tmp/e2e/node_modules && cd /tmp/e2e && npx playwright test
+    environment:
+      RECORD: ${RECORD:-}
+      APP_URL: http://qe-web-demo:5194
+    volumes:
+      - .:/workspace
+    depends_on:
+      - qe-web-demo
 
   # Runs tests against the module's builds: npm run qe:lab -- --builds baseline --runs 20
   lab:

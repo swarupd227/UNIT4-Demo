@@ -5,6 +5,7 @@ import { CoverageScreen } from "./screens/CoverageScreen";
 import { FlakyScreen } from "./screens/FlakyScreen";
 import { GapsScreen } from "./screens/GapsScreen";
 import { GeneratedTestsScreen } from "./screens/GeneratedTestsScreen";
+import { PresenterScreen } from "./screens/PresenterScreen";
 import { ProofScreen } from "./screens/ProofScreen";
 import { ReviewScreen } from "./screens/ReviewScreen";
 import { ScorecardScreen } from "./screens/ScorecardScreen";
@@ -13,6 +14,7 @@ import { AppShell } from "./shell/AppShell";
 export function App() {
   return (
     <Routes>
+      <Route path="/presenter" element={<PresenterScreen />} />
       <Route element={<AppShell />}>
         <Route path="/area" element={<AreaScreen />} />
         <Route path="/coverage" element={<CoverageScreen />} />

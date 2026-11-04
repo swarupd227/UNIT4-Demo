@@ -7,7 +7,7 @@ from fastapi import FastAPI
 from pydantic import BaseModel
 from sqlalchemy import text
 
-from app import context, maintenance_api, review_api, scorecard_api, tests_api
+from app import context, maintenance_api, reset, review_api, scorecard_api, tests_api
 from app.config import get_settings
 from app.db import Db
 from qe.engines.estate import estate
@@ -96,3 +96,13 @@ def _area_card() -> AreaCard:
         help_pages=source.help_pages(),
         gate_percent=settings.gate_percent,
     )
+
+
+@app.post("/api/workspace/reset")
+def workspace_reset() -> dict[str, str]:
+    """Back to the start of the story, from the presenter console: nothing reviewed, nothing merged."""
+    reset.main()
+    # The repository is back at its first state, so read it again now rather than on the first screen.
+    review_api.warm()
+    maintenance_api.warm()
+    return {"status": "reset"}

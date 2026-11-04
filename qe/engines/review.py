@@ -23,13 +23,29 @@ AGENT_AUTHOR = ("Test Assurance agents", "test-assurance@kestrel.example")
 REVIEWER_EMAIL = "{key}@kestrel.example"
 
 
+class MissingRepository(RuntimeError):
+    pass
+
+
+class GitFailed(RuntimeError):
+    pass
+
+
 def _git(repo: Path, *args: str, author: tuple[str, str] | None = None) -> str:
+    # Without its own .git, Git would walk up and act on whatever repository holds this folder.
+    if not (repo / ".git").is_dir():
+        raise MissingRepository(
+            f"The module repository at {repo} is missing. Reset the workbench to rebuild it."
+        )
     who = author or AGENT_AUTHOR
     command = [
         "git", "-c", "safe.directory=*", "-c", f"user.name={who[0]}", "-c", f"user.email={who[1]}",
         "-C", str(repo), *args,
     ]  # fmt: skip
-    return subprocess.run(command, capture_output=True, text=True, check=True, encoding="utf-8").stdout
+    done = subprocess.run(command, capture_output=True, text=True, encoding="utf-8")
+    if done.returncode != 0:
+        raise GitFailed(f"git {args[0]} failed: {done.stderr.strip() or done.stdout.strip()}")
+    return done.stdout
 
 
 def suite_folder() -> Path:
@@ -40,7 +56,7 @@ def suite_folder() -> Path:
 def _in_repo(repo: Path, path: str) -> str | None:
     try:
         return _git(repo, "show", f"main:{path}")
-    except subprocess.CalledProcessError:
+    except GitFailed:
         return None
 
 
@@ -176,10 +192,13 @@ def merge(repo: Path, approved: list[str], reviewer: tuple[str, str]) -> dict[st
     _git(repo, "commit", "-q", "-m", f"Add proven billing tests and fix two flaky tests\n\n{titles}")
     branch_commit = _git(repo, "rev-parse", "HEAD").strip()
     _git(repo, "checkout", "-q", "main")
+    # Main has not moved since the branch was cut, so the merged tree is the branch's tree. Writing the
+    # merge commit directly, with both parents, avoids git merge stashing files whose timestamps the
+    # mounted folder reports as changed.
     message = f"Merge {PR_ID}: {BRANCH}\n\nApproved by {reviewer[0]}."
-    _git(repo, "merge", "-q", "--no-ff", BRANCH, "-m", message, author=reviewer)
-    return {
-        "branch": BRANCH,
-        "branch_commit": branch_commit,
-        "merge_commit": _git(repo, "rev-parse", "HEAD").strip(),
-    }
+    tree = _git(repo, "rev-parse", f"{BRANCH}^{{tree}}").strip()
+    merge_commit = _git(repo, "commit-tree", tree, "-p", "main", "-p", BRANCH, "-m", message, author=reviewer)
+    merge_commit = merge_commit.strip()
+    _git(repo, "update-ref", "refs/heads/main", merge_commit)
+    _git(repo, "reset", "-q", "--hard", "main")
+    return {"branch": BRANCH, "branch_commit": branch_commit, "merge_commit": merge_commit}

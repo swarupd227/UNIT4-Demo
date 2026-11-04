@@ -16,6 +16,8 @@ class Settings(BaseSettings):
     answer_key: str = "/workspace/qe/answer-key"
     # Demo setting for the MOSAIC coverage gate. Unit4's real gate rule is a discovery item.
     gate_percent: int = 80
+    # The lab's runner, for the one live check in the Proof scene.
+    lab_url: str = "http://lab-runner:5390"
 
 
 @lru_cache

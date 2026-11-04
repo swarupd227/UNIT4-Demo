@@ -101,7 +101,7 @@ export function ScorecardScreen() {
             </table>
           </Panel>
           <div className="grid grid-cols-[minmax(0,1fr)_420px] items-start gap-5">
-            <Panel title="Planted issues" aside={<SourceBadge>Answer key written before any agent ran</SourceBadge>}>
+            <Panel title="Known issues in this area" aside={<SourceBadge>Answer key written before any agent ran</SourceBadge>}>
               <ul className="space-y-2">
                 {data.planted.map((p) => (
                   <li key={p.id} className="flex items-start gap-3">

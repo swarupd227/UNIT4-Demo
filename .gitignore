@@ -27,3 +27,4 @@ qe/lab/results/*
 qe/estate/test-data/*.db
 *.tsbuildinfo
 qe/generated/*.log
+apps/qe-web/e2e-results/

@@ -133,6 +133,7 @@ export const api = {
       body: JSON.stringify({ person_key: personKey, decision, note }),
     }),
   exportContext: () => request<unknown>("/api/context/export"),
+  reset: () => request<{ status: string }>("/api/workspace/reset", { method: "POST" }),
 };
 
 export type Basis = { document: string; find: string };
@@ -218,8 +219,19 @@ export type Tests = {
   coverage_after: CoverageAfter;
 };
 
+export type LiveCheck = {
+  test: string;
+  build: string;
+  fault: string;
+  status: string;
+  caught: boolean;
+  error: string;
+  seconds: number;
+};
+
 export const testsApi = {
   tests: () => request<Tests>("/api/tests"),
+  live: (testId: string) => request<LiveCheck>(`/api/tests/${encodeURIComponent(testId)}/live`, { method: "POST" }),
 };
 
 export type Review = { status: "approved" | "rejected"; reviewed_by: string; reviewed_at: string; note: string | null };
