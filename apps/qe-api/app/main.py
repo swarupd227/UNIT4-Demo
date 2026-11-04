@@ -7,7 +7,7 @@ from fastapi import FastAPI
 from pydantic import BaseModel
 from sqlalchemy import text
 
-from app import context, maintenance_api, tests_api
+from app import context, maintenance_api, review_api, scorecard_api, tests_api
 from app.config import get_settings
 from app.db import Db
 from qe.engines.estate import estate
@@ -19,6 +19,7 @@ async def lifespan(_: FastAPI) -> AsyncIterator[None]:
     threading.Thread(target=_area_card, daemon=True).start()
     threading.Thread(target=context.warm, daemon=True).start()
     threading.Thread(target=maintenance_api.warm, daemon=True).start()
+    threading.Thread(target=review_api.warm, daemon=True).start()
     yield
 
 
@@ -26,6 +27,8 @@ app = FastAPI(title="Test Assurance API", lifespan=lifespan)
 app.include_router(context.router)
 app.include_router(tests_api.router)
 app.include_router(maintenance_api.router)
+app.include_router(review_api.router)
+app.include_router(scorecard_api.router)
 
 
 class Person(BaseModel):

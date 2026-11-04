@@ -13,10 +13,12 @@ to the generator with only the data no other test owns, and checks every candida
 Only a candidate that passes all four is put to an engineer.
 """
 
+import copy
 import json
 import re
 from collections import defaultdict
 from dataclasses import dataclass
+from functools import lru_cache
 from pathlib import Path
 from typing import Any
 
@@ -563,8 +565,22 @@ def attempts() -> list[int]:
 # What the workbench shows
 
 
+def version(*patterns: tuple[Path, str]) -> tuple[tuple[str, float], ...]:
+    """The files behind a result and when each last changed, so a cached result is never stale."""
+    return tuple(
+        sorted(
+            (str(p), p.stat().st_mtime) for folder, glob in patterns for p in folder.glob(glob) if p.is_file()
+        )
+    )
+
+
 def history() -> dict[str, list[dict[str, Any]]]:
     """Every attempt at every candidate, oldest first, each with its four checks."""
+    return copy.deepcopy(_history(version((GENERATED, "attempt-*/manifest.json"), (PROOF, "*.jsonl"))))
+
+
+@lru_cache(maxsize=1)
+def _history(_version: tuple[tuple[str, float], ...]) -> dict[str, list[dict[str, Any]]]:
     faults_file = QE_ROOT / "faults" / "faults.yaml"
     out: dict[str, list[dict[str, Any]]] = defaultdict(list)
     for attempt in attempts():

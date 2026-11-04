@@ -57,7 +57,9 @@ function Validation({ attempt }: { attempt: Attempt }) {
           <th className="py-1.5 font-semibold">Check</th>
           <th className="py-1.5 font-semibold">The test expects</th>
           <th className="py-1.5 font-semibold">The documents give</th>
-          <th className="py-1.5" />
+          <th className="py-1.5">
+            <span className="sr-only">Agrees</span>
+          </th>
         </tr>
       </thead>
       <tbody>
@@ -105,7 +107,7 @@ function TestDetail({ test }: { test: GeneratedTest }) {
       </div>
       <div>
         <SectionLabel>Code</SectionLabel>
-        <pre className="scroll-quiet max-h-[420px] overflow-auto rounded-lg bg-spine p-4 font-mono text-[13px] leading-5 text-on-spine">
+        <pre tabIndex={0} aria-label="Test code" className="scroll-quiet max-h-[420px] overflow-auto rounded-lg bg-spine p-4 font-mono text-[13px] leading-5 text-on-spine">
           {attempt.generated.code}
         </pre>
       </div>

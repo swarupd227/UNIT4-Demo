@@ -1,15 +1,14 @@
 import { Navigate, Route, Routes } from "react-router-dom";
 import { AreaScreen } from "./screens/AreaScreen";
 import { ContextScreen } from "./screens/ContextScreen";
-import { FlakyScreen } from "./screens/FlakyScreen";
 import { CoverageScreen } from "./screens/CoverageScreen";
+import { FlakyScreen } from "./screens/FlakyScreen";
+import { GapsScreen } from "./screens/GapsScreen";
 import { GeneratedTestsScreen } from "./screens/GeneratedTestsScreen";
-import { PendingScreen } from "./screens/PendingScreen";
 import { ProofScreen } from "./screens/ProofScreen";
-import { STAGES } from "./lib/terms";
+import { ReviewScreen } from "./screens/ReviewScreen";
+import { ScorecardScreen } from "./screens/ScorecardScreen";
 import { AppShell } from "./shell/AppShell";
-
-const BUILT = new Set(["area", "coverage", "context", "tests", "proof", "flaky"]);
 
 export function App() {
   return (
@@ -21,9 +20,9 @@ export function App() {
         <Route path="/tests" element={<GeneratedTestsScreen />} />
         <Route path="/proof" element={<ProofScreen />} />
         <Route path="/flaky" element={<FlakyScreen />} />
-        {STAGES.filter((stage) => !BUILT.has(stage.key)).map((stage) => (
-          <Route key={stage.key} path={`/${stage.key}`} element={<PendingScreen title={stage.label} />} />
-        ))}
+        <Route path="/review" element={<ReviewScreen />} />
+        <Route path="/gaps" element={<GapsScreen />} />
+        <Route path="/scorecard" element={<ScorecardScreen />} />
         <Route path="*" element={<Navigate to="/area" replace />} />
       </Route>
     </Routes>

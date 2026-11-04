@@ -1,0 +1,57 @@
+# Project Billing build and release. Stands in for Full Circuit's pipeline in the test assurance
+# workbench; the real pipeline, its gates and its approvers are Unit4's.
+trigger:
+  branches:
+    include: [main]
+
+pr:
+  branches:
+    include: [main]
+
+variables:
+  BUILD_CONFIGURATION: Release
+
+stages:
+  - stage: Build
+    jobs:
+      - job: build
+        pool: { vmImage: ubuntu-latest }
+        steps:
+          - task: UseDotNet@2
+            inputs: { version: 8.0.x }
+          - script: dotnet publish src/Billing.Web/Billing.Web.csproj -c $(BUILD_CONFIGURATION) -o $(Build.ArtifactStagingDirectory)/app
+          - publish: $(Build.ArtifactStagingDirectory)/app
+            artifact: billing-web
+
+  - stage: Test
+    dependsOn: Build
+    jobs:
+      - job: e2e
+        pool: { vmImage: ubuntu-latest }
+        steps:
+          - download: current
+            artifact: billing-web
+          # Every run starts the module on a fresh copy of the seeded test database.
+          - script: |
+              dotnet $(Pipeline.Workspace)/billing-web/Billing.Web.dll --seed-only=true --Billing:Database=billing.db
+              dotnet $(Pipeline.Workspace)/billing-web/Billing.Web.dll --Billing:Database=billing.db &
+            displayName: Start the module on seeded data
+          - script: npm ci && npx playwright install --with-deps chromium && npx playwright test
+            workingDirectory: tests/e2e
+            env: { CI: "true", RETRIES: "0" }
+          - task: PublishTestResults@2
+            condition: always()
+            inputs: { testResultsFiles: tests/e2e/results/junit.xml }
+
+  # Release controls. Changes to tests never change these stages or their approvers.
+  - stage: Release
+    dependsOn: Test
+    condition: and(succeeded(), eq(variables['Build.SourceBranch'], 'refs/heads/main'))
+    jobs:
+      - deployment: production
+        environment: billing-production # approval by the release manager is set on the environment
+        strategy:
+          runOnce:
+            deploy:
+              steps:
+                - script: echo "Deploy billing-web"

@@ -72,6 +72,9 @@ def fail(msg):
 
 def final_tree():
     tree = {".gitignore": ROOT_GITIGNORE}
+    pipeline = ESTATE / "azure-pipelines.yml"
+    if pipeline.exists():
+        tree["azure-pipelines.yml"] = pipeline.read_bytes()
     for src, dest, skip_dirs in SOURCES:
         if not src.exists():
             continue

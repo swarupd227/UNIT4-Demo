@@ -69,6 +69,22 @@ docker compose -f docker-compose.qe.yml exec -w /workspace qe-api python -m qe.t
 Rewrites the test data catalogue after a change to the seed data.
 
 ```bash
+npm run qe:maintain -- flaky
+npm run qe:maintain-lab -- flaky
+npm run qe:maintain-lab -- release
+npm run qe:maintain -- repair
+npm run qe:maintain-lab -- repair
+```
+
+Reliability and maintenance. The diagnoser finds and fixes each flaky test in `lab/results/baseline-20.jsonl`, and the lab proves the fixes over 20 runs. Then the suite runs on the next release (`faults/releases.yaml`), the repairer fixes the selectors it broke, and the lab proves the repair. All results go to `lab/results/maintenance`.
+
+```bash
+npm run qe:reset
+```
+
+Puts the workbench back to the start for a rehearsal. It rebuilds the module repository, which reopens the pull request, and clears every review, merge and audit event. Recordings and lab results are kept.
+
+```bash
 npm run qe:verify
 ```
 

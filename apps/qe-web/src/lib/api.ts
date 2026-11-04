@@ -272,3 +272,109 @@ export const maintenanceApi = {
       body: JSON.stringify({ person_key: personKey, decision, note }),
     }),
 };
+
+export type RunRecord = { status: string; ms: number; started: string | null };
+
+export type PrItem = {
+  item_id: string;
+  kind: "test" | "flaky_fix";
+  title: string;
+  rule: string;
+  source: { kind: string; ref: string };
+  files: string[];
+  attempts?: number;
+  validation?: Attempt["validation"];
+  faults?: Attempt["checks"]["faults"];
+  cause?: string;
+  fix_summary?: string;
+  before?: { failed: number; runs: number };
+  runs: RunRecord[];
+  decision: { decision: "approved" | "rejected"; reviewed_by: string; reviewed_at: string; note: string | null } | null;
+};
+
+export type PullRequest = {
+  id: string;
+  branch: string;
+  title: string;
+  author: string;
+  files: { path: string; status: "added" | "modified"; content: string }[];
+  release_controls_unchanged: boolean;
+  pipeline_file: string;
+  items: PrItem[];
+  merged: {
+    merged_by: string;
+    merged_at: string;
+    branch: string;
+    branch_commit: string;
+    merge_commit: string;
+    items: string[];
+  } | null;
+};
+
+export type Gaps = {
+  gate_percent: number;
+  covered: number;
+  critical_rules: number;
+  percent: number;
+  below_gate: {
+    rule: string;
+    title: string;
+    critical: boolean;
+    score: number | null;
+    tests: number;
+    missed_faults: { id: string; description: string }[];
+    defects: number;
+    untested_defects: number;
+    manual_cases: string[];
+  }[];
+  waiting_on_people: { case: string; title: string; outcome: string; review: string | null }[];
+  dead_code: DeadCodeContent[];
+};
+
+export type Scorecard = {
+  manual_regression: {
+    total_minutes: number;
+    cases: number;
+    automated_cases: string[];
+    automated_minutes: number;
+    suite_run_seconds: number | null;
+    suite_tests: number;
+    assumption: string;
+  };
+  coverage: {
+    before: { critical_covered: number; critical_rules: number; percent: number };
+    after: { critical_covered: number; critical_rules: number; percent: number };
+    gate_percent: number;
+    newly_covered: string[];
+  };
+  defects_detected: { faults: number; caught_before: number; caught_after: number; t1_t2_caught: boolean };
+  escaped_defects: { measured: boolean; note: string };
+  reliability: {
+    before: { test: string; failed: number; runs: number }[];
+    after_runs: number;
+    after_tests: number;
+    after_failures: number;
+  };
+  maintenance: { broken_tests: number; machine_seconds: number | null; approved: Review | null };
+  engineer: { accepted: number; rejected: number; items: number; merged: PullRequest["merged"] };
+  planted: { id: string; what: string; handled: boolean; how: string }[];
+};
+
+const post = (body: unknown): RequestInit => ({
+  method: "POST",
+  headers: { "Content-Type": "application/json" },
+  body: JSON.stringify(body),
+});
+
+export const evidenceApi = {
+  review: () => request<PullRequest>("/api/review"),
+  decide: (itemId: string, personKey: string, decision: "approved" | "rejected", note = "") =>
+    request<{ decision: string }>(
+      `/api/review/items/${encodeURIComponent(itemId)}`,
+      post({ person_key: personKey, decision, note }),
+    ),
+  merge: (personKey: string) => request<{ merge_commit: string }>("/api/review/merge", post({ person_key: personKey })),
+  gaps: () => request<Gaps>("/api/gaps"),
+  scorecard: () => request<Scorecard>("/api/scorecard"),
+  pack: () => request<unknown>("/api/pack"),
+};

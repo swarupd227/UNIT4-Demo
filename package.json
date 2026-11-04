@@ -26,6 +26,7 @@
     "qe:generate": "docker compose -f docker-compose.qe.yml exec -w /workspace qe-api python -m qe.engines.agents.generate",
     "qe:prove": "node qe/lab/prove.mjs",
     "qe:maintain": "docker compose -f docker-compose.qe.yml exec -w /workspace qe-api python -m qe.engines.agents.maintain",
-    "qe:maintain-lab": "node qe/lab/maintain.mjs"
+    "qe:maintain-lab": "node qe/lab/maintain.mjs",
+    "qe:reset": "docker compose -f docker-compose.qe.yml exec -w /workspace/apps/qe-api qe-api python -m app.reset"
   }
 }

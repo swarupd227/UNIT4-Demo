@@ -7,7 +7,7 @@ defects:
   cluster: Expenses
   severity: 1
   created: '2023-11-06'
-  fix_commit: 58d6cf24e780a4c445fb9170f94f6b5ffc96f9b7
+  fix_commit: 26ccbfa912b351b2c6c35ccc6351527ea52bee84
   files:
   - src/Billing.Web/Helpers/BillingHelper.cs
   tests_added: manual
@@ -20,7 +20,7 @@ defects:
   cluster: VAT
   severity: 1
   created: '2023-11-08'
-  fix_commit: 22e9ead4a7f77a700a6823125be7e0ad4678ad5a
+  fix_commit: 4f485952af7cdf543f97a0b43fb5da37032c7a94
   files:
   - src/Billing.Web/Helpers/BillingHelper.cs
   tests_added: manual
@@ -33,7 +33,7 @@ defects:
   cluster: Due dates
   severity: 3
   created: '2023-11-13'
-  fix_commit: 517443e19c43fc254c36da54c0eecb467f7fb8bb
+  fix_commit: 38fac3be0c8c642b97ecb1e4e17c45d0054fa0d7
   files:
   - src/Billing.Web/Helpers/BillingHelper.cs
   tests_added: none
@@ -46,7 +46,7 @@ defects:
   cluster: Formatting
   severity: 4
   created: '2023-11-16'
-  fix_commit: 4b20b533202d0c137e64aff2092b549b4ca892d2
+  fix_commit: 9fcfbcd7014c5cd4fd5f62297032c6f3467ad10f
   files:
   - src/Billing.Web/Helpers/BillingHelper.cs
   tests_added: none
@@ -59,7 +59,7 @@ defects:
   cluster: Billable time
   severity: 2
   created: '2023-11-20'
-  fix_commit: 308f9f72e77c9db7590549ec518d1718f0064121
+  fix_commit: 747c93ef6ed9c0e96f13211ddec8dd3898294e42
   files:
   - src/Billing.Web/Services/ProposalService.cs
   tests_added: manual
@@ -72,7 +72,7 @@ defects:
   cluster: Numbering
   severity: 3
   created: '2023-11-23'
-  fix_commit: d45fe334986e8a286059ae23e216c256dc196213
+  fix_commit: 3b90f15c95121ca706743a54b5ec4effde491b0e
   files:
   - src/Billing.Web/Services/NumberingService.cs
   tests_added: manual
@@ -85,7 +85,7 @@ defects:
   cluster: Credit notes
   severity: 2
   created: '2023-11-28'
-  fix_commit: 9a89073faabd87af4661a39bf5acfe4bdb31a8a4
+  fix_commit: ca4c0a9271c488a011dadb33c060a10ba162a72b
   files:
   - src/Billing.Web/Services/CreditNoteService.cs
   tests_added: manual
@@ -98,7 +98,7 @@ defects:
   cluster: Final invoice lock
   severity: 1
   created: '2023-12-04'
-  fix_commit: 108b94157fdf0bc0f619a5e9ca76650223b59bda
+  fix_commit: 21950abbca4efe3db4f17464bcd0ea73a13c769f
   files:
   - src/Billing.Web/Services/ProposalService.cs
   tests_added: manual
@@ -111,7 +111,7 @@ defects:
   cluster: VAT
   severity: 2
   created: '2023-12-07'
-  fix_commit: 0e224495feedc39ca3541b2490f5232dab3bb1f9
+  fix_commit: 599f39d2281c63c4844a07dbe717054c46eceec4
   files:
   - src/Billing.Web/Helpers/BillingHelper.cs
   tests_added: manual
@@ -124,7 +124,7 @@ defects:
   cluster: Labels and messages
   severity: 4
   created: '2023-12-12'
-  fix_commit: afb0dd5f481fa3819629afbe8144fe1ef442830c
+  fix_commit: a31e1157c923620f079c2b5c214eaa501c438c36
   files:
   - src/Billing.Web/Services/ProposalService.cs
   tests_added: none
@@ -137,7 +137,7 @@ defects:
   cluster: Adjustments
   severity: 2
   created: '2023-12-19'
-  fix_commit: 9551a65c6995ecc21379fe8ab8b5cbe1f7641597
+  fix_commit: ceebe9176ccc584a732f1752ff3c4ef6aaa1a92e
   files:
   - src/Billing.Web/Services/ProposalService.cs
   tests_added: manual
@@ -150,7 +150,7 @@ defects:
   cluster: Rates
   severity: 2
   created: '2024-01-08'
-  fix_commit: efef03074171d38acb97eba28541f491436dd43c
+  fix_commit: 238296a6575691fbe55e682a534838665560084d
   files:
   - src/Billing.Web/Helpers/BillingHelper.cs
   tests_added: manual
@@ -164,7 +164,7 @@ defects:
   cluster: VAT
   severity: 3
   created: '2024-01-10'
-  fix_commit: dc5e900b1504477689ca41880c23eb336912d5de
+  fix_commit: 609daf25539334a9df97efe00182e454c3da5260
   files:
   - src/Billing.Web/Helpers/BillingHelper.cs
   tests_added: manual
@@ -177,7 +177,7 @@ defects:
   cluster: Billable time
   severity: 2
   created: '2024-01-16'
-  fix_commit: 4b0aefe096f0254ff9c0cbcae1705ce5288b4ca6
+  fix_commit: 7a68d1572ee468ae40eb89efc5f4998685cb69ee
   files:
   - src/Billing.Web/Services/ProposalService.cs
   tests_added: manual
@@ -191,7 +191,7 @@ defects:
   cluster: Billing holds
   severity: 4
   created: '2024-01-22'
-  fix_commit: e3cf1fd87be1c5ee33bc874b8838405ab501ea2b
+  fix_commit: 9189c0219fbf53a63aec790a86e1e59135d0b20d
   files:
   - src/Billing.Web/Services/ProposalService.cs
   tests_added: none
@@ -204,7 +204,7 @@ defects:
   cluster: Purchase orders
   severity: 3
   created: '2024-01-24'
-  fix_commit: 0ce02a20bce2e7f377d0c84f2bc2dedf38dd90ca
+  fix_commit: c7860a5e46433304bb26179567a5d3e023e71422
   files:
   - src/Billing.Web/Helpers/BillingHelper.cs
   tests_added: manual
@@ -217,7 +217,7 @@ defects:
   cluster: Milestones
   severity: 2
   created: '2024-01-30'
-  fix_commit: d169dfdbd6aca00b2e323e2ba973db504dc8a18a
+  fix_commit: ff562f4785ecd7d9187a20a13ae84d74e9293e71
   files:
   - src/Billing.Web/Services/InvoiceService.cs
   - src/Billing.Web/Services/ProposalService.cs
@@ -232,7 +232,7 @@ defects:
   cluster: Page layout
   severity: 3
   created: '2024-02-01'
-  fix_commit: 70c080be5255982992b0990c74f9f02403c7a9f9
+  fix_commit: b77706001bd839a090dc621142a305257e1ad277
   files:
   - src/Billing.Web/Pages/Shared/_Layout.cshtml
   tests_added: manual
@@ -245,7 +245,7 @@ defects:
   cluster: Numbering
   severity: 1
   created: '2024-02-06'
-  fix_commit: 5dc674823760d18566712f32fb280834ba39a421
+  fix_commit: ccde2ebc6d459de9cfec582fa1694fdd5ec8e224
   files:
   - src/Billing.Web/Services/NumberingService.cs
   tests_added: manual
@@ -258,7 +258,7 @@ defects:
   cluster: Due dates
   severity: 3
   created: '2024-02-08'
-  fix_commit: 54517cfbfeb33deda56942e4fec748259622a8ba
+  fix_commit: 16ad85d30f33cdb3b1f8cff09c7b5171434905f8
   files:
   - src/Billing.Web/Services/InvoiceService.cs
   tests_added: manual
@@ -271,7 +271,7 @@ defects:
   cluster: Credit notes
   severity: 3
   created: '2024-02-13'
-  fix_commit: 251d0a968885924d38906ebadf9f89ff13c6ece3
+  fix_commit: 567d0e51229615c1b9a9523740ef2e395144b753
   files:
   - src/Billing.Web/Services/CreditNoteService.cs
   tests_added: manual
@@ -284,7 +284,7 @@ defects:
   cluster: Proposal dates
   severity: 2
   created: '2024-02-29'
-  fix_commit: d3b2cdad3adf3a84f35ca0ec0238e9f39c8e4aab
+  fix_commit: 2157a202efdf0177ff047b1597cdd4127556b7d0
   files:
   - src/Billing.Web/Helpers/BillingHelper.cs
   tests_added: manual
@@ -297,7 +297,7 @@ defects:
   cluster: Proposal dates
   severity: 3
   created: '2024-03-04'
-  fix_commit: ea0a83ace9f7fbc9c92e9ba5232924f1b002621b
+  fix_commit: d1ee241a12546974906efda4941edc7a02065da4
   files:
   - src/Billing.Web/Pages/Proposals/Create.cshtml.cs
   tests_added: none
@@ -310,7 +310,7 @@ defects:
   cluster: Exchange rates
   severity: 2
   created: '2024-03-07'
-  fix_commit: 20cbca182c24c90943831dc1d9e2af9913e7eb81
+  fix_commit: 2dee7d65327e7b4c0acfbc1b49bfd7e58990495c
   files:
   - src/Billing.Web/Pages/Proposals/Edit.cshtml
   - src/Billing.Web/Services/ProposalService.cs
@@ -324,7 +324,7 @@ defects:
   cluster: Export
   severity: 3
   created: '2024-03-11'
-  fix_commit: 2f677c78f85ccfa01d12bc45150aca8584fee326
+  fix_commit: 2d3399bdfeffad933419aeffa5af6c38a293ad47
   files:
   - src/Billing.Web/Helpers/BillingHelper.cs
   tests_added: none
@@ -337,7 +337,7 @@ defects:
   cluster: Input parsing
   severity: 3
   created: '2024-03-14'
-  fix_commit: ed95289d1ceb54fc6f9bc8e1b665ec0b37f3a550
+  fix_commit: 412466b987f3a16e1893ba0441ec3b2aa12daa12
   files:
   - src/Billing.Web/Helpers/BillingHelper.cs
   tests_added: manual
@@ -350,7 +350,7 @@ defects:
   cluster: Multi-currency rounding
   severity: 2
   created: '2024-03-18'
-  fix_commit: b9484b989c6f5e46e5af113e8d10867c3c0ec3b6
+  fix_commit: 88b7ca779c20997fa35281c3d81cab9efe299f68
   files:
   - src/Billing.Web/Helpers/RoundingHelper.cs
   tests_added: manual
@@ -364,7 +364,7 @@ defects:
   cluster: VAT
   severity: 3
   created: '2024-03-21'
-  fix_commit: 1ef8fd605e9383477de3c228cb1b61f74d204c42
+  fix_commit: 687bc13db3e525f829083835fa2f188c1ad3f775
   files:
   - src/Billing.Web/Services/TaxService.cs
   tests_added: manual
@@ -377,7 +377,7 @@ defects:
   cluster: Exchange rates
   severity: 2
   created: '2024-03-26'
-  fix_commit: 726a34937c3c89ba3ab121dd2b9f00c7e4a0ed55
+  fix_commit: 2be5d85c51fe9ba8b161ad8f785a1ef762ac4b27
   files:
   - src/Billing.Web/Services/ExchangeRateService.cs
   tests_added: manual
@@ -391,7 +391,7 @@ defects:
   cluster: Quarter hours
   severity: 3
   created: '2024-03-28'
-  fix_commit: a18ec42718a0689233933b2e7a3ebe6ff4707e0f
+  fix_commit: a4da53d0a8203eaf75a30f7832ae168a6004f884
   files:
   - src/Billing.Web/Services/ProposalService.cs
   tests_added: manual
@@ -404,7 +404,7 @@ defects:
   cluster: Credit notes
   severity: 3
   created: '2024-04-03'
-  fix_commit: 30d06c7ab0d45d686ee9072893c11a8da4e77a10
+  fix_commit: 74779a1d30ef1c450baa8cf8f661464f30a441a6
   files:
   - src/Billing.Web/Services/CreditNoteService.cs
   tests_added: manual
@@ -417,7 +417,7 @@ defects:
   cluster: Security
   severity: 2
   created: '2024-04-05'
-  fix_commit: aab2d7b0969f92dcac0c59553dc4c9967186c44e
+  fix_commit: b9da3a348fd0fb4625e4fdabdfddd5b259079a8f
   files:
   - src/Billing.Web/Pages/User/Switch.cshtml.cs
   tests_added: manual
@@ -430,7 +430,7 @@ defects:
   cluster: Billable time
   severity: 2
   created: '2024-04-11'
-  fix_commit: 066ee7858b7368ce2f1ab6f3ac5ba77d39ccb4fd
+  fix_commit: d24674ad4167de495cbba8d20922acdd5a419f58
   files:
   - src/Billing.Web/Services/ProposalService.cs
   tests_added: manual
@@ -443,7 +443,7 @@ defects:
   cluster: Discounts
   severity: 3
   created: '2024-04-16'
-  fix_commit: 1a4d5e71e4ed6672598276a2b2f0439dc68171c0
+  fix_commit: 47d016fe0133a12603ebe07efd738fc95ed41450
   files:
   - src/Billing.Web/Pages/Customers/Edit.cshtml.cs
   tests_added: manual
@@ -456,7 +456,7 @@ defects:
   cluster: Purchase orders
   severity: 3
   created: '2024-04-22'
-  fix_commit: c5c92c3b9e19883f219779fc0598aba3f1cb8d27
+  fix_commit: 2b751226b318d16923663add553966fe141fe063
   files:
   - src/Billing.Web/Services/InvoiceService.cs
   tests_added: manual
@@ -469,7 +469,7 @@ defects:
   cluster: Exchange rates
   severity: 3
   created: '2024-04-25'
-  fix_commit: a0454538b1ec560834579d9d9c97c0574206e694
+  fix_commit: 442b610e43965da2449b920e510ba884d1e1f9f7
   files:
   - src/Billing.Web/Services/ExchangeRateService.cs
   tests_added: manual
@@ -482,7 +482,7 @@ defects:
   cluster: Minimum invoice
   severity: 3
   created: '2024-05-06'
-  fix_commit: c95e284911a108f31fcea5cf3dc2dfd24d0577c4
+  fix_commit: d04f6b49e8ee0351effcc99b621e0d6e02d3026e
   files:
   - src/Billing.Web/Services/ProposalService.cs
   tests_added: manual
@@ -495,7 +495,7 @@ defects:
   cluster: Page layout
   severity: 4
   created: '2024-05-08'
-  fix_commit: 21911aa77a5f2b8c5e17fcca78954a098cba68a7
+  fix_commit: a450c2b5a677a2cdb90e0c17367c9bd6ef2a8ac9
   files:
   - src/Billing.Web/wwwroot/css/site.css
   tests_added: none
@@ -508,7 +508,7 @@ defects:
   cluster: Multi-currency rounding
   severity: 2
   created: '2024-05-13'
-  fix_commit: 0aaa4ddc65bf02943756dfde5b835ab7b2b24c40
+  fix_commit: 097d72678dca9b72b3003cca8d6967c7340e2e0a
   files:
   - src/Billing.Web/Helpers/RoundingHelper.cs
   tests_added: manual
@@ -521,7 +521,7 @@ defects:
   cluster: Billable time
   severity: 2
   created: '2024-05-16'
-  fix_commit: acd2e07ff3f9ee7cfa417f01c7b6879630060347
+  fix_commit: 3cec9339fdb3f1d938e071b0c32bec8f0806c971
   files:
   - src/Billing.Web/Services/ProposalService.cs
   tests_added: manual
@@ -534,7 +534,7 @@ defects:
   cluster: Due dates
   severity: 3
   created: '2024-05-21'
-  fix_commit: d858ba5445ed74a0d387356ec8666497769c5a98
+  fix_commit: 95b17f845e32f0362803bdd3f9194c1294e1c62f
   files:
   - src/Billing.Web/Helpers/BillingHelper.cs
   tests_added: manual
@@ -547,7 +547,7 @@ defects:
   cluster: Minimum invoice
   severity: 3
   created: '2024-05-27'
-  fix_commit: 372cbce6a112cbb35a35929be6ced042a58292f1
+  fix_commit: 3822d7741230bd07837a9fb14762f987f328e90d
   files:
   - src/Billing.Web/Services/InvoiceService.cs
   tests_added: none
@@ -560,7 +560,7 @@ defects:
   cluster: Milestones
   severity: 2
   created: '2024-05-29'
-  fix_commit: 67446d6a230891aaafea859b06bf36b55dde5790
+  fix_commit: f9b3294260f22e8fced984a985747ff0a47ef4f0
   files:
   - src/Billing.Web/Pages/Projects/Details.cshtml.cs
   tests_added: manual
@@ -573,7 +573,7 @@ defects:
   cluster: Credit notes
   severity: 2
   created: '2024-06-04'
-  fix_commit: e6bbc07da757ee2a89976f30479a49a0dc15a0e6
+  fix_commit: 146fbef41866c95ae5635d98a834ea5241c96db5
   files:
   - src/Billing.Web/Services/CreditNoteService.cs
   tests_added: manual
@@ -586,7 +586,7 @@ defects:
   cluster: Credit notes
   severity: 2
   created: '2024-06-18'
-  fix_commit: f043c04b5d4418d357500af960d69d812a414b83
+  fix_commit: e1894706f640731146da75397d713622fd09869e
   files:
   - src/Billing.Web/Services/InvoiceService.cs
   - tests/e2e/specs/invoicing/credit-notes.spec.ts
@@ -600,7 +600,7 @@ defects:
   cluster: Milestones
   severity: 2
   created: '2024-06-20'
-  fix_commit: b9731271e512744a7c7266d6806d149ea227819b
+  fix_commit: 2beb6595dc09d282d46250b3c20c89f5e6bd9d31
   files:
   - src/Billing.Web/Services/ProposalService.cs
   tests_added: manual
@@ -614,7 +614,7 @@ defects:
   cluster: Final invoice lock
   severity: 3
   created: '2024-06-25'
-  fix_commit: 025a26feedef7119dab0a8d0d97819867b8905b5
+  fix_commit: a94959680853905a999ccefa989b7c03f2279173
   files:
   - src/Billing.Web/Pages/Proposals/Edit.cshtml
   - tests/e2e/specs/invoicing/locked.spec.ts
@@ -628,7 +628,7 @@ defects:
   cluster: Discounts
   severity: 2
   created: '2024-06-27'
-  fix_commit: dda69a140bb7e1b424c331ffa6d5a5874e8a4c65
+  fix_commit: cf66ce785d70f8c7b373b5b2b6cd6bd2fdb1d3cd
   files:
   - src/Billing.Web/Helpers/BillingHelper.cs
   - tests/e2e/specs/pricing/discount.spec.ts
@@ -643,7 +643,7 @@ defects:
   cluster: Numbering
   severity: 2
   created: '2024-07-02'
-  fix_commit: ad25ff5c4ef974b510a6a6571cf03e9907715bd0
+  fix_commit: c3367059b207bc29046ed505fb1b55c0aa235abe
   files:
   - src/Billing.Web/Services/CreditNoteService.cs
   - tests/e2e/specs/invoicing/numbering.spec.ts
@@ -658,7 +658,7 @@ defects:
   cluster: VAT
   severity: 2
   created: '2024-07-04'
-  fix_commit: c4221e209a13893e7bd3686c300f04a83e870cd6
+  fix_commit: 89c85c89e279c297097a1e99f5d26d5f72ee6c6b
   files:
   - src/Billing.Web/Helpers/BillingHelper.cs
   - tests/e2e/specs/pricing/tax.spec.ts
@@ -673,7 +673,7 @@ defects:
   cluster: Page layout
   severity: 4
   created: '2024-07-09'
-  fix_commit: 242c416fda3f6aa268509581508e8efb54a26b93
+  fix_commit: d4f2cc9fe2e6c1024ff00a0695f17ca4043d4f5b
   files:
   - src/Billing.Web/Pages/Proposals/Edit.cshtml
   tests_added: none
@@ -686,7 +686,7 @@ defects:
   cluster: Numbering
   severity: 2
   created: '2024-07-11'
-  fix_commit: f5071f10c09866f5c88e5540283e2de0b9130a48
+  fix_commit: 7cb1639cb3fa796526c8b8326aa8968da0ebe3c2
   files:
   - src/Billing.Web/Pages/Proposals/Edit.cshtml
   - src/Billing.Web/Services/InvoiceService.cs
@@ -703,7 +703,7 @@ defects:
   cluster: Billing holds
   severity: 2
   created: '2024-07-16'
-  fix_commit: c4819bfa794c1f33edcb24a0a0ea84b84f886204
+  fix_commit: 63ce4ee3cdcef13683b8a3d062d4cb1932956c5d
   files:
   - src/Billing.Web/Services/ProposalService.cs
   - tests/e2e/specs/proposals/holds.spec.ts
@@ -717,7 +717,7 @@ defects:
   cluster: Adjustments
   severity: 3
   created: '2024-07-18'
-  fix_commit: 065060e0ed92b6a814a1fa43af865bd958e9d48d
+  fix_commit: f2ade823275bc42f84c13110db784fbba7ca4536
   files:
   - src/Billing.Web/Services/AdjustmentService.cs
   tests_added: manual
@@ -730,7 +730,7 @@ defects:
   cluster: Multi-currency rounding
   severity: 2
   created: '2024-07-22'
-  fix_commit: fc1aa16053117e729a798778c2e4567a8a505774
+  fix_commit: c266fcb2a2fe53539592a7f09c63f716946b01ce
   files:
   - src/Billing.Web/Helpers/RoundingHelper.cs
   tests_added: manual
@@ -743,7 +743,7 @@ defects:
   cluster: VAT
   severity: 3
   created: '2024-07-30'
-  fix_commit: 8a3efd93aed25ab1754edb958e4da85302fbcbfe
+  fix_commit: 7bee2aa0c070488a89ab9984fc4789c3e8c552bd
   files:
   - src/Billing.Web/Services/ProposalService.cs
   - tests/e2e/specs/pricing/tax.spec.ts
@@ -757,7 +757,7 @@ defects:
   cluster: Credit notes
   severity: 1
   created: '2024-08-06'
-  fix_commit: 5d38494db0f38beea5601823a061625c0b2d133e
+  fix_commit: 44aa5394d69f00ffbe32daa730b34f2e50166c8b
   files:
   - src/Billing.Web/Services/CreditNoteService.cs
   - tests/e2e/pages/CreditNotePage.ts
@@ -773,7 +773,7 @@ defects:
   cluster: Not-to-exceed
   severity: 2
   created: '2024-08-08'
-  fix_commit: b5b267a320975ee4e89f57e3fa91e94c9f61da5b
+  fix_commit: abb110e90d527180811f282d216da45d6e298fce
   files:
   - src/Billing.Web/Services/ProposalService.cs
   tests_added: manual
@@ -786,7 +786,7 @@ defects:
   cluster: Not-to-exceed
   severity: 3
   created: '2024-08-14'
-  fix_commit: 5c66fb8b0e7fae42b362709d2b5f786749ece364
+  fix_commit: 54696bb45c03344bc6fd6748a5deeaba81b0f33a
   files:
   - src/Billing.Web/Pages/Proposals/Edit.cshtml
   - src/Billing.Web/Services/ProposalService.cs
@@ -800,7 +800,7 @@ defects:
   cluster: Final invoice lock
   severity: 3
   created: '2024-08-22'
-  fix_commit: 0572038a024ea760e09904df699f30cb67e74dd7
+  fix_commit: d0862be5c2288ca52366ecf449c6e08a7a71b2f7
   files:
   - src/Billing.Web/Services/InvoiceService.cs
   tests_added: none
@@ -813,7 +813,7 @@ defects:
   cluster: Billable time
   severity: 2
   created: '2024-08-28'
-  fix_commit: 92a2122943fce8e31b9d03ddd0576bffd7f814cb
+  fix_commit: 6814fc88cd2faf85a782d7ce909259c7d40c841e
   files:
   - src/Billing.Web/Services/ProposalService.cs
   - tests/e2e/specs/pricing/proposal-totals.spec.ts
@@ -828,7 +828,7 @@ defects:
   cluster: VAT
   severity: 2
   created: '2024-09-03'
-  fix_commit: 5e392d3168a71f656e86af6cb5b35f66618cb708
+  fix_commit: 725bad73ee1291e50f0ba78a468c7578a2511007
   files:
   - src/Billing.Web/Pages/CreditNotes/Create.cshtml
   - src/Billing.Web/Pages/Invoices/Details.cshtml
@@ -843,7 +843,7 @@ defects:
   cluster: Credit notes
   severity: 2
   created: '2024-09-05'
-  fix_commit: 9470f51eaedf6ab707b007b0a3d3da394582de28
+  fix_commit: 7811ff9e771d3a6c0d9d1658edbe8bfac896edeb
   files:
   - src/Billing.Web/Services/CreditNoteService.cs
   tests_added: manual
@@ -857,7 +857,7 @@ defects:
   cluster: Rates
   severity: 2
   created: '2024-09-11'
-  fix_commit: 662b4c9ff7d6d10ad5e6394ffa17a41d117fc787
+  fix_commit: 10e9fc8050b210171e48d24471a17aeb9ef3ed03
   files:
   - src/Billing.Web/Helpers/BillingHelper.cs
   - tests/e2e/specs/pricing/rates.spec.ts
@@ -871,7 +871,7 @@ defects:
   cluster: Credit notes
   severity: 3
   created: '2024-09-17'
-  fix_commit: ec9e7528bf6a21d79f40a221727c70b5d545eeee
+  fix_commit: 58d2018c069ce8a7ae0e6b2c3b21bcc12c941e86
   files:
   - src/Billing.Web/Pages/Invoices/Details.cshtml
   - src/Billing.Web/Pages/Invoices/Details.cshtml.cs
@@ -886,7 +886,7 @@ defects:
   cluster: Exchange rates
   severity: 2
   created: '2024-09-19'
-  fix_commit: eae1d6ecea9a0304ac0095e6fa9b899bc6cdf1b0
+  fix_commit: 93982d7e3ff486c5f45b94a31745c1e5bdefd44b
   files:
   - src/Billing.Web/Services/InvoiceService.cs
   tests_added: manual
@@ -900,7 +900,7 @@ defects:
   cluster: Not-to-exceed
   severity: 2
   created: '2024-09-25'
-  fix_commit: e96cf776e2bd69c78ad6c15a09736f2814676780
+  fix_commit: e42b8c994c26e2adae2e2314103fc97a419d369f
   files:
   - src/Billing.Web/Services/ProposalService.cs
   tests_added: manual
@@ -913,7 +913,7 @@ defects:
   cluster: Labels and messages
   severity: 4
   created: '2024-10-01'
-  fix_commit: aec26ff2f3432602feb358341bca56079e808db8
+  fix_commit: 06f075185655a99529b15602430dd5073acd230c
   files:
   - src/Billing.Web/Pages/Proposals/Edit.cshtml
   - tests/e2e/specs/pricing/proposal-totals.spec.ts
@@ -927,7 +927,7 @@ defects:
   cluster: Exchange rates
   severity: 1
   created: '2024-10-03'
-  fix_commit: 506eeb131ce9d357b0515f01479adc24304d7006
+  fix_commit: 8afe511356a23a028f95e208e2da8e232be6c6d3
   files:
   - src/Billing.Web/Services/InvoiceService.cs
   tests_added: manual
@@ -940,7 +940,7 @@ defects:
   cluster: Final invoice lock
   severity: 3
   created: '2024-10-09'
-  fix_commit: 2ab153d78f3faf424cd7e548d8da1d25f69c1062
+  fix_commit: de072f625d9215eaaf6d958df6ab2ed54b37d4ba
   files:
   - src/Billing.Web/Pages/Proposals/Edit.cshtml
   - tests/e2e/specs/invoicing/locked.spec.ts
@@ -954,7 +954,7 @@ defects:
   cluster: Not-to-exceed
   severity: 2
   created: '2024-10-14'
-  fix_commit: 604ce628e829317de34cf5537ba5424770986ecf
+  fix_commit: 695d8faeb6aa0fe20b3fa30a877b09a98f0f7867
   files:
   - src/Billing.Web/Services/ProposalService.cs
   tests_added: manual
@@ -968,7 +968,7 @@ defects:
   cluster: Credit notes
   severity: 3
   created: '2024-10-29'
-  fix_commit: 89eff76a1cb10f1e1d8c508314179869521a48a7
+  fix_commit: 2ee9d19d0805fba0c32a47fcbc82d715ba318c1b
   files:
   - src/Billing.Web/Services/CreditNoteService.cs
   tests_added: manual
@@ -981,7 +981,7 @@ defects:
   cluster: Multi-currency rounding
   severity: 2
   created: '2024-11-04'
-  fix_commit: 683128a9d7074a6295dcb9273de3cd3203ad924e
+  fix_commit: d894cee63d086f42393cd826a7bb16827799b2a0
   files:
   - src/Billing.Web/Helpers/RoundingHelper.cs
   tests_added: manual
@@ -995,7 +995,7 @@ defects:
   cluster: Quarter hours
   severity: 3
   created: '2024-11-12'
-  fix_commit: 838cdc8ca744ccef94b219a95097961a2836bfb2
+  fix_commit: ecbd3e075aef577fd3727a35cfc04fd4d0afdc80
   files:
   - src/Billing.Web/Services/ProposalService.cs
   tests_added: manual
@@ -1008,7 +1008,7 @@ defects:
   cluster: Credit notes
   severity: 2
   created: '2024-11-19'
-  fix_commit: 51ddf86e4af69ed94b00d2ddd68fe5f121edd258
+  fix_commit: e297f29965542c31fa836ba825c3080a2aee1271
   files:
   - src/Billing.Web/Services/CreditNoteService.cs
   tests_added: manual
@@ -1021,7 +1021,7 @@ defects:
   cluster: Milestones
   severity: 2
   created: '2024-12-05'
-  fix_commit: ef1f2b5dfb382c956845687d76938e85f5114aee
+  fix_commit: 029716988f71bad758c9300b844c4ad126dd159d
   files:
   - src/Billing.Web/Services/ProposalService.cs
   tests_added: manual
@@ -1034,7 +1034,7 @@ defects:
   cluster: Exchange rates
   severity: 3
   created: '2024-12-11'
-  fix_commit: 563e5faa878f078ba409e12d5d205b790d4d8c86
+  fix_commit: 00205464b806538c3f8c2272dade68d5db8e49f0
   files:
   - src/Billing.Web/Pages/Admin/ExchangeRates.cshtml.cs
   tests_added: none
@@ -1047,7 +1047,7 @@ defects:
   cluster: Adjustments
   severity: 3
   created: '2025-01-08'
-  fix_commit: aad0e246b6c2fb0f21835b4a5d78d6ecf5857944
+  fix_commit: 05d7be8af9986842000ad41d97087bba65a00efe
   files:
   - src/Billing.Web/Services/AdjustmentService.cs
   tests_added: manual
@@ -1061,7 +1061,7 @@ defects:
   cluster: Percent complete
   severity: 3
   created: '2025-01-10'
-  fix_commit: a7819e54955e446ca500e91912e6a2ad1fdd9781
+  fix_commit: e1d4b4c17dc669922f2e65efa5257517d44d20ee
   files:
   - src/Billing.Web/Helpers/BillingHelper.cs
   tests_added: manual
@@ -1074,7 +1074,7 @@ defects:
   cluster: Purchase orders
   severity: 4
   created: '2025-01-22'
-  fix_commit: 24cc4fd64a1de1518f6d58b739655f7638eb966a
+  fix_commit: 3c734908972f18f46a300153af156e08d354cbfd
   files:
   - src/Billing.Web/Helpers/BillingHelper.cs
   tests_added: none
@@ -1087,7 +1087,7 @@ defects:
   cluster: Adjustments
   severity: 3
   created: '2025-01-24'
-  fix_commit: c4cc80bec66a2434d9a08dd5ca612e6cffa3e5f5
+  fix_commit: aa629aad372ae30b934bdb9ee9aadaa2f15ea714
   files:
   - src/Billing.Web/Services/ProposalService.cs
   tests_added: manual
@@ -1100,7 +1100,7 @@ defects:
   cluster: Exchange rates
   severity: 2
   created: '2025-02-04'
-  fix_commit: 3acdd36fca4b5a95f4b406c6bf28f22d28986498
+  fix_commit: 2c93b7b9b10fb132a93ea636e23d3805931328b4
   files:
   - src/Billing.Web/Services/InvoiceService.cs
   tests_added: manual
@@ -1113,7 +1113,7 @@ defects:
   cluster: Final invoice lock
   severity: 3
   created: '2025-02-12'
-  fix_commit: 635a95cdc9e39f66aa25f371d5c6f688518690cd
+  fix_commit: 1fbbf0e8f6fa82664325bea1b7c0a748757bfcb6
   files:
   - src/Billing.Web/Services/ProposalService.cs
   tests_added: manual
@@ -1126,7 +1126,7 @@ defects:
   cluster: Credit notes
   severity: 3
   created: '2025-03-06'
-  fix_commit: bba8743a8a3a36051288ed2b3ac63be7e7c05198
+  fix_commit: b47f4b6fbd85070bff0f54049d5069ffaaa8e1fc
   files:
   - src/Billing.Web/Services/CreditNoteService.cs
   tests_added: manual
@@ -1139,7 +1139,7 @@ defects:
   cluster: Project screens
   severity: 4
   created: '2025-03-12'
-  fix_commit: 9db06e331c79ec3312b35979a397c0169e9ea885
+  fix_commit: a60549c8e3111a4d76fa539998f69e34201bbaa1
   files:
   - src/Billing.Web/Pages/Projects/Index.cshtml.cs
   tests_added: none
@@ -1152,7 +1152,7 @@ defects:
   cluster: VAT
   severity: 3
   created: '2025-03-20'
-  fix_commit: d6a8c570bb378c97134746834fdb71d1afe96caa
+  fix_commit: 70b09194eb6f5085e78b83815cd7483ca252ecf8
   files:
   - src/Billing.Web/Services/TaxService.cs
   tests_added: manual
@@ -1165,7 +1165,7 @@ defects:
   cluster: Write-down approval
   severity: 2
   created: '2025-04-03'
-  fix_commit: 2539115a30bcc58c4eb006d0004c7a0781fc29a2
+  fix_commit: 0f90e47177104cb39bd884c0e39c95fca0dc5f0c
   files:
   - src/Billing.Web/Services/AdjustmentService.cs
   - src/Billing.Web/Services/InvoiceService.cs
@@ -1179,7 +1179,7 @@ defects:
   cluster: Write-down approval
   severity: 3
   created: '2025-04-15'
-  fix_commit: 30aa966ae4b73fc8ea7b41f34a2bea11efdfe0c4
+  fix_commit: d3bf84b9f353f97f321340b11a77fd78da5b71f0
   files:
   - src/Billing.Web/Services/AdjustmentService.cs
   tests_added: manual
@@ -1192,7 +1192,7 @@ defects:
   cluster: Write-down approval
   severity: 2
   created: '2025-04-17'
-  fix_commit: 64946a1b3fea158ad9d203cb68bb9327b1e7ea83
+  fix_commit: 72c1f5d3209208e2874cb24caba0e516cce454ec
   files:
   - src/Billing.Web/Services/ApprovalService.cs
   tests_added: manual
@@ -1205,7 +1205,7 @@ defects:
   cluster: Write-down approval
   severity: 3
   created: '2025-04-23'
-  fix_commit: 0c56ba49d586257ae389ce08909956759c4a0587
+  fix_commit: 509e5d62a564010451def8066693c083f6a40081
   files:
   - src/Billing.Web/Services/ApprovalService.cs
   tests_added: none
@@ -1218,7 +1218,7 @@ defects:
   cluster: Labels and messages
   severity: 4
   created: '2025-05-02'
-  fix_commit: b2d25e1cfa42b8c7ade1cebb225ac8215384d61b
+  fix_commit: d2c71527ede015f20f6d4e22529a439f0ec29991
   files:
   - src/Billing.Web/Helpers/BillingHelper.cs
   tests_added: none
@@ -1231,7 +1231,7 @@ defects:
   cluster: Billable time
   severity: 2
   created: '2025-05-08'
-  fix_commit: d7fb3cea3ba330225f9c3be5aa0fb50750d37a2c
+  fix_commit: b8e6e56eedf7202588ec93849b58e169a2197fdf
   files:
   - src/Billing.Web/Services/ProposalService.cs
   tests_added: manual
@@ -1244,7 +1244,7 @@ defects:
   cluster: Write-down approval
   severity: 4
   created: '2025-05-14'
-  fix_commit: 9e04afd0a61128040a70deca610d240049ca799a
+  fix_commit: f485c81bc7a3203f29676c02779e9297095c0dce
   files:
   - src/Billing.Web/Pages/Proposals/Edit.cshtml.cs
   tests_added: none
@@ -1257,7 +1257,7 @@ defects:
   cluster: Invoice list
   severity: 3
   created: '2025-05-28'
-  fix_commit: 51168a56a36f4666bb4d1da8589502f539c7eaa6
+  fix_commit: b476d3d5d8479a14e90d6df2909c17833f544065
   files:
   - src/Billing.Web/Services/InvoiceService.cs
   tests_added: none
@@ -1270,7 +1270,7 @@ defects:
   cluster: VAT
   severity: 3
   created: '2025-06-05'
-  fix_commit: 0b7fdf7379258c0f4ed35e36a04591a352b873bd
+  fix_commit: b0649adff0ae85b4d2e37e6d72ae3bc367ac9081
   files:
   - src/Billing.Web/Helpers/BillingHelper.cs
   tests_added: manual
@@ -1283,7 +1283,7 @@ defects:
   cluster: Credit notes
   severity: 4
   created: '2025-06-10'
-  fix_commit: bd2f384c5bd75cbaa6b0a800ec46694754c3b6c1
+  fix_commit: 034efcecfcc2a540ba4667d330808707e5c2a54d
   files:
   - src/Billing.Web/Services/CreditNoteService.cs
   tests_added: none
@@ -1296,7 +1296,7 @@ defects:
   cluster: Write-down approval
   severity: 3
   created: '2025-06-12'
-  fix_commit: 5c7d6504204202abd581a7470104dfabb8eb75a7
+  fix_commit: bee1e73939ae37fa35c7913789e1dc9fed6a89a5
   files:
   - src/Billing.Web/Services/ApprovalService.cs
   tests_added: manual
@@ -1309,7 +1309,7 @@ defects:
   cluster: Multi-currency rounding
   severity: 2
   created: '2025-06-16'
-  fix_commit: 5d298b03ed562e37674ffd3ab7296805af6f7edd
+  fix_commit: dae9879201788414a2e371a23643bd60a389dd13
   files:
   - src/Billing.Web/Helpers/RoundingHelper.cs
   tests_added: none
@@ -1323,7 +1323,7 @@ defects:
   cluster: Write-down approval
   severity: 2
   created: '2025-06-26'
-  fix_commit: 05f6c4fafc4272ab9171cf3e50dd369f12ccd980
+  fix_commit: c0a2fff6d5bc2b71b1a348d73975b26adbbac021
   files:
   - src/Billing.Web/Services/AdjustmentService.cs
   tests_added: manual
@@ -1336,7 +1336,7 @@ defects:
   cluster: Adjustments
   severity: 3
   created: '2025-07-03'
-  fix_commit: 2d91de476e2464aea05218c4d3b2f709fa77b6c9
+  fix_commit: 268027252b1491b07007f4aa91d7db8f36106513
   files:
   - src/Billing.Web/Pages/Proposals/Edit.cshtml
   - tests/e2e/specs/proposals/write-up.spec.ts
@@ -1350,7 +1350,7 @@ defects:
   cluster: Percent complete
   severity: 3
   created: '2025-07-15'
-  fix_commit: cbb80d7295dba95c571af30a3e5193699c031476
+  fix_commit: f858557f75ff4b11c75968db72aefe406ae0a04d
   files:
   - src/Billing.Web/Services/PercentCompleteBilling.cs
   tests_added: manual
@@ -1363,7 +1363,7 @@ defects:
   cluster: Invoice list
   severity: 3
   created: '2025-08-05'
-  fix_commit: 38fd610efd349a9eef1490339879aaee09871b8d
+  fix_commit: 632929de487970f32d9e5d24dfb9ae4bdc479332
   files:
   - src/Billing.Web/Pages/Invoices/Index.cshtml
   tests_added: manual
@@ -1376,7 +1376,7 @@ defects:
   cluster: Exchange rates
   severity: 3
   created: '2025-08-12'
-  fix_commit: 525c876e33e2fd1fafde13e3c1f11117c7f16669
+  fix_commit: 1e00dbc8baaffd5ad59d8002102102b143e861be
   files:
   - src/Billing.Web/Pages/Admin/ExchangeRates.cshtml.cs
   tests_added: none
@@ -1389,7 +1389,7 @@ defects:
   cluster: Credit notes
   severity: 4
   created: '2025-08-20'
-  fix_commit: bd9d6feb22dd8aa46b476db3035033434cd43e91
+  fix_commit: a70406cce838bd007999e9ec5058cebce8faaad0
   files:
   - src/Billing.Web/Pages/CreditNotes/Create.cshtml
   tests_added: none
@@ -1402,7 +1402,7 @@ defects:
   cluster: Page layout
   severity: 4
   created: '2025-09-02'
-  fix_commit: dbbabe8a351124a9e3e6876f0956f1b6f23958e8
+  fix_commit: f4abc61feea602f89755ad258c082b8facc63526
   files:
   - src/Billing.Web/wwwroot/css/site.css
   tests_added: none
@@ -1415,7 +1415,7 @@ defects:
   cluster: Multi-currency rounding
   severity: 2
   created: '2025-09-08'
-  fix_commit: f97063ac88d01b74e3195cf70fe12543ff2a8e55
+  fix_commit: a7dc17fe370f83d07f95dc262a4437a4a1150a7d
   files:
   - src/Billing.Web/Helpers/RoundingHelper.cs
   tests_added: none
@@ -1429,7 +1429,7 @@ defects:
   cluster: VAT
   severity: 3
   created: '2025-09-23'
-  fix_commit: b545a9ea9487346c809b6451543d44ef5fdd4aaf
+  fix_commit: f501d8963081cdb558f110e9ff8c286876e10cea
   files:
   - src/Billing.Web/Services/TaxService.cs
   tests_added: none
@@ -1442,7 +1442,7 @@ defects:
   cluster: Proposal screens
   severity: 4
   created: '2025-10-14'
-  fix_commit: 0b1fa2672d9bc933adb5f90e8c42f3f31f77e173
+  fix_commit: e149cdf0ac63362c075ff6315f22ce327a870407
   files:
   - src/Billing.Web/Pages/Proposals/Create.cshtml.cs
   tests_added: none
@@ -1455,7 +1455,7 @@ defects:
   cluster: Expenses
   severity: 4
   created: '2025-11-04'
-  fix_commit: d4f848f9afc9b5bf718cd505e28476d59e701cba
+  fix_commit: ae998a891bb74a4d6bfe3ab5319322b0fe630d3c
   files:
   - src/Billing.Web/Services/ProposalService.cs
   tests_added: none
@@ -1468,7 +1468,7 @@ defects:
   cluster: Percent complete
   severity: 4
   created: '2025-11-25'
-  fix_commit: 98ffabde0f4867ebaf05356a916b13cb1c21b779
+  fix_commit: 62bd1e9a6623b1421cbf0d26dbf09210a83591f8
   files:
   - src/Billing.Web/Services/PercentCompleteBilling.cs
   tests_added: none
@@ -1481,7 +1481,7 @@ defects:
   cluster: Credit notes
   severity: 4
   created: '2025-12-09'
-  fix_commit: d21315aae0b29e91ab1b91b5b4fb21645908cd83
+  fix_commit: ca961151ee35c0bec4640ffe8fb31d6538f5cceb
   files:
   - src/Billing.Web/Pages/CreditNotes/Create.cshtml.cs
   tests_added: none
@@ -1494,7 +1494,7 @@ defects:
   cluster: Home page
   severity: 4
   created: '2026-01-13'
-  fix_commit: 6d452e3cc87ab77759ca8b3bc44f63e8f619ffa6
+  fix_commit: 4ecdfbcf2c2601ccc0bc9bfc5c0ba217c168bd93
   files:
   - src/Billing.Web/Pages/Index.cshtml.cs
   tests_added: none
@@ -1507,7 +1507,7 @@ defects:
   cluster: Multi-currency rounding
   severity: 3
   created: '2026-02-09'
-  fix_commit: 5059e04bbf1ef7ad847b405c130b0f73d2dfa347
+  fix_commit: 521783a7f0d88960d318d6f0ae0c758b3220a203
   files:
   - src/Billing.Web/Helpers/RoundingHelper.cs
   tests_added: manual
@@ -1520,7 +1520,7 @@ defects:
   cluster: Page layout
   severity: 4
   created: '2026-03-03'
-  fix_commit: 95dba7cd8f34dba3d851bb5df645ae9a81d84dc5
+  fix_commit: 792404408af84faaaab070860dadb318e0fea3e7
   files:
   - src/Billing.Web/wwwroot/css/site.css
   tests_added: none
@@ -1533,7 +1533,7 @@ defects:
   cluster: Percent complete
   severity: 3
   created: '2026-04-07'
-  fix_commit: 8caf0bf27f2592a024b0a4a200e239960b01a2a3
+  fix_commit: b61fb937b1e959798110c7827a726e9ec42600f3
   files:
   - src/Billing.Web/Helpers/BillingHelper.cs
   tests_added: manual
@@ -1546,7 +1546,7 @@ defects:
   cluster: Exchange rates
   severity: 4
   created: '2026-05-12'
-  fix_commit: 43a9a78130a2ece3cd7c3e012a0ac6dd8bdf3762
+  fix_commit: 038503bbe3092fc6ac1a277dd77fd58bc0846fb0
   files:
   - src/Billing.Web/Pages/Admin/ExchangeRates.cshtml.cs
   tests_added: none
@@ -1559,7 +1559,7 @@ defects:
   cluster: Home page
   severity: 4
   created: '2026-06-09'
-  fix_commit: 6467904c0a85342579689e14454012842a809856
+  fix_commit: 6f217775fa904ba921a59a4a82939735b6fa1d99
   files:
   - src/Billing.Web/Pages/Index.cshtml.cs
   tests_added: none
@@ -1572,7 +1572,7 @@ defects:
   cluster: Adjustments
   severity: 4
   created: '2026-07-21'
-  fix_commit: 17384cb8cedb8c47b6595fd7127b940d7ba9efb5
+  fix_commit: 79624571fb9fd6eb545d8126da88f56600454020
   files:
   - src/Billing.Web/Services/AdjustmentService.cs
   tests_added: none
@@ -1585,7 +1585,7 @@ defects:
   cluster: Exchange rates
   severity: 4
   created: '2026-08-25'
-  fix_commit: 80bea528170c1e6ed069900377e75b91252f2055
+  fix_commit: 860dca688b8ea33059b6413ef7be49fa23c307ec
   files:
   - src/Billing.Web/Pages/Admin/ExchangeRates.cshtml.cs
   tests_added: none
@@ -1598,7 +1598,7 @@ defects:
   cluster: Billing holds
   severity: 3
   created: '2026-09-15'
-  fix_commit: 867bf52b751886d46b7f0646f06470d6a16420c8
+  fix_commit: eeaa331c717bbba3ca9b0af32be7d60ec822cb7a
   files:
   - src/Billing.Web/Pages/Customers/Edit.cshtml.cs
   tests_added: manual

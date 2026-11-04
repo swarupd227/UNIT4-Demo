@@ -34,7 +34,7 @@ function Files({ files }: { files: FileChange[] }) {
           </button>
         ))}
       </div>
-      <pre className="scroll-quiet max-h-[320px] overflow-auto rounded-lg bg-spine p-4 font-mono text-[13px] leading-5 text-on-spine">
+      <pre tabIndex={0} aria-label={`Contents of ${file.path}`} className="scroll-quiet max-h-[320px] overflow-auto rounded-lg bg-spine p-4 font-mono text-[13px] leading-5 text-on-spine">
         {file.content}
       </pre>
     </div>
@@ -82,7 +82,7 @@ function FlakySection() {
               <div className="text-[13px] font-semibold text-ink-3">
                 {test.file} · {CAUSE[diagnosis.cause] ?? diagnosis.cause}
               </div>
-              <h3 className="text-[19px] font-semibold">{test.title.replace(" @critical", "")}</h3>
+              <h2 className="text-[19px] font-semibold">{test.title.replace(" @critical", "")}</h2>
             </div>
             <AiBadge source={agent.source} />
           </div>
